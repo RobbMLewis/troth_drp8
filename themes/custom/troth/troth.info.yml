@@ -1,0 +1,28 @@
+name: Troth Theme
+type: theme
+description: 'Troth Theme'
+package: Custom
+core: 8.x
+engine: twig
+base theme: classy
+
+libraries:
+  - troth/global-styling
+  
+regions:
+   header_left: 'Header Left'
+   header_right: 'Header Right'
+   navigation: 'Navigation'
+   slideshow: 'Slideshow'
+   highlighted: 'Highlighted'
+   help: 'Help'
+   breadcrumb: 'Breadcrumb'
+   title: 'Title'
+   tabs: 'Tabs'
+   content: 'Content'
+   sidebar_first: 'First sidebar'
+   footer_left: 'Footer Left'
+   footer_right: 'Footer Right'
+   copyright: 'Copyright'
+   page_top: 'Page top'
+   page_bottom: 'Page bottom'

@@ -1,0 +1,9 @@
+features:
+   comment_user_picture: false
+   comment_user_verification: false
+   favicon: true
+   logo: true
+   name: false
+   node_user_picture: false
+   slogan: true
+

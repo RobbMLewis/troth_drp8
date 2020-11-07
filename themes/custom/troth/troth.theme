@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * Functions to support theming in the Troth theme.
+ */
+
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_preprocess_HOOK() for menu.html.twig.
+ */
+function troth_preprocess_menu(&$variables) {
+  $variables['attributes']['class'][] = 'clearfix';
+}
+
+/**
+ * Implements hook_preprocess_field().
+ */
+function troth_preprocess_field(&$variables, $hook) {
+  if ($variables['field_name'] === 'field_officers_present') {
+    $officers = $variables['element']['#object']->field_officers_present->getValue();
+    $variables['officer_name'] = [];
+    foreach ($officers as $officer) {
+      $officer = User::load($officer['target_id']);
+      $name = $officer->field_first_name->value . " " . $officer->field_last_name->value;
+      $variables['officer_name'][] = $name;
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function troth_preprocess_block(&$variables) {
+  if ($variables['plugin_id'] == 'commerce_cart') {
+    /* @var CurrentStoreInterface $cs */
+    $cs = \Drupal::service('commerce_store.current_store');
+    /* @var CartProviderInterface $cpi */
+    $cpi = \Drupal::service('commerce_cart.cart_provider');
+    $cart = $cpi->getCart('default', $cs->getStore());
+
+    $nbItemsInCart = $cart ? count($cart->getItems()) : 0;
+    if ($nbItemsInCart == 0) {
+      $variables['attributes']['class'][] = 'visually-hidden';
+    }
+  }
+}

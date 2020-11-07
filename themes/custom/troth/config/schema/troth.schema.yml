@@ -1,0 +1,6 @@
+# Schema for the configuration files of the Troth theme.
+
+troth.settings:
+  type: theme_settings
+  label: 'Troth settings'
+
