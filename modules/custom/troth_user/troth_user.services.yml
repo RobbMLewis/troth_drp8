@@ -1,0 +1,5 @@
+services:
+  troth_user.order_paid_subscriber:
+    class: Drupal\troth_user\EventSubscriber\OrderPaidSubscriber
+    tags:
+      - { name: event_subscriber }

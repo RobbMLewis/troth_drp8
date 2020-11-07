@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_troth_name
+    - profile.type.membership_join
+_core:
+  default_config_hash: byTmIsfmTiEYOtdsov-mkUSsMpHeokq2uZ3fggHEnls
+id: profile.membership_join.field_profile_troth_name
+field_name: field_profile_troth_name
+entity_type: profile
+bundle: membership_join
+label: 'Preferred Name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

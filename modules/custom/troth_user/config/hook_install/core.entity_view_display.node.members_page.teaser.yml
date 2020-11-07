@@ -1,0 +1,37 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.members_page.body
+    - field.field.node.members_page.field_meta_tags
+    - field.field.node.members_page.field_yoast_seo
+    - node.type.members_page
+  module:
+    - text
+    - user
+id: node.members_page.teaser
+targetEntityType: node
+bundle: members_page
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 101
+    settings:
+      trim_length: 200
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  addtoany: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_meta_tags: true
+  field_yoast_seo: true

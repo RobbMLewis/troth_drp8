@@ -1,0 +1,119 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_join
+    - field.field.commerce_product_variation.membership_join.field_allowed_countries
+    - field.field.commerce_product_variation.membership_join.field_description
+    - field.field.commerce_product_variation.membership_join.field_disallowed_countries
+    - field.field.commerce_product_variation.membership_join.field_inmate
+    - field.field.commerce_product_variation.membership_join.field_membership_type
+    - field.field.commerce_product_variation.membership_join.field_paper_idunna
+  module:
+    - address
+    - commerce_price
+    - text
+id: commerce_product_variation.membership_join.default
+targetEntityType: commerce_product_variation
+bundle: membership_join
+mode: default
+content:
+  field_allowed_countries:
+    weight: 9
+    settings: {  }
+    third_party_settings: {  }
+    type: address_country_default
+    region: content
+  field_countries:
+    weight: 7
+    settings: {  }
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+          add: Add
+    type: address_country_default
+    region: content
+  field_description:
+    weight: 5
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_disallowed_countries:
+    weight: 10
+    settings: {  }
+    third_party_settings: {  }
+    type: address_country_default
+    region: content
+  field_inmate:
+    weight: 6
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_membership_type:
+    weight: 8
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_paper_idunna:
+    weight: 7
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_terms_of_service:
+    weight: 10
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete_tags
+    region: content
+  list_price:
+    type: commerce_list_price
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  price:
+    type: commerce_price_default
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  sku:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 4
+    region: content
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  uid: true

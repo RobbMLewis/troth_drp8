@@ -1,0 +1,593 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\troth_google\Entity\TrothGoogleGroup;
+use Drupal\troth_google\Entity\TrothGoogleGroupType;
+use Drupal\user\Entity\User;
+// Use Google_Client;
+// use Google_Service_Directory;.
+use Drupal\Core\Url;
+
+/**
+ * Creates the Google Client.
+ */
+function troth_google_client() {
+  $reddirectUrl = Url::fromRoute('troth_google.admin_settings_form');
+  $reddirectUrl->setOptions(['absolute' => TRUE, 'https' => TRUE]);
+
+  // We need the client_secret.json.  Check if it exists.
+  // if it doesn't exist, create it from the config variable.
+  $client_secret = "private://oauth/client_secret.json";
+  if (!file_exists($client_secret)) {
+    // File does not exist, create it.
+    $client_secret_json = \Drupal::config('troth_google.adminsettings')->get('oauth_client_secret');
+    $dir = "private://oauth/";
+    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    $path = $dir . "client_secret.json";
+    $file = file_save_data($client_secret_json, $path, FILE_EXISTS_REPLACE);
+    if (!is_object($file)) {
+      \Drupal::logger('troth_gogle')->error('Client_secret.json could not be saved to @path', ['@path' => $path]);
+      return;
+    }
+  }
+  $client = new Google_Client();
+  $client->setApplicationName("Google Group");
+  $client->setScopes(['https://apps-apis.google.com/a/feeds/groups/']);
+  $client->setRedirectUri($reddirectUrl->toString());
+  $client->setAccessType('offline');
+  $client_secret_path = \Drupal::service('file_system')->realpath($client_secret);
+  $client->setAuthConfig($client_secret_path);
+
+  // Do we have an access token?
+  if (!$access_token = \Drupal::state()->get('troth_google_access_token')) {
+    \Drupal::logger('troth_gogle')->error('The site needs to be re-authorized: @url', ['@url' => $reddirectUrl->toString()]);
+  }
+  // Authenticate with access token.
+  else {
+    $client->setAccessToken($access_token);
+    if ($client->isAccessTokenExpired()) {
+      // If expired, use refresh token.
+      if ($refresh_token = \Drupal::state()->get('troth_google_refresh_token')) {
+        \Drupal::logger('troth_gogle')->notice('Access token expired, using refresh token.');
+        $client->refreshToken($refresh_token);
+        // Check and see if that worked...
+        if (!$access_token = $client->getAccessToken()) {
+          \Drupal::logger('troth_gogle')->error('Unable to authenticate.');
+        }
+      }
+    }
+  }
+  return $client;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function troth_google_delete_expired_cron($lim = 50) {
+  // Get all bundles, save the list names in an array.
+  $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_google');
+  $types = [];
+  foreach ($bundles as $bundle => $data) {
+    $type = TrothGoogleGroupType::load($bundle);
+    $types[$bundle] = $type->getName();
+  }
+
+  // Get all users that are expired.
+  $grace = \Drupal::config('troth_user.adminsettings')->get('grace_period');
+  $date = new DateTimePlus("-$grace weeks");
+  $query = \Drupal::entityQuery('user')
+    ->condition('field_profile_member_expire_date', $date->format('Y-m-d'), '<');
+  $uids = $query->execute();
+
+  if (count($uids) > 0) {
+    // Get all entites that shouldn't exist.
+    $query = \Drupal::entityQuery('troth_google')
+      ->condition('uid', $uids, 'IN')
+      ->range(0, $lim);
+    $entids = $query->execute();
+
+    // Go through the entities.
+    $users = [];
+    foreach ($entids as $entid) {
+      $entity = TrothGoogleGroup::load($entid);
+      $name = $types[$entity->bundle()];
+      // Get username.
+      $uid = $entity->getOwnerId();
+      if (!$users[$uid]) {
+        $account = User::load($uid);
+        $users[$uid] = $account->getUsername();
+      }
+
+      // Unsubscribe and then delete the entity.
+      $entity->trothGoogleUnsubscribe();
+      $entity->delete();
+      \Drupal::logger('troth_gogle')->notice("@user removed from @list because they are expired", [
+        '@user' => $users[$uid],
+        '@list' => $name,
+      ]);
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function troth_google_add_required_cron($lim = 50) {
+  // Get all bundles that are required into an array.
+  $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_google');
+  $types = [];
+  foreach ($bundles as $bundle => $data) {
+    $type = TrothGoogleGroupType::load($bundle);
+    if ($type->getRequired()) {
+      $types[$bundle] = $type;
+    }
+  }
+
+  // We now go through the types and check to make sure members are subscribed.
+  $grace = \Drupal::config('troth_user.adminsettings')->get('grace_period');
+  $date = new DateTimePlus("-$grace weeks");
+  $status = ['active', 'warning'];
+  foreach ($types as $bundle => $type) {
+    // Get all users that are supposed to be subscribed.
+    $query = \Drupal::entityQuery('user')
+      ->condition('field_profile_member_expire_date', $date->format('Y-m-d'), '>=')
+      ->condition('field_profile_membership_status', $status, 'IN');
+    if ($type->getLimitRole()) {
+      $query->condition('role', $type->getRoles(), 'IN');
+    }
+    $uids = $query->execute();
+
+    // Get all uids from the entity.
+    // We're using the database API for this as we only need uids.
+    $table_mapping = \Drupal::entityTypeManager()->getStorage('troth_google')->getTableMapping();
+    $field_table = $table_mapping->getFieldTableName('uid');
+    $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('troth_google')['uid'];
+    $field_column = $table_mapping->getFieldColumnName($field_storage_definitions, 'target_id');
+    $connection = \Drupal::database();
+    $results = $connection->select($field_table, 'f')
+      ->fields('f', [$field_column])
+      ->distinct(TRUE)
+      ->condition('bundle', $bundle)
+      ->execute()->fetchCol();
+
+    // Delete the uids we don't need to worry about.
+    foreach ($results as $uid) {
+      unset($uids[$uid]);
+    }
+    if (count($uids) > 0) {
+      foreach ($uids as $uid) {
+        // We need to create an entity for the user.
+        $account = User::load($uid);
+        $entity = TrothGoogleGroup::create([
+          'bundle' => $type->id(),
+          'uid' => $account->id(),
+          'email' => $account->getEmail(),
+          'subscribed' => 1,
+        ]);
+        // Subscribe to the list.
+        $entity->trothGoogleSubscribe();
+        // Save.
+        $entity->save();
+        \Drupal::logger('troth_gogle')->notice("@user added from @list because the list is required.", [
+          '@user' => $account->getUsername(),
+          '@list' => $type->getName(),
+        ]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function troth_google_no_user_cron($lim = 50) {
+  // Load list of users previously notified.
+  $previous = "private://oauth/previously_emailed.txt";
+  $previousArr = [];
+  $newArr = [];
+  $token_service = \Drupal::token();
+  $mailManager = \Drupal::service('plugin.manager.mail');
+
+  if (file_exists($previous)) {
+    $previousArr = unserialize(file_get_contents($previous));
+  }
+
+  $client = troth_google_client();
+  $domain = \Drupal::config('troth_google.adminsettings')->get('domain_name');
+
+  // Get all bundles that are required into an array.
+  $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_google');
+  foreach ($bundles as $bundle => $data) {
+    $type = TrothGoogleGroupType::load($bundle);
+    if ($type->getExpired() == 0) {
+      $types[$bundle] = $type;
+      $group_id = $type->getGroupId();
+      $group_email = $group_id . '@' . $domain;
+      $options = [];
+      $group = new Google_Service_Directory($client);
+      $results = $group->members->listMembers($group_email, $options);
+      $memlist = [];
+      while (isset($results->nextPageToken) && ($results->nextPageToken != '')) {
+        foreach ($results->members as $member) {
+          $memlist[] = $member->email;
+        }
+        $options['pageToken'] = $results->nextPageToken;
+        $results = $group->members->listMembers($group_email, $options);
+      }
+
+      foreach ($results->members as $member) {
+        $memlist[] = $member->email;
+      }
+
+      // The access token may have been updated lazily, save it just in case.
+      $token_array = $client->getAccessToken();
+      if ($token_array != '') {
+        \Drupal::state()->set('troth_google_access_token', $token_array['access_token']);
+        \Drupal::state()->set('troth_google_refresh_token', $token_array['refresh_token']);
+      }
+      $examine = [];
+
+      while (count($memlist) > 0) {
+        // Take the first $lim from subscribed.
+        $subbed = array_slice($memlist, 0, $lim, TRUE);
+        // Remove the emails we just took from subscribed.
+        $memlist = array_diff($memlist, $subbed);
+        // Get all entites of this bundle with that email.
+        $query = \Drupal::entityQuery('troth_google')
+          ->condition('bundle', $bundle, '=')
+          ->condition('email', $subbed, 'IN');
+        $entids = $query->execute();
+        // If the 2 arrays are not the same size, go 1 by 1.
+        if (count($entids) != count($subbed)) {
+          foreach ($subbed as $email) {
+            $query = \Drupal::entityQuery('troth_google')
+              ->condition('bundle', $bundle, '=')
+              ->condition('email', $email, '=');
+            $entids = $query->execute();
+            if (count($entids) == 0) {
+              // We found one that is subscribed but not an entity.
+              // Any domain email we ignore.
+              if (!preg_match("/@${domain}\$/i", $email)) {
+                $examine[] = $email;
+              }
+            }
+          }
+        }
+      }
+    }
+    // If we have any emails subscribed but not entites, continue.
+    if (count($examine) > 0) {
+      $date = new DateTimePlus("+28days");
+      $times = 0;
+      foreach ($examine as $email) {
+        // First check if this is a user email, create entity if it is.
+        $query = \Drupal::entityQuery('user');
+        $or = $query->orConditionGroup()
+          ->condition('mail', $email)
+          ->condition('field_profile_alt_email', $email);
+        $query->condition($or);
+        $uids = $query->execute();
+        if (count($uids) > 0) {
+          // We have found the email on a user.  Check if an entity exist.
+          // Email should be unique to user, so we can check first value.
+          $uid = reset($uids);
+          $query = \Drupal::entityQuery('troth_google')
+            ->condition('bundle', $bundle, '=')
+            ->condition('uid', $uid, '=');
+          $entids = $query->execute();
+          if ($entids > 0) {
+            $entid = reset($entids);
+            // Lets update the email address.
+            $entity = entity_load('troth_google', $entid);
+            $entity->trothGoogleUnsubscribe();
+            $entity->setEmail($email);
+            $entity->setSubscribed(1);
+            $entity->trothGoogleSubscribe($email);
+            $entity->save();
+            \Drupal::logger('troth_gogle')->notice('Subscribed Email: @email on $bundle was associated with User:@uid had entity updated.', [
+              '@uid' => $uid,
+              '@email' => $email,
+              '@bundle' => $bundle,
+            ]);
+          }
+          else {
+            // Entity doesn't exist, lets create the entity.
+            $entity = TrothGoogleGroup::create([
+              'bundle' => $bundle,
+              'uid' => $uid,
+              'email' => $email,
+              'subscribed' => 1,
+            ]);
+            // Subscribe to the list.
+            $entity->trothGoogleSubscribe();
+            $entity->save();
+            \Drupal::logger('troth_gogle')->notice('Subscribed Email: @email on $bundle was associated with User:@uid had a new entity created.', [
+              '@uid' => $uid,
+              '@email' => $email,
+              '@bundle' => $bundle,
+            ]);
+          }
+        }
+        else {
+          // This is not a user we have record of.
+          // We check if they are in the previous array.
+          $diff = '';
+          if (isset($previousArr[$bundle][$email])) {
+            $lastdate = new DateTimePlus($previousArr[$bundle][$email]['lastdate']);
+            $times = $previousArr[$bundle][$email]['times'];
+            $diff = $date->diff($lastdate)->days;
+          }
+
+          // We only send an email the first time noticed and 2 weeks later.
+          if ($times == 0 || ($diff >= 14 && $times < 2)) {
+            if ($times == 0) {
+              $expiredate = new DateTimePlus('+4 weeks');
+            }
+            else {
+              $expiredate = new DateTimePlus('+2 weeks');
+            }
+            // We send an email to them.
+            $params['message'] = $token_service->replace($type->getMessage(), [
+              'bundle' => $bundle,
+              'email' => $email,
+              'date' => $expiredate,
+            ]);
+            $params['sub'] = "Your subscription to $group_email";
+            $to = $email;
+            $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+            if ($result['result'] != TRUE) {
+              \Drupal::logger('troth_google')->error('Warning Email did not send to: %to, %message', [
+                '%to' => $to,
+                '%message' => $param['message'],
+              ]);
+            }
+            else {
+              \Drupal::logger('troth_user')->notice('Warning Email sent. %to, %message', [
+                '%to' => $to,
+                '%message' => $param['message'],
+              ]);
+            }
+            // We save to the new array.
+            $newArr[$bundle][$email] = [
+              'lastdate' => $date->format('Y-m-d'),
+              'times' => $times + 1,
+            ];
+          }
+          elseif ($times == 2 && $diff >= 14) {
+            // If we've sent 2 times before and it's been 2 weeks: unsubscribe.
+            $entity = TrothGoogleGroup::create([
+              'bundle' => $bundle,
+              'uid' => 0,
+              'email' => $email,
+              'subscribed' => 1,
+            ]);
+            // Subscribe to the list.
+            $entity->trothGoogleUnsubscribe();
+          }
+          else {
+            // We do nothing, we just add to the newArr to keep the info.
+            $newArr[$bundle][$email] = $previousArr[$bundle][$email];
+          }
+        }
+      }
+    }
+
+  }
+
+  if (!file_exists($previous)) {
+    // File does not exist, create it.
+    $dir = "private://oauth/";
+    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+  }
+  $file = file_save_data(serialize($newArr), $previous, FILE_EXISTS_REPLACE);
+  if (!is_object($file)) {
+    \Drupal::logger('troth_gogle')->error('Notifications to non-user emails could not be saved to @path', ['@path' => $path]);
+    return;
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function troth_google_token_info() {
+  $info = [];
+
+  $info['types'] = [
+    // [troth-google:].
+    'troth-google' => [
+      'name' => t('troth Google'),
+      'description' => t('Tokens related to the troth Google Module'),
+    ],
+  ];
+
+  $info['tokens'] = [
+    'troth-google' => [
+    // [troth-google:list-name].
+      'list-name' => [
+        'name' => t('List Name'),
+        'description' => t('Human Readable Mailing List Name'),
+        'needs-data' => ['bundle'],
+      ],
+      // [troth-google:list-id].
+      'list-id' => [
+        'name' => t('List ID'),
+        'description' => t('Machine Readable Malining List ID (before @ sign)'),
+        'needs-data' => ['bundle'],
+      ],
+      // [troth-google:list-domain].
+      'list-domain' => [
+        'name' => t('List Domain'),
+        'description' => t('Mailing List Domain (after @ sign)'),
+        'needs-data' => ['bundle'],
+      ],
+      // [troth-google:list-email].
+      'list-email' => [
+        'name' => t('List Email'),
+        'description' => t('Email Address of Mailing List'),
+        'needs-data' => ['bundle'],
+      ],
+      // [troth-google:user-email].
+      'user-email' => [
+        'name' => t('User Email'),
+        'description' => t('Email Address of user'),
+        'needs-data' => ['email'],
+      ],
+      // [troth-google:unsub-date].
+      'unsub-date' => [
+        'name' => t('Unsubscribe Date'),
+        'description' => t('Date email will be unsubscribed.'),
+        'needs-data' => ['date'],
+      ],
+    ],
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function troth_google_tokens($type, $tokens, array $data = [], array $options = []) {
+  $replacements = [];
+
+  // Replacement values for tokens that can be calculated without any additional
+  // data.
+  if ($type == 'troth-google') {
+
+    $type = TrothGoogleGroupType::load($data['bundle']);
+    $domain = \Drupal::config('troth_google.adminsettings')->get('domain_name');
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'list-name':
+          $replacements[$original] = $type->getName();
+          break;
+
+        case 'list-id':
+          $replacements[$original] = $type->getGroupId();
+          break;
+
+        case 'list-domain':
+          $replacements[$original] = $domain;
+          break;
+
+        case 'list-email':
+          $replacements[$original] = $type->getGroupId() . '@' . $domain;
+          break;
+
+        case 'user-email':
+          $replacements[$original] = $data['email'];
+          break;
+
+        case 'unsub-date':
+          if (!$data['date'] instanceof DateTimePlus) {
+            $data['date'] = new DateTimePlus($data['date']);
+          }
+          $replacements[$original] = $data['date']->format('j M, Y');
+          break;
+      }
+    }
+  }
+
+  // An array of replacement values keyed by original token string.
+  return $replacements;
+}
+
+/**
+ * Set dynamic allowed values for the subscribe to mailing list profile field.
+ */
+function troth_google_registration_mailing_lists() {
+  $options = [];
+  $bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_google');
+  foreach ($bundles as $bundle => $data) {
+    $type = TrothGoogleGroupType::load($bundle);
+    if ($type->getRegistration()) {
+      $options[$type->Id()] = $type->getName();
+    }
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_user_update().
+ */
+function troth_google_user_update($entity) {
+  $original = $entity->original;
+  if (isset($entity->field_profile_ban_lists) && $entity->field_profile_ban_lists->value == 1) {
+    // We unsubscribe from all lists.
+    $query = \Drupal::entityQuery('troth_google')
+      ->condition('uid', $entity->id(), '=');
+    $entids = $query->execute();
+    foreach ($entids as $entid) {
+      $e = entity_load('troth_google', $entid);
+      $e->trothGoogleUnsubscribe();
+      $e->delete();
+    }
+  }
+  else {
+    if ($original->getEmail() != $entity->getEmail()) {
+      // The email changed.
+      $oldEmail = $original->getEmail();
+      $newEmail = $entity->getEmail();
+      // Find all the enties that need to be changed.
+      $query = \Drupal::entityQuery('troth_google')
+        ->condition('uid', $entity->id(), '=')
+        ->condition('email', $oldEmail, '=');
+      $entids = $query->execute();
+      foreach ($entids as $entid) {
+        $e = entity_load('troth_google', $entid);
+        if ($newEmail != '') {
+          // We have an email address, make the change.
+          $e->setEmail($newEmail);
+          if ($e->getSubscribed()) {
+            $e->trothGoogleUnsubscribe($oldEmail);
+            $e->trothGoogleSubscribe($newEmail);
+          }
+          $e->save();
+        }
+        else {
+          // We don't have an email address, delete the entity.
+          $e->trothGoogleUnsubscribe($oldEmail);
+          $e->delete();
+        }
+      }
+    }
+
+    if ($original->field_profile_alt_email->value != $entity->field_profile_alt_email->value) {
+      // The email changed.
+      $oldEmail = $original->field_profile_alt_email->value;
+      $newEmail = $entity->field_profile_alt_email->value;
+      // If they delete alt email, we need to set to master mail.
+      if ($newEmail == '') {
+        $newEmail = $entity->getEmail();
+      }
+      // Find all the enties that need to be changed.
+      $query = \Drupal::entityQuery('troth_google')
+        ->condition('uid', $entity->id(), '=')
+        ->condition('email', $oldEmail, '=');
+      $entids = $query->execute();
+      foreach ($entids as $entid) {
+        $e = entity_load('troth_google', $entid);
+        if ($newEmail != '') {
+          // We have an email address, make the change.
+          $e->setEmail($newEmail);
+          if ($e->getSubscribed()) {
+            $e->trothGoogleUnsubscribe($oldEmail);
+            $e->trothGoogleSubscribe($newEmail);
+          }
+          $e->save();
+        }
+        else {
+          // We don't have an email address, delete the entity.
+          $e->trothGoogleUnsubscribe($oldEmail);
+          $e->delete();
+        }
+      }
+    }
+  }
+}

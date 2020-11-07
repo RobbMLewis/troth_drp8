@@ -1,0 +1,39 @@
+troth_steward_entity_task_edit:
+  route_name: entity.troth_steward.edit_form
+  base_route: entity.troth_steward.canonical		
+  title: 'Edit'
+  
+troth_steward_entity_task_delete:
+  route_name:  entity.troth_steward.delete_form
+  base_route: entity.troth_steward.canonical
+  title: Delete
+  weight: 10
+  
+troth_maps.region:
+  route_name:  troth_maps.region_listbuilder
+  base_route: troth_maps.region_listbuilder
+  title: Major Regions
+troth_maps.local_region:
+  route_name:  troth_maps.local_region_listbuilder
+  base_route: troth_maps.region_listbuilder
+  title: Local Regions
+troth_maps.special_region:
+  route_name:  troth_maps.special_region_listbuilder
+  base_route: troth_maps.region_listbuilder
+  title: Special Regions
+troth_maps.stewards:
+  route_name:  entity.troth_steward.collection
+  base_route: troth_maps.region_listbuilder
+  title: Stewards
+troth_maps.region_archive:
+  route_name: troth_maps.region_archive_listbuilder
+  base_route: troth_maps.region_listbuilder
+  title: Archived Regions
+troth_maps.stewards_archive:
+  route_name: troth_maps.steward_archive_listbuilder
+  base_route: troth_maps.region_listbuilder
+  title: Archived Stewards
+troth_maps.update_shapes_form:
+  route_name: troth_maps.update_shapes_form
+  base_route: troth_maps.region_listbuilder
+  title: 'Update Shape Files'

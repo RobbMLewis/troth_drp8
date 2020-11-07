@@ -1,0 +1,64 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_join
+    - field.field.commerce_product_variation.membership_join.field_allowed_countries
+    - field.field.commerce_product_variation.membership_join.field_description
+    - field.field.commerce_product_variation.membership_join.field_disallowed_countries
+    - field.field.commerce_product_variation.membership_join.field_inmate
+    - field.field.commerce_product_variation.membership_join.field_membership_type
+    - field.field.commerce_product_variation.membership_join.field_paper_idunna
+  module:
+    - commerce_price
+    - text
+id: commerce_product_variation.membership_join.default
+targetEntityType: commerce_product_variation
+bundle: membership_join
+mode: default
+content:
+  field_countries:
+    weight: 1
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: address_country_default
+    region: content
+  field_description:
+    type: text_default
+    weight: 1
+    region: content
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+  field_terms_of_service:
+    weight: 2
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    type: entity_reference_entity_view
+    region: content
+  price:
+    label: inline
+    type: commerce_price_default
+    weight: 0
+    region: content
+    settings:
+      currency_display: symbol
+      strip_trailing_zeroes: false
+    third_party_settings: {  }
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_allowed_countries: true
+  field_disallowed_countries: true
+  field_inmate: true
+  field_membership_type: true
+  field_paper_idunna: true
+  list_price: true
+  product_id: true
+  sku: true
+  title: true

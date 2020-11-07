@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: blog
+label: Blog
+type: 'canonical_entities:node'
+pattern: 'news/[node:created:custom:''Ymd-His'']'
+selection_criteria:
+  7ccae361-17e5-4530-9061-e7dbad9a276e:
+    id: node_type
+    bundles:
+      blog: blog
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 7ccae361-17e5-4530-9061-e7dbad9a276e
+selection_logic: and
+weight: -5
+relationships: {  }

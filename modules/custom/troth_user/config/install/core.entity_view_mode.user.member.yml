@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: A-R_GHgdLtInQnaxjWZK2fVH4uunGf28AsSiTpLUYB4
+id: user.member
+label: Member
+targetEntityType: user
+cache: true

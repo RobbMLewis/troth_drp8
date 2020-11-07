@@ -1,0 +1,10 @@
+name: Troth Migrate
+description: Troth Migration
+package: Troth
+type: module
+dependencies:
+  - drupal:troth_user
+
+core: 8.x
+php: 7.3
+hidden: FALSE

@@ -1,0 +1,6 @@
+channel:
+  description: 'RSS Feed'
+items:
+  limit: 10
+  view_mode: teaser
+langcode: en

@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies: {  }
+id: authenticated
+label: 'Authenticated user'
+weight: -10
+is_admin: false
+permissions:
+  - 'access checkout'
+  - 'access content'
+  - 'display eu cookie compliance popup'
+  - 'manage own commerce_payment_method'
+  - 'view Terms and Conditions'
+  - 'view commerce_product'
+  - 'view files'
+  - 'view media'
+  - 'view own commerce_order'

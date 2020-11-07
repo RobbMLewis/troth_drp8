@@ -1,0 +1,246 @@
+<?php
+
+/**
+ * @file
+ * Install file.
+ */
+
+use Drupal\Component\Serialization\Yaml;
+use Drupal\troth_maps\Entity\TrothMapsCountry;
+use Drupal\troth_maps\Entity\TrothMapsState;
+use Drupal\troth_maps\Entity\TrothMapsCounty;
+use CommerceGuys\Addressing\Country\CountryRepository;
+use CommerceGuys\Addressing\Subdivision\SubdivisionRepository;
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_install().
+ */
+function troth_maps_install() {
+  // Replace these configs.  We're using code to do this, as they are already
+  // installed.
+  $dir = drupal_get_path('module', 'troth_maps') . '/config/hook_install/';
+  $files = file_scan_directory($dir, "/\.yml$/");
+  foreach ($files as $file) {
+    $fileuri = $file->uri;
+    $config_id = explode('/', $fileuri);
+    $config_id = end($config_id);
+    $config_id = substr($config_id, 0, -4);
+    $raw_data = file_get_contents($fileuri);
+    \Drupal::configFactory()->getEditable($config_id)
+      ->setData(Yaml::decode($raw_data))
+      ->save();
+  }
+
+  // Populate Taxonomy.
+  $vocab = 'troth_maps';
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'uszipcodes',
+    'field_country' => 'US',
+    'field_entity' => 'zipcode',
+    'field_file_type' => 'shp',
+    'field_mapping' => 'country=>
+country_abr=>
+state=>
+state_abr=>
+state_code=>
+state_no=>
+county=>
+county_full=>
+county_code=>
+community=>
+community_code=>
+zipcode=>GEOID10
+city=>
+latitude=>
+longitude=>',
+    'field_url' => [
+      'uri' => 'https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_us_zcta510_500k.zip',
+    ],
+  ]);
+  $term->save();
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'uscounty',
+    'field_country' => 'US',
+    'field_entity' => 'county',
+    'field_file_type' => 'shp',
+    'field_mapping' => 'country=>
+country_abr=>
+state=>
+state_abr=>
+state_code=>
+state_no=>STATEFP
+county=>NAME
+county_full=>
+county_code=>
+community=>
+community_code=>
+zipcode=>
+city=>
+latitude=>
+longitude=>',
+    'field_url' => [
+      'uri' => 'https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_us_county_500k.zip',
+    ],
+  ]);
+  $term->save();
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'usstate',
+    'field_country' => 'US',
+    'field_entity' => 'state',
+    'field_file_type' => 'shp',
+    'field_mapping' => 'country=>
+country_abr=>
+state=>NAME
+state_abr=>STUSPS
+state_code=>
+state_no=>STATEFP
+county=>
+county_full=>
+county_code=>
+community=>
+community_code=>
+zipcode=>
+city=>
+latitude=>
+longitude=>',
+    'field_url' => [
+      'uri' => 'https://www2.census.gov/geo/tiger/GENZ{year}/shp/cb_{year}_us_state_500k.zip',
+    ],
+  ]);
+  $term->save();
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'castate',
+    'field_country' => 'CA',
+    'field_entity' => 'state',
+    'field_file_type' => 'shp',
+    'field_mapping' => 'country=>
+country_abr=>
+state=>PRENAME
+state_abr=>
+state_code=>
+state_no=>
+county=>
+county_full=>
+county_code=>
+community=>
+community_code=>
+zipcode=>
+city=>
+latitude=>
+longitude=>',
+    'field_url' => [
+      'uri' => 'http://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/files-fichiers/gpr_000a11a_e.zip',
+    ],
+  ]);
+  $term->save();
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'country_zips',
+    'field_country' => '',
+    'field_entity' => 'zipcode',
+    'field_file_type' => 'txt',
+    'field_mapping' => 'country=>0
+country_abr=>
+state=>3
+state_abr=>
+state_code=>4
+state_no=>
+county=>5
+county_full=>
+county_code=>6
+community=>7
+community_code=>8
+zipcode=>1
+city=>2
+latitude=>9
+longitude=>10',
+    'field_url' => [
+      'uri' => 'http://download.geonames.org/export/zip/{country}.zip',
+    ],
+  ]);
+  $term->save();
+  $term = Term::create([
+    'vid' => $vocab,
+    'name' => 'countries',
+    'field_country' => '',
+    'field_entity' => 'country',
+    'field_file_type' => 'shp',
+    'field_mapping' => 'country=>COUNTRY
+country_abr=>ISO
+state=>
+state_abr=>
+state_code=>
+state_no=>
+county=>
+county_full=>
+county_code=>
+community=>
+community_code=>
+zipcode=>
+city=>
+latitude=>
+longitude=>',
+    'field_url' => [
+      'uri' => 'https://opendata.arcgis.com/datasets/252471276c9941729543be8789e06e12_0.zip',
+    ],
+  ]);
+  $term->save();
+
+  // Set path.
+  $path = DRUPAL_ROOT . '/' . drupal_get_path('module', 'troth_maps') . '/source_data/';
+
+  // Get countries from address module and create entities.
+  $rep = new CountryRepository();
+  $list = $rep->getAll();
+  foreach ($list as $code => $obj) {
+    $entity = TrothMapsCountry::create([
+      'country_abr' => $code,
+      'country' => $obj->getName(),
+    ]);
+    $entity->save();
+  }
+
+  // Get states from address module and create entities.
+  $rep = new SubdivisionRepository();
+  $countries = ['US', 'CA', 'AU'];
+  foreach ($countries as $country_code) {
+    $states = $rep->getAll([$country_code]);
+    foreach ($states as $code => $obj) {
+      $entity = TrothMapsState::create([
+        'state' => $obj->getName(),
+        'state_abr' => $code,
+        'country' => $country_code,
+      ]);
+      $entity->save();
+    }
+  }
+
+  // Read the county files and create the entities.
+  $filename = $path . 'county.csv';
+  $data = array_map('str_getcsv', file($filename));
+  $headers = $data[0];
+  unset($data[0]);
+
+  /*
+   * [0] => county
+   * [1] =>  state
+   * [2] =>  country
+   * [3] =>  county_full
+   */
+
+  foreach ($data as $values) {
+    $entity = TrothMapsCounty::create([
+      $headers[0] => $values[0],
+      $headers[1] => $values[1],
+      $headers[2] => $values[2],
+      $headers[3] => $values[3],
+    ]);
+    $entity->save();
+  }
+
+}

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_join
+    - field.storage.commerce_product_variation.field_description
+  module:
+    - text
+_core:
+  default_config_hash: bq63hefTvKpxDuZsp1lWcKWU-_D4v81TYUO_v7Ci2oQ
+id: commerce_product_variation.membership_join.field_description
+field_name: field_description
+entity_type: commerce_product_variation
+bundle: membership_join
+label: Description
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

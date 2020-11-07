@@ -1,0 +1,7 @@
+troth_files.collapse:
+  version: VERSION
+  js:
+    js/troth_files_js.js: {}
+  css:
+    component:
+      css/troth_files_css.css: {}

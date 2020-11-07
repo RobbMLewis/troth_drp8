@@ -1,0 +1,71 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.date.body
+    - field.field.node.date.field_date
+    - field.field.node.date.field_location
+    - field.field.node.date.field_troth_approved
+    - field.field.node.date.field_url
+    - node.type.date
+  module:
+    - address
+    - datetime_range
+    - link
+    - options
+    - text
+    - user
+id: node.date.default
+targetEntityType: node
+bundle: date
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 4
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_date:
+    type: daterange_default
+    weight: 1
+    region: content
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: long
+      separator: ' to '
+    third_party_settings: {  }
+  field_location:
+    type: address_default
+    weight: 2
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_troth_approved:
+    type: list_default
+    weight: 0
+    region: content
+    label: visually_hidden
+    settings: {  }
+    third_party_settings: {  }
+  field_url:
+    type: link
+    weight: 3
+    region: content
+    label: above
+    settings:
+      trim_length: 80
+      rel: nofollow
+      target: _blank
+      url_only: false
+      url_plain: false
+    third_party_settings: {  }
+hidden:
+  addtoany: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  links: true

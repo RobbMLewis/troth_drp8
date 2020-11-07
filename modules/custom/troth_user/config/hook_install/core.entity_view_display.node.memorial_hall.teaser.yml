@@ -1,0 +1,53 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.memorial_hall.body
+    - field.field.node.memorial_hall.field_comments
+    - field.field.node.memorial_hall.field_date
+    - field.field.node.memorial_hall.field_meta_tags
+    - field.field.node.memorial_hall.field_picture
+    - field.field.node.memorial_hall.field_yoast_seo
+    - node.type.memorial_hall
+  module:
+    - datetime_range
+    - text
+    - user
+id: node.memorial_hall.teaser
+targetEntityType: node
+bundle: memorial_hall
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 2
+    settings:
+      trim_length: 200
+    third_party_settings: {  }
+    region: content
+  field_date:
+    type: daterange_default
+    weight: 1
+    region: content
+    label: above
+    settings:
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  addtoany: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_comments: true
+  field_meta_tags: true
+  field_picture: true
+  field_yoast_seo: true

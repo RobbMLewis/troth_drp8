@@ -1,0 +1,5 @@
+services:
+  troth_donate.cart_subscriber:
+    class: Drupal\troth_donate\EventSubscriber\CartEventSubscriber
+    tags:
+      - { name: event_subscriber }

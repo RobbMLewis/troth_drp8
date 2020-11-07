@@ -1,0 +1,96 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership_join
+    - field.field.commerce_order_item.membership_join.field_membership_join
+  module:
+    - commerce_price
+    - commerce_product
+    - inline_entity_form
+    - xnumber
+id: commerce_order_item.membership_join.default
+targetEntityType: commerce_order_item
+bundle: membership_join
+mode: default
+content:
+  field_membership_join:
+    weight: 3
+    settings:
+      form_mode: default
+      revision: false
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+      collapsible: false
+      collapsed: false
+    third_party_settings: {  }
+    type: inline_entity_form_simple
+    region: content
+  field_t:
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_terms_of_service:
+    weight: 4
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_test:
+    weight: 6
+    settings:
+      form_mode: default
+      revision: false
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+      collapsible: false
+      collapsed: false
+    third_party_settings: {  }
+    type: inline_entity_form_simple
+    region: content
+  purchased_entity:
+    type: commerce_product_variation_title
+    weight: -1
+    settings:
+      label_display: true
+      label_text: 'Please select'
+      hide_single: true
+    region: content
+    third_party_settings: {  }
+  quantity:
+    type: xnumber
+    weight: 1
+    region: content
+    settings:
+      step: '1'
+      placeholder: ''
+      disable_on_cart: ''
+      qty_prices: '0'
+      qty_price:
+        - {  }
+      default_value: ''
+      min: ''
+      max: ''
+      prefix: ''
+      suffix: ''
+    third_party_settings: {  }
+  unit_price:
+    type: commerce_price_default
+    weight: 2
+    settings: {  }
+    region: content
+    third_party_settings: {  }
+hidden:
+  created: true

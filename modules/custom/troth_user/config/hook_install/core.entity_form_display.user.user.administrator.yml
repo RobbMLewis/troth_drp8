@@ -1,0 +1,352 @@
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.user.administrator
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_last_password_reset
+    - field.field.user.user.field_password_expiration
+    - field.field.user.user.field_profile_admin_notes
+    - field.field.user.user.field_profile_alt_email
+    - field.field.user.user.field_profile_birth_date
+    - field.field.user.user.field_profile_dont_contact
+    - field.field.user.user.field_profile_e_copies
+    - field.field.user.user.field_profile_expire_issue
+    - field.field.user.user.field_profile_family_id
+    - field.field.user.user.field_profile_first_name
+    - field.field.user.user.field_profile_gender
+    - field.field.user.user.field_profile_inmate
+    - field.field.user.user.field_profile_inmate_number
+    - field.field.user.user.field_profile_last_contact_date
+    - field.field.user.user.field_profile_last_name
+    - field.field.user.user.field_profile_last_renew_date
+    - field.field.user.user.field_profile_location
+    - field.field.user.user.field_profile_member_expire_date
+    - field.field.user.user.field_profile_member_notes
+    - field.field.user.user.field_profile_member_start_date
+    - field.field.user.user.field_profile_membership_control
+    - field.field.user.user.field_profile_membership_status
+    - field.field.user.user.field_profile_membership_type
+    - field.field.user.user.field_profile_shared_notes
+    - field.field.user.user.field_profile_ship_notes
+    - field.field.user.user.field_profile_troth_name
+    - field.field.user.user.field_profile_visibility
+    - field.field.user.user.field_telephone_number
+    - field.field.user.user.field_user_facebook_url
+    - field.field.user.user.field_user_instagram_url
+    - field.field.user.user.field_user_linkedin_url
+    - field.field.user.user.field_user_twitter_url
+    - field.field.user.user.user_picture
+    - image.style.thumbnail
+  module:
+    - address
+    - datetime
+    - image
+    - link
+    - telephone
+    - user
+id: user.user.administrator
+targetEntityType: user
+bundle: user
+mode: administrator
+content:
+  account:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  current_pass:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_admin_notes:
+    type: string_textarea
+    weight: 30
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_alt_email:
+    type: email_default
+    weight: 6
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_birth_date:
+    type: datetime_default
+    weight: 16
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_dont_contact:
+    weight: 28
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_profile_e_copies:
+    type: boolean_checkbox
+    weight: 24
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_profile_expire_issue:
+    type: number
+    weight: 23
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_family_id:
+    type: number
+    weight: 25
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_first_name:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_inmate:
+    type: boolean_checkbox
+    weight: 26
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_profile_inmate_number:
+    type: string_textfield
+    weight: 27
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list:
+            68035209-79eb-4a11-9e7e-7d3f984a5dd7:
+              operations:
+                edit: Edit
+                delete: Delete
+            ba471599-1758-4cce-8c86-466f3d3dd534:
+              operations:
+                edit: Edit
+                delete: Delete
+          add: Add
+        field_states:
+          68035209-79eb-4a11-9e7e-7d3f984a5dd7:
+            uuid: 68035209-79eb-4a11-9e7e-7d3f984a5dd7
+            id: visible
+            data:
+              target: field_profile_inmate
+              comparison: checked
+              value: ''
+              submit: 'Add Cancel'
+          ba471599-1758-4cce-8c86-466f3d3dd534:
+            uuid: ba471599-1758-4cce-8c86-466f3d3dd534
+            id: invisible
+            data:
+              target: field_profile_inmate
+              comparison: unchecked
+              value: ''
+              submit: 'Add Cancel'
+  field_profile_last_contact_date:
+    weight: 29
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_profile_last_name:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_last_renew_date:
+    type: datetime_default
+    weight: 21
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_location:
+    type: address_default
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_member_expire_date:
+    type: datetime_default
+    weight: 22
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_member_notes:
+    type: string_textarea
+    weight: 10
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_member_start_date:
+    type: datetime_default
+    weight: 20
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_membership_control:
+    type: options_select
+    weight: 19
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_membership_status:
+    type: options_select
+    weight: 18
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_membership_type:
+    type: options_select
+    weight: 17
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_shared_notes:
+    type: string_textarea
+    weight: 11
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_ship_notes:
+    type: string_textarea
+    weight: 31
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_troth_name:
+    type: string_textfield
+    weight: 4
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_profile_visibility:
+    type: boolean_checkbox
+    weight: 9
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  field_telephone_number:
+    type: telephone_default
+    weight: 8
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_user_facebook_url:
+    type: link_default
+    weight: 12
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_user_instagram_url:
+    type: link_default
+    weight: 14
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_user_linkedin_url:
+    type: link_default
+    weight: 15
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_user_twitter_url:
+    type: link_default
+    weight: 13
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  language:
+    weight: 35
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  mail:
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  name:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  notify:
+    weight: 37
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  roles:
+    weight: 33
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    weight: 32
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  timezone:
+    weight: 36
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  user_picture:
+    type: image_image
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    weight: 34
+    region: content
+hidden:
+  commerce_remote_id: true
+  contact: true
+  customer_profiles: true
+  field_last_password_reset: true
+  field_password_expiration: true
+  field_profile_gender: true
+  membership_join_profiles: true
+  membership_renew_profiles: true
+  pass: true
+  path: true

@@ -1,0 +1,23 @@
+troth_files.member_file_browser:  
+  path: '/members/files'  
+  defaults:  
+    _controller: '\Drupal\troth_files\Controller\TrothFilesController::displayPage'
+    _title: 'Member Files'
+    uri: 'private://members'
+    header: 'Members'
+  requirements:  
+    _role: member+administrator
+  options:
+    no_cache: 'TRUE'
+    
+troth_files.officer_file_browser:  
+  path: '/officers/files'  
+  defaults:  
+    _controller: '\Drupal\troth_files\Controller\TrothFilesController::displayPage'
+    _title: 'Officer Files'
+    uri: 'private://members/officers'
+    header: 'Officers'
+  requirements:  
+    _role: officer+administrator
+  options:
+    no_cache: 'TRUE'

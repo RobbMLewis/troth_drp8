@@ -1,0 +1,31 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - user
+_core:
+  default_config_hash: LX_xa3IMq-M8pugW5K4d-2xn7tw_FZugq8CKC-1N6k4
+id: user.field_profile_gender
+field_name: field_profile_gender
+entity_type: user
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: unset
+      label: Unset
+    -
+      value: male
+      label: Male
+    -
+      value: female
+      label: Female
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

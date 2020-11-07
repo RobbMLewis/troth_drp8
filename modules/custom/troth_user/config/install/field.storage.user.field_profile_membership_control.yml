@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - user
+_core:
+  default_config_hash: 7HL1hzaggqdeLqAHjWmBFmhvrJxt6bcURnozYJqvtD4
+id: user.field_profile_membership_control
+field_name: field_profile_membership_control
+entity_type: user
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: self
+      label: Self
+    -
+      value: primary
+      label: Primary
+    -
+      value: secondary
+      label: Secondary
+    -
+      value: child
+      label: Child
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

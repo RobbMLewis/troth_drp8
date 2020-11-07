@@ -1,0 +1,248 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\troth_maps\Entity\TrothMapsDownloads;
+use Drupal\troth_maps\Entity\TrothMapsZipcodes;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Function to delete old files.
+ */
+function troth_maps_delete_old(DrupalDateTime $cutoff = NULL) {
+  if ($cutoff == NULL) {
+    $cutoff = new DrupalDateTime("-6 months");
+  }
+  $path = \Drupal::service('module_handler')->getModule('troth_maps')->getPath() . '/source_data/';
+  $path = \Drupal::service('file_system')->realpath($path);
+  $files = glob($path . "/*.zip");
+  foreach ($files as $file) {
+    $date = DrupalDateTime::createFromTimestamp(filemtime($file));
+    if ($date < $cutoff) {
+      unlink($file);
+    }
+  }
+}
+
+/**
+ * Function to download a url.
+ */
+function troth_maps_download_url($url = NULL) {
+  if ($url == NULL) {
+    return;
+  }
+  $path = \Drupal::service('module_handler')->getModule('troth_maps')->getPath() . '/source_data/';
+  $path = \Drupal::service('file_system')->realpath($path);
+  $fname = $path . '/' . basename($url);
+  $cutoff = new DrupalDateTime("-6 months");
+  if (file_exists($fname)) {
+    $date = DrupalDateTime::createFromTimestamp(filemtime($fname));
+  }
+  if (!file_exists($fname) || $date < $cutoff) {
+    $file = system_retrieve_file($url, $path);
+    return $fname;
+  }
+  return NULL;
+}
+
+/**
+ * Function to download source data.
+ */
+function troth_maps_download_zips() {
+  $now = new DrupalDateTime();
+  // Delete old zip files that are beyond expire date.
+  troth_maps_delete_old();
+  // Get the urls from taxonomy.
+  $vid = 'troth_maps';
+  $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid);
+  $tids = [];
+  $tables = [];
+  foreach ($terms as $tid => $term) {
+    $tids[] = $term->tid;
+  }
+  $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($tids);
+  $delete = [];
+  foreach ($terms as $tid => $term) {
+    $type = $term->field_file_type->value;
+    $url = $term->field_url->uri;
+    $table = $term->field_entity->value;
+    $country = $term->field_country->value;
+    $tables[$tid] = $table;
+
+    if (preg_match('/{year}/', $url)) {
+      $year = $now->format('Y');
+      $valid = FALSE;
+      while ($valid == FALSE) {
+        $testurl = str_replace('{year}', $year, $url);
+        $response = get_headers($testurl)[0];
+        if (preg_match('/ok/i', $response)) {
+          $url = $testurl;
+          $valid = TRUE;
+        }
+        else {
+          $year = $year - 1;
+        }
+      }
+    }
+    $usecountry = [];
+    if (preg_match('/{country}/', $url)) {
+      $delete[] = $tid;
+      // Create an object of type Select.
+      $database = \Drupal::database();
+      $query = $database->query("SELECT distinct(field_profile_location_country_code) FROM {user__field_profile_location} u join {user__field_profile_membership_status} as s on u.bundle = s.bundle and u.entity_id = s.entity_id and u.bundle = 'user' where s.field_profile_membership_status_value = 'active'");
+      $countries = $query->fetchAllKeyed(0, 0);
+      $stored = $database->select('troth_maps_downloads', 'd')
+        ->fields('d', ['country'])
+        ->condition('country', $countries, 'in')
+        ->execute()->fetchAllKeyed(0, 0);
+      $timestamp = time();
+      foreach ($countries as $country) {
+        if (!isset($stored[$country])) {
+          $download = TrothMapsDownloads::create([
+            'country' => $country,
+            'last_update' => $timestamp,
+          ]);
+          $download->save();
+        }
+      }
+      // We need to update the download entity to add any new countries.
+      $query = $database->select('troth_maps_downloads', 'd')
+        ->fields('d', ['country'])
+        ->orderBy('last_update')
+        ->range(0, 3)
+        ->execute();
+
+      while ($row = $query->fetchAssoc()) {
+        $zcountry = $row['country'];
+        $usecountry[] = $zcountry;
+        $urls[$tid . ":" . $zcountry] = str_replace('{country}', $zcountry, $url);
+        $tables[$tid . ":" . $zcountry] = $table;
+        $taxquery = \Drupal::entityQuery('taxonomy_term')
+          ->condition('vid', $vid, '=')
+          ->condition('field_country', $zcountry, '=')
+          ->condition('field_entity', 'zipcode', '=')
+          ->execute();
+        if (count($taxquery) > 0) {
+          $zipterms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($taxquery);
+          foreach ($zipterms as $zipterm) {
+            $ztid = $zipterm->tid->value;
+            $zurl = $zipterm->field_url->uri;
+            if (preg_match('/{year}/', $zurl)) {
+              $year = $now->format('Y');
+              $valid = FALSE;
+              while ($valid == FALSE) {
+                $testurl = str_replace('{year}', $year, $zurl);
+                $response = get_headers($testurl)[0];
+                if (preg_match('/ok/i', $response)) {
+                  $zurl = $testurl;
+                  $valid = TRUE;
+                }
+                else {
+                  $year = $year - 1;
+                }
+              }
+            }
+            $urls[$ztid] = $zurl;
+          }
+        }
+      }
+    }
+
+    // Only add zipcode shapefiles if we're downloading the text file.
+    if ($table != 'zipcode' && !in_array($country, $usecountry)) {
+      $urls[$tid] = $url;
+    }
+  }
+
+  // Clean up any extra urls.
+  foreach ($delete as $tid) {
+    unset($urls[$tid]);
+  }
+
+  $files = ['country' => [], 'state' => [], 'county' => [], 'zipcode' => []];
+  foreach ($urls as $tid => $url) {
+    $table = $tables[$tid];
+    $file = troth_maps_download_url($url);
+    if ($file != NULL) {
+      $files[$table][$tid] = $file;
+    }
+  }
+  return $files;
+}
+
+/**
+ * Extracts zip file, lists filenames extracted.
+ */
+function troth_maps_extract_zip($fname = NULL) {
+
+  if ($fname == NULL) {
+    return;
+  }
+  $path = pathinfo($fname);
+  $zip = new ZipArchive();
+  $res = $zip->open($fname);
+  $files = [];
+
+  if ($res === TRUE) {
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+      $files[$zip->getNameIndex($i)] = $path['dirname'] . "/tmp/" . $zip->getNameIndex($i);
+    }
+    $zip->extractTo($path['dirname'] . "/tmp/");
+    $zip->close();
+  }
+  return $files;
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function troth_maps_entity_presave(EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'user') {
+    $localregion = 0;
+    $majorregion = 0;
+    $results = \Drupal::entityQuery('troth_maps_regions')
+      ->condition('region_name', '%International%', 'like')
+      ->execute();
+    if (count($results) > 0) {
+      foreach ($results as $regid) {
+        $majorregion = $regid;
+      }
+    }
+
+    $country = $entity->field_profile_location->country_code;
+    $zipcode = $entity->field_profile_location->postal_code;
+    $results = \Drupal::entityQuery('troth_maps_zipcodes')
+      ->condition('zipcode', $zipcode . '%', 'like')
+      ->condition('country', $country . '%', 'like')
+      ->execute();
+
+    $regions = TrothMapsZipcodes::loadMultiple($results);
+    foreach ($regions as $region) {
+      $localregion = $region->getLocRegid()->value;
+      $majorregion = $region->getRegid()->value;
+    }
+    if ($localregion != 0) {
+      $entity->field_region = $localregion;
+    }
+    else {
+      $entity->field_region = $majorregion;
+    }
+      $entity->field_major_region = $majorregion;
+  }
+}
+
+function troth_maps_test(){
+    $batch = [
+      'title' => t('Importing Shapes'),
+      'init_message' => t('The shape files are being imported'),
+      'operations' => [],
+      'file' => drupal_get_path('module', 'troth_maps') . '/troth_maps_import.batch.inc',
+      'finished' => 'batch_finish_callback',
+    ];
+    $batch['operations'][] = ['update_user_region', []];
+    batch_set($batch);
+}

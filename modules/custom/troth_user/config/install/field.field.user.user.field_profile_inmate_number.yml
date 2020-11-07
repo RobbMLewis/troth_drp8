@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_inmate_number
+  module:
+    - user
+_core:
+  default_config_hash: lkBFIWxBnVeLZPb6aX75jJ7EENvCigNfZdambhQCPYg
+id: user.user.field_profile_inmate_number
+field_name: field_profile_inmate_number
+entity_type: user
+bundle: user
+label: 'Inmate Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

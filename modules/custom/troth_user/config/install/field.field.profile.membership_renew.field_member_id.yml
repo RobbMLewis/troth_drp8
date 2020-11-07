@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_member_id
+    - profile.type.membership_renew
+_core:
+  default_config_hash: 1CUmKQasVPb59C4VFdK8t4ZFDYVzHPqGTaef9jqBP9E
+id: profile.membership_renew.field_member_id
+field_name: field_member_id
+entity_type: profile
+bundle: membership_renew
+label: 'Member ID'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 1
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

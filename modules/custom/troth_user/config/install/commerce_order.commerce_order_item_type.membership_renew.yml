@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 1Cy600ZVl7kT2tvSoew_anBtWjJdjVic2mqTADSqWqk
+label: 'Membership Renew'
+id: membership_renew
+purchasableEntityType: commerce_product_variation
+orderType: default
+traits: {  }
+locked: false

@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: members_paths
+label: 'Members Paths'
+type: 'canonical_entities:node'
+pattern: 'members/[node:menu-link:parents:join-path]/[node:menu-link:title].html'
+selection_criteria:
+  21d5c465-5fc7-4625-ba98-1e25acb85740:
+    id: node_type
+    bundles:
+      children_and_youth: children_and_youth
+      lore: lore
+      members_page: members_page
+      steward: steward
+      troth_kindred_program: troth_kindred_program
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 21d5c465-5fc7-4625-ba98-1e25acb85740
+selection_logic: and
+weight: -5
+relationships: {  }

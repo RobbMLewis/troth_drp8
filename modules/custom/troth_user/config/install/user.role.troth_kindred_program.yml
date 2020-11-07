@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: troth_kindred_program
+label: 'Troth Kindred Program'
+weight: 13
+is_admin: null
+permissions: {  }

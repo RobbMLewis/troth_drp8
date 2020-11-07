@@ -1,0 +1,43 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_renew
+    - core.entity_view_mode.commerce_product_variation.summary
+    - field.field.commerce_product_variation.membership_renew.field_allowed_countries
+    - field.field.commerce_product_variation.membership_renew.field_description
+    - field.field.commerce_product_variation.membership_renew.field_disallowed_countries
+    - field.field.commerce_product_variation.membership_renew.field_membership_type
+    - field.field.commerce_product_variation.membership_renew.field_paper_idunna
+  module:
+    - layout_builder
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: commerce_product_variation.membership_renew.summary
+targetEntityType: commerce_product_variation
+bundle: membership_renew
+mode: summary
+content:
+  title:
+    type: string
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_allowed_countries: true
+  field_description: true
+  field_disallowed_countries: true
+  field_membership_type: true
+  field_paper_idunna: true
+  list_price: true
+  price: true
+  product_id: true
+  sku: true

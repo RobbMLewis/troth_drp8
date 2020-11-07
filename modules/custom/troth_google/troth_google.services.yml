@@ -1,0 +1,5 @@
+services:
+  troth_google.event_subscriber:
+    class: Drupal\troth_google\EventSubscriber\TrothGoogleSubscriber
+    tags:
+      - {name: event_subscriber}

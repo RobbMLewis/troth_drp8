@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: r8Drx7AoVSR1Y6nAOBFufeofjd1zjaocNOkJvGl_r4M
+id: membership_renew
+label: 'Membership Renew'
+description: ''
+variationType: membership_renew
+multipleVariations: true
+injectVariationFields: true
+traits: {  }
+locked: false

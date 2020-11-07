@@ -1,0 +1,13 @@
+name: Troth Elections
+description: Module to run elections
+package: Troth
+type: module
+dependencies:
+  - drupal:troth_user
+  - drupal:troth_officer
+
+core: 8.x
+php: 7.3
+hidden: FALSE
+
+configure: troth_elections.admin_settings_form

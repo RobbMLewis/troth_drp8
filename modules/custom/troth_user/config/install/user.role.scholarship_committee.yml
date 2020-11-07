@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: scholarship_committee
+label: 'Scholarship Committee'
+weight: 18
+is_admin: null
+permissions: {  }

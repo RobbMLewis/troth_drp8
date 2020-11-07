@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_gender
+  module:
+    - options
+    - user
+_core:
+  default_config_hash: mO68w8Qe3wMFzIDsdq53Y7DaSoxzfdH8gSJGOxtAcvo
+id: user.user.field_profile_gender
+field_name: field_profile_gender
+entity_type: user
+bundle: user
+label: Gender
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: unset
+default_value_callback: ''
+settings: {  }
+field_type: list_string

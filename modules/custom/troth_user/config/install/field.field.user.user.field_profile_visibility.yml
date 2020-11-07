@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_visibility
+  module:
+    - user
+_core:
+  default_config_hash: MV18NQ8B_WqNHI9cZmJrhxY86N-RZmF2X7zKbFtan9g
+id: user.user.field_profile_visibility
+field_name: field_profile_visibility
+entity_type: user
+bundle: user
+label: Visiblitiy
+description: 'If checked, your name, Email, Address (City, State, Country only), and Social Media links will be displayed to other members.'
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Visible to Members'
+  off_label: ' Not Visible to Members'
+field_type: boolean

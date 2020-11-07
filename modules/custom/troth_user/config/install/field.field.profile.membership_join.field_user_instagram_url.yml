@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_user_instagram_url
+    - profile.type.membership_join
+  module:
+    - link
+id: profile.membership_join.field_user_instagram_url
+field_name: field_user_instagram_url
+entity_type: profile
+bundle: membership_join
+label: 'Instagram URL'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 0
+field_type: link

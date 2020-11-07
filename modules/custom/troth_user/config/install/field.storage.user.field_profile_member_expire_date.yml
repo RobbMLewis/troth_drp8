@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - datetime
+    - user
+_core:
+  default_config_hash: gE8Rv8Cjq9ibADQ_LWtboRNrQa5WY1nEBdmrBj6MTAo
+id: user.field_profile_member_expire_date
+field_name: field_profile_member_expire_date
+entity_type: user
+type: datetime
+settings:
+  datetime_type: date
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

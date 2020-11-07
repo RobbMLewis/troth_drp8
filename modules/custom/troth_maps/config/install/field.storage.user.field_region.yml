@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - troth_maps
+    - user
+id: user.field_region
+field_name: field_region
+entity_type: user
+type: entity_reference
+settings:
+  target_type: troth_maps_regions
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
+

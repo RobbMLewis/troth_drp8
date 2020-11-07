@@ -1,0 +1,10 @@
+troth_google_entity_action_add:
+  route_name: entity.troth_google.add_page
+  title: 'New Subscription'
+  appears_on:
+    - entity.troth_google.collection
+troth_google_type_entity_action_add:
+  route_name: entity.troth_google_type.add_form	
+  title: 'Add a New Group'
+  appears_on:
+    - entity.troth_google_type.collection	

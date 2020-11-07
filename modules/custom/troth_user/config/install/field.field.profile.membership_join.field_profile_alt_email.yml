@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_alt_email
+    - profile.type.membership_join
+id: profile.membership_join.field_profile_alt_email
+field_name: field_profile_alt_email
+entity_type: profile
+bundle: membership_join
+label: 'Alternative Email'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email

@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_renew
+    - field.storage.commerce_product_variation.field_description
+  module:
+    - text
+_core:
+  default_config_hash: AdQKgHGJEr1ypDrLdMIFsJS2JOV31r-ncU916Jb6Da8
+id: commerce_product_variation.membership_renew.field_description
+field_name: field_description
+entity_type: commerce_product_variation
+bundle: membership_renew
+label: Description
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

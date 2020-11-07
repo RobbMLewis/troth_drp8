@@ -1,0 +1,116 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the dbtng_example module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Creates some default entries on this module custom table.
+ *
+ * @see hook_install()
+ *
+ * @ingroup troth_google
+ */
+function troth_google_install() {
+  // New field on user profile: field_profile_ban_lists
+  // Show on user admin form.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('user.user.administrator')
+    ->setComponent('field_profile_ban_lists', [
+      'type' => 'boolean_checkbox',
+      'region' => 'content',
+      'settings' =>
+      ['display_label' => TRUE],
+    ])
+    ->save();
+
+  // Hide on user default form.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('user.user.default')
+    ->removeComponent('field_profile_ban_lists')
+    ->save();
+
+  // Add to the user admin view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.administrator')
+    ->setComponent('field_profile_ban_lists', [
+      'type' => 'boolean',
+      'region' => 'content',
+      'label' => 'inline',
+      'settings' =>
+      [
+        'format' => 'default',
+        'format_custom_false' => '',
+        'format_custom_true' => '',
+      ],
+    ])
+    ->save();
+
+  // Add to the user officer view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.officer')
+    ->setComponent('field_profile_ban_lists', [
+      'type' => 'boolean',
+      'region' => 'content',
+      'label' => 'inline',
+      'settings' =>
+      [
+        'format' => 'default',
+        'format_custom_false' => '',
+        'format_custom_true' => '',
+      ],
+    ])
+    ->save();
+
+  // Add to the user tech view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.tech')
+    ->setComponent('field_profile_ban_lists', [
+      'type' => 'boolean',
+      'region' => 'content',
+      'label' => 'inline',
+      'settings' =>
+      [
+        'format' => 'default',
+        'format_custom_false' => '',
+        'format_custom_true' => '',
+      ],
+    ])
+    ->save();
+
+  // Hide on the user compact view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.compact')
+    ->removeComponent('field_profile_ban_lists')
+    ->save();
+
+  // Hide on the user empty view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.empty')
+    ->removeComponent('field_profile_ban_lists')
+    ->save();
+
+  // Hide on the user full view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.full')
+    ->removeComponent('field_profile_ban_lists')
+    ->save();
+
+  // Hide on the user member view.
+  \Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('user.user.member')
+    ->removeComponent('field_profile_ban_lists')
+    ->save();
+}

@@ -1,0 +1,176 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the dbtng_example module.
+ */
+
+use Drupal\Component\Serialization\Yaml;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_price\Price;
+
+/**
+ * Implements hook_install().
+ *
+ * Creates some default entries on this module custom table.
+ *
+ * @see hook_install()
+ *
+ * @ingroup troth_donate
+ */
+function troth_donate_install() {
+  // Replace these configs.  We're using code to do this, as they are already
+  // installed.
+  $dir = drupal_get_path('module', 'troth_donate') . '/config/hook_install/';
+  $files = file_scan_directory($dir, "/\.yml$/");
+  foreach ($files as $file) {
+    $fileuri = $file->uri;
+    $config_id = explode('/', $fileuri);
+    $config_id = end($config_id);
+    $config_id = substr($config_id, 0, -4);
+    $raw_data = file_get_contents($fileuri);
+    \Drupal::configFactory()->getEditable($config_id)
+      ->setData(Yaml::decode($raw_data))
+      ->save();
+  }
+
+  // Load default store.
+  $entity_manager = \Drupal::entityManager();
+  $store = $entity_manager->getStorage('commerce_store')->loadDefault();
+
+  // Create Donation products.
+  $donation_red_hammer_main = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_red_hammer_main',
+    'price' => new Price('1', 'USD'),
+    'title' => 'Disaster Relief Program Donations (Red Hammer)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>Donations will go to disaster relief where there is current need.</p>',
+    ],
+  ]);
+  $donation_red_hammer_main->save();
+
+  $donation_hah = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_hah',
+    'price' => new Price('1', 'USD'),
+    'title' => 'Heathens Against Hate',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>Heathens Against Hate was formed to help combat the non-inclusive ideology that has been found within the Heathen community.</p>',
+    ],
+  ]);
+  $donation_hah->save();
+
+  $donation_in_reach = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_in_reach',
+    'price' => new Price('1', 'USD'),
+    'title' => 'In-Reach Heathen Prison Services Fund',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>Developed to help with the cost of books, materials, postage, visitation, and other expenses associated with the In-Reach Heathen Services program. Use of the money in the funds is determined by the In-Reach Heathen Services Program Coordinator.</p>',
+    ],
+  ]);
+  $donation_in_reach->save();
+
+  $donation_irep = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_irep',
+    'price' => new Price('1', 'USD'),
+    'title' => 'International Relations and Exchange Program',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>International Relations and Exchange Program (IREP) was formed to facilitate and to participate in international discussion among inclusive Heathen/Asatru groups and individuals.</p>',
+    ],
+  ]);
+  $donation_irep->save();
+
+  $donation_gebo_fund = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_gebo_fund',
+    'price' => new Price('1', 'USD'),
+    'title' => 'Gebo Fund (Donation to Indigent Memberships)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>This fund aids indigent members with funds to join or to renew membership in The Troth.&nbsp;</p>
+
+<p>Determining receipt of funds for renewal will be under the purview of a committee to include the Clerk, Secretary, and one Rede member. Members receiving this award will be kept confidential and the renewal is for an electronic membership only, for one year only, and they will need to request this annually. They can request additional years but the purpose of our fund is to help with existing members who cannot afford to renew their membership, who have been determined that they have added to The Troth with their presence as members, and are agreed upon by the committee of no more than three officers listed above.<br />
+<br />
+Any donation amount helps. One $25 donation buys one electronic membership anywhere in the world.</p>
+
+<p><em>Existing Troth members with financial hardship may apply to be granted one year renewal electronic Troth membership, with a limit of three consecutive years of such per member. The Gebo fund is intended for members who have served and/or make a contribution to the betterment of our Organization. Gebo means gift and we believe in giving “a gift for a gift”</em></p>
+
+<p><em>Successive years after the first may require documentation of a minimum of four hours pre-approved community service.</em></p>
+
+<p><em>If granted renewal Gebo membership will be processed immediately as long as we have funds available, otherwise your renewal will be queued until such funds are available. The Troth collects donations to the Gebo fund and will match funds donated up to $500 per year for members in need.</em></p>
+
+<p><em>To apply for the Gebo fund renewal, contact the Clerk&nbsp;(clerk@thetroth.org ) detailing your hardship. The Clerk will present your application to the Gebo Committee for a vote, and will then notify you of the results.</em></p>',
+    ],
+  ]);
+  $donation_gebo_fund->save();
+
+  $donation_development = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_development',
+    'price' => new Price('1', 'USD'),
+    'title' => 'Kindred Development Fund',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>Money donated to this fund may be used for the development of local moots and other programs by Troth Kindred Program kindreds and hearths.</p>',
+    ],
+  ]);
+  $donation_development->save();
+
+  $donation_scholarship = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_scholarship',
+    'price' => new Price('1', 'USD'),
+    'title' => 'Scholarship Fund',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>See <a href="/donate/scholarship-fund.html">separate web page</a> for detailed description of the fund and the application process.</p>',
+    ],
+  ]);
+  $donation_scholarship->save();
+
+  $donation_general = ProductVariation::create([
+    'type' => 'donation',
+    'sku' => 'donation_general',
+    'price' => new Price('1', 'USD'),
+    'title' => 'General Operating Expenses	',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => '<p>Money donated to this fund may be used by The Troth for general expenses as determined by the Steer and the Reckoner.</p>',
+    ],
+  ]);
+  $donation_general->save();
+
+  $product = Product::create([
+    'type' => 'donation',
+    'title' => 'Troth Special Funds',
+    'stores' => [$store],
+    'variations' => [
+      $donation_red_hammer_main,
+      $donation_hah,
+      $donation_in_reach,
+      $donation_irep,
+      $donation_gebo_fund,
+      $donation_development,
+      $donation_scholarship,
+      $donation_general,
+    ],
+    'body' => [
+      'format' => 'basic_html',
+      'value' => '<p><strong>FUNDING CONSIDERATIONS</strong></p>
+
+<p>The Troth has a number of special budgetary funds that are earmarked for specific projects and needs. As a member, you have the option of directing $5.00 of your membership donation to be earmarked for one of these funds. This is totally voluntary.</p>
+
+<p>Donations to the funds may be conducted at any time by check or by PayPal. When renewing, you may also wish to divert $5 of your membership dues to one of the funds. Please drop a note to us at <a href="mailto:reckoner@thetroth.org">reckoner@thetroth.org</a>. Thank you for your support of our community efforts!</p>',
+    ],
+  ]);
+  $product->save();
+  $path = \Drupal::service('path.alias_storage')->save("/product/" . $product->id(), "/donate.html", "en");
+}

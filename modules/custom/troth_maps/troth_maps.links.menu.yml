@@ -1,0 +1,5 @@
+troth_maps_region_entity:  
+  title: 'Troth Maps configuration'  
+  route_name: troth_maps.region_listbuilder
+  description: 'Troth Maps admin'  
+  parent: troth.group.admin 

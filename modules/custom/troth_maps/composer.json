@@ -1,0 +1,27 @@
+{
+    "name": "custom/troth_maps",
+    "description": "Troth Maps provides maping functions.",
+    "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Robert Lewis",
+            "homepage": "https://ghosti.net",
+            "role": "Maintainer"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "drupal/leaflet": "^1.0",
+        "drupal/geocoder": "^3.0",
+        "geocoder-php/bing-maps-provider": "^4.0",
+        "gasparesganga/php-shapefile": "^3.0"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}

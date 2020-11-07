@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_code_of_conduct
+    - profile.type.membership_renew
+id: profile.membership_renew.field_code_of_conduct
+field_name: field_code_of_conduct
+entity_type: profile
+bundle: membership_renew
+label: 'Code of Conduct'
+description: "<p>To join The Troth we ask that you agree to follow our code of conduct.  You will also be asked to agree upon first log in and upon any changes.</p>\r\n<p><strong>Code of Conduct:</strong></p>\r\n\r\n[troth-user:code-conduct]"
+required: true
+translatable: true
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

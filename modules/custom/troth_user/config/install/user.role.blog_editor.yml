@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: blog_editor
+label: 'Blog Editor'
+weight: 15
+is_admin: null
+permissions: {  }

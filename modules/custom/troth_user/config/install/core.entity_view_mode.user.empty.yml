@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: kslFtnltEv8TjvhIYJrvgcK9rpXPKyCA23gEpxIAL98
+id: user.empty
+label: Empty
+targetEntityType: user
+cache: true

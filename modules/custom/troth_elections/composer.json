@@ -1,0 +1,17 @@
+{
+    "name": "custom/troth_elections",
+    "description": "Troth Elections provides an elections interface",
+    "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Robert Lewis",
+            "homepage": "https://ghosti.net",
+            "role": "Maintainer"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "html2text/html2text": "^4.0"
+    }
+}

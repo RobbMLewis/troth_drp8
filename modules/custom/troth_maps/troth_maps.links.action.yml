@@ -1,0 +1,20 @@
+troth_steward_entity_action_add:
+  route_name: entity.troth_steward.add_form
+  title: 'New Steward'
+  appears_on:
+    - entity.troth_steward.collection
+troth_maps.region_add_region:
+  route_name: troth_maps.region_add_region
+  title: 'New Major Region'
+  appears_on:
+    - troth_maps.region_listbuilder
+troth_maps.region_add_local_region:
+  route_name: troth_maps.region_add_local_region
+  title: 'New Local Region'
+  appears_on:
+    - troth_maps.local_region_listbuilder
+troth_maps.region_add_special_region:
+  route_name: troth_maps.region_add_special_region
+  title: 'New Special Region'
+  appears_on:
+    - troth_maps.special_region_listbuilder

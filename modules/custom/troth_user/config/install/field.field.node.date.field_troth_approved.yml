@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_troth_approved
+    - node.type.date
+  module:
+    - options
+id: node.date.field_troth_approved
+field_name: field_troth_approved
+entity_type: node
+bundle: date
+label: 'Troth Approved'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

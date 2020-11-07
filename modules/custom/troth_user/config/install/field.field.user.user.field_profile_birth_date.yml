@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_birth_date
+  module:
+    - datetime
+    - user
+_core:
+  default_config_hash: FfoIrDj0EEUCqf11WZOAkcTf0V48K35SDZnVucl8BeM
+id: user.user.field_profile_birth_date
+field_name: field_profile_birth_date
+entity_type: user
+bundle: user
+label: 'Birth Date'
+description: 'Please provide your birth date.  This will be used only to determine if you are over 18 years old and will not be shared.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

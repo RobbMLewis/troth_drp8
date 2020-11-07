@@ -1,0 +1,5 @@
+troth_elections_proposition_type_entity_action_add:
+  route_name: entity.troth_elections_proposition_type.add_form
+  title: 'New Proposition'
+  appears_on:
+    - entity.troth_elections_proposition_type.collection

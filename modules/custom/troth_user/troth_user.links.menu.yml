@@ -1,0 +1,16 @@
+troth_user.admin_settings_form:  
+  title: 'Troth User configuration'  
+  route_name: troth_user.admin_settings_form  
+  description: 'Troth User admin'  
+  parent: troth.group.admin 
+troth.group.admin:
+  title: 'Troth'
+  route_name: system.admin_config_troth
+  parent: system.admin_config
+  description: 'Troth Configuration'
+troth_user.member_search:
+  title: 'Find Members'
+  description: 'Member Search page'
+  parent: main
+  menu_name: main
+  route_name: troth_user.member_search

@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: public_relations
+label: 'Public Relations'
+weight: 6
+is_admin: null
+permissions: {  }

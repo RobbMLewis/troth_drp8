@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership_join
+    - field.storage.commerce_order_item.field_membership_join
+    - profile.type.membership_join
+_core:
+  default_config_hash: G1fmyphRp91D0s88Jc9KpKZVFHrG4i46bPkdZE5qWls
+id: commerce_order_item.membership_join.field_membership_join
+field_name: field_membership_join
+entity_type: commerce_order_item
+bundle: membership_join
+label: 'Membership Information'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:profile'
+  handler_settings:
+    target_bundles:
+      membership_join: membership_join
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_inmate
+  module:
+    - user
+_core:
+  default_config_hash: '-yIKP_X11zmx9N-l_xym7I_5g8X61pa6DaWEwJFavlY'
+id: user.user.field_profile_inmate
+field_name: field_profile_inmate
+entity_type: user
+bundle: user
+label: Inmate
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Currently an Inmate'
+  off_label: 'Not an Inmate'
+field_type: boolean

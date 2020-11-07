@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: xy1H_zVGzH1ttv5haeH-A5vJzNEaAovEAl7QoPSv6W8
+id: user.officer
+label: Officer
+targetEntityType: user
+cache: true

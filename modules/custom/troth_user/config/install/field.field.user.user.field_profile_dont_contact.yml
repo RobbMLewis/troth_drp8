@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_dont_contact
+  module:
+    - user
+_core:
+  default_config_hash: JulYwRCC6zdEwOFmdtoXa0kLK4MW5LpLpf3R4OGAkFk
+id: user.user.field_profile_dont_contact
+field_name: field_profile_dont_contact
+entity_type: user
+bundle: user
+label: 'Do Not Contact'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'Do Not Contact'
+  off_label: 'Allow contact'
+field_type: boolean

@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: public_paths
+label: 'Public Paths'
+type: 'canonical_entities:node'
+pattern: '[node:menu-link:parents:join-path]/[node:menu-link:title].html'
+selection_criteria:
+  77c3eae0-38a5-4278-8498-f853cb4db985:
+    id: node_type
+    bundles:
+      publications: publications
+      public_page: public_page
+      shop: shop
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 77c3eae0-38a5-4278-8498-f853cb4db985
+selection_logic: and
+weight: -5
+relationships: {  }

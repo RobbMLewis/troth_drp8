@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_last_name
+    - profile.type.membership_join
+_core:
+  default_config_hash: q9rfWhPxzJ9ZI5Cp0oN6qkh2PTveDuTQ3U3yHhDl2n4
+id: profile.membership_join.field_profile_last_name
+field_name: field_profile_last_name
+entity_type: profile
+bundle: membership_join
+label: 'Last Name'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

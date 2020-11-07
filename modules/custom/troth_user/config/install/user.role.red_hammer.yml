@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: red_hammer
+label: 'Red Hammer'
+weight: 17
+is_admin: null
+permissions: {  }

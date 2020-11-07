@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_birth_date
+    - profile.type.membership_join
+  module:
+    - datetime
+_core:
+  default_config_hash: QmSLmALUXEiv1I5P1MwU7hjcp0CwtaOeeghhZYvcQmY
+id: profile.membership_join.field_profile_birth_date
+field_name: field_profile_birth_date
+entity_type: profile
+bundle: membership_join
+label: 'Birth Date'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

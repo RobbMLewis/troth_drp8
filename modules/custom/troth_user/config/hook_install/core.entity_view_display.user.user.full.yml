@@ -1,0 +1,267 @@
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.user.full
+    - field.field.user.user.commerce_remote_id
+    - field.field.user.user.field_last_password_reset
+    - field.field.user.user.field_password_expiration
+    - field.field.user.user.field_profile_admin_notes
+    - field.field.user.user.field_profile_alt_email
+    - field.field.user.user.field_profile_birth_date
+    - field.field.user.user.field_profile_dont_contact
+    - field.field.user.user.field_profile_e_copies
+    - field.field.user.user.field_profile_expire_issue
+    - field.field.user.user.field_profile_family_id
+    - field.field.user.user.field_profile_first_name
+    - field.field.user.user.field_profile_gender
+    - field.field.user.user.field_profile_inmate
+    - field.field.user.user.field_profile_inmate_number
+    - field.field.user.user.field_profile_last_contact_date
+    - field.field.user.user.field_profile_last_name
+    - field.field.user.user.field_profile_last_renew_date
+    - field.field.user.user.field_profile_location
+    - field.field.user.user.field_profile_member_expire_date
+    - field.field.user.user.field_profile_member_notes
+    - field.field.user.user.field_profile_member_start_date
+    - field.field.user.user.field_profile_membership_control
+    - field.field.user.user.field_profile_membership_status
+    - field.field.user.user.field_profile_membership_type
+    - field.field.user.user.field_profile_shared_notes
+    - field.field.user.user.field_profile_ship_notes
+    - field.field.user.user.field_profile_troth_name
+    - field.field.user.user.field_profile_visibility
+    - field.field.user.user.field_telephone_number
+    - field.field.user.user.field_user_facebook_url
+    - field.field.user.user.field_user_instagram_url
+    - field.field.user.user.field_user_linkedin_url
+    - field.field.user.user.field_user_twitter_url
+    - field.field.user.user.user_picture
+    - image.style.thumbnail
+  module:
+    - address
+    - datetime
+    - image
+    - layout_builder
+    - link
+    - options
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: user.user.full
+targetEntityType: user
+bundle: user
+mode: full
+content:
+  field_profile_alt_email:
+    type: basic_string
+    weight: 6
+    region: content
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_birth_date:
+    type: datetime_custom
+    weight: 13
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      date_format: 'j F, Y'
+    third_party_settings: {  }
+  field_profile_e_copies:
+    type: boolean
+    weight: 20
+    region: content
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_profile_expire_issue:
+    type: number_integer
+    weight: 19
+    region: content
+    label: inline
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+  field_profile_first_name:
+    type: string
+    weight: 1
+    region: content
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_profile_last_name:
+    type: string
+    weight: 2
+    region: content
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_profile_last_renew_date:
+    type: datetime_default
+    weight: 17
+    region: content
+    label: inline
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_profile_location:
+    type: address_default
+    weight: 7
+    region: content
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_member_expire_date:
+    type: datetime_custom
+    weight: 18
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      date_format: 'j F, Y'
+    third_party_settings: {  }
+  field_profile_member_start_date:
+    type: datetime_custom
+    weight: 16
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      date_format: 'j F, Y'
+    third_party_settings: {  }
+  field_profile_membership_status:
+    weight: 15
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_profile_membership_type:
+    type: list_default
+    weight: 14
+    region: content
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+  field_profile_troth_name:
+    type: string
+    weight: 3
+    region: content
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_profile_visibility:
+    type: boolean
+    weight: 12
+    region: content
+    label: inline
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_telephone_number:
+    weight: 4
+    label: inline
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_user_facebook_url:
+    type: link
+    weight: 8
+    region: content
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: true
+      rel: nofollow
+      target: _blank
+      url_plain: false
+    third_party_settings: {  }
+  field_user_instagram_url:
+    type: link
+    weight: 10
+    region: content
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: true
+      rel: nofollow
+      target: _blank
+      url_plain: false
+    third_party_settings: {  }
+  field_user_linkedin_url:
+    type: link
+    weight: 11
+    region: content
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: true
+      rel: nofollow
+      target: _blank
+      url_plain: false
+    third_party_settings: {  }
+  field_user_twitter_url:
+    type: link
+    weight: 9
+    region: content
+    label: inline
+    settings:
+      trim_length: 80
+      url_only: true
+      rel: nofollow
+      target: _blank
+      url_plain: false
+    third_party_settings: {  }
+  mail:
+    type: basic_string
+    weight: 5
+    region: content
+    label: inline
+    settings: {  }
+    third_party_settings: {  }
+  user_picture:
+    type: image
+    weight: 0
+    region: content
+    settings:
+      image_style: thumbnail
+      image_link: content
+    third_party_settings: {  }
+    label: hidden
+hidden:
+  commerce_remote_id: true
+  customer_profiles: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_last_password_reset: true
+  field_password_expiration: true
+  field_profile_admin_notes: true
+  field_profile_dont_contact: true
+  field_profile_family_id: true
+  field_profile_gender: true
+  field_profile_inmate: true
+  field_profile_inmate_number: true
+  field_profile_last_contact_date: true
+  field_profile_member_notes: true
+  field_profile_membership_control: true
+  field_profile_shared_notes: true
+  field_profile_ship_notes: true
+  member_for: true
+  membership_join_profiles: true
+  membership_renew_profiles: true

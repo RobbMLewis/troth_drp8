@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: events
+label: Events
+type: 'canonical_entities:node'
+pattern: 'events/[node:field_date:start_date:html_datetime]'
+selection_criteria:
+  f12f8593-36d7-4015-8898-c3910c9fb6cd:
+    id: node_type
+    bundles:
+      date: date
+    negate: false
+    context_mapping:
+      node: node
+    uuid: f12f8593-36d7-4015-8898-c3910c9fb6cd
+selection_logic: and
+weight: -5
+relationships: {  }

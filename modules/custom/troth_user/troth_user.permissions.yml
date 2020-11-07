@@ -1,0 +1,20 @@
+troth user view member pages:
+  title: 'View member pages'
+  description: 'This allows the role to view all member pages.'
+  restrict access: TRUE
+troth user member view:
+  title: 'Member View of Member Info'
+  description: 'This allows the role to view all member shareable information in a users profile.'
+  restrict access: TRUE
+troth user admin view:
+  title: 'Admin View of Member Info'
+  description: 'This allows the role to view all information in a users profile.'
+  restrict access: TRUE
+troth user admin edit:
+  title: 'Admin Edit of Member Info'
+  description: 'This allows the role to edit all the information in a users profile.'
+  restrict access: TRUE
+troth user admin config:
+  title: 'Access Troth Admin Configuration'
+  description: 'This allows the role to modify the Troth configurations.'
+  restrict access: TRUE

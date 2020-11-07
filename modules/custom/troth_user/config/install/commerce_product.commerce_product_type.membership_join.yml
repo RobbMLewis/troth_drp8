@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: QIUZntUpRt3HJ2LMtaIYnZDpCNvcMVz4n7h6Ic27o-w
+id: membership_join
+label: 'Membership Join'
+description: ''
+variationType: membership_join
+multipleVariations: true
+injectVariationFields: true
+traits: {  }
+locked: false

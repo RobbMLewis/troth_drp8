@@ -1,0 +1,528 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the dbtng_example module.
+ */
+
+use Drupal\commerce_store\Entity\Store;
+use Drupal\Component\Serialization\Yaml;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_price\Price;
+
+/**
+ * Implements hook_install().
+ *
+ * Creates some default entries on this module custom table.
+ *
+ * @see hook_install()
+ *
+ * @ingroup troth_user
+ */
+function troth_user_install() {
+  // Replace these configs.  We're using code to do this, as they are already
+  // installed.
+  $dir = drupal_get_path('module', 'troth_user') . '/config/hook_install/';
+  $files = file_scan_directory($dir, "/\.yml$/");
+  foreach ($files as $file) {
+    $fileuri = $file->uri;
+    $config_id = explode('/', $fileuri);
+    $config_id = end($config_id);
+    $config_id = substr($config_id, 0, -4);
+    $raw_data = file_get_contents($fileuri);
+    \Drupal::configFactory()->getEditable($config_id)
+      ->setData(Yaml::decode($raw_data))
+      ->save();
+  }
+
+  // Create the store
+  // The store's address.
+  $address = [
+    'country_code' => 'US',
+    'address_line1' => 'P.O. Box 2131',
+    'locality' => 'Bristol',
+    'administrative_area' => 'PA',
+    'postal_code' => '19007',
+  ];
+
+  // The currency code.
+  $currency = 'USD';
+
+  // If needed, this will import the currency.
+  $currency_importer = \Drupal::service('commerce_price.currency_importer');
+  $currency_importer->import($currency);
+
+  $store = Store::create([
+    'type' => 'online',
+    'uid' => 1,
+    'name' => 'Default',
+    'mail' => 'clerk@thetroth.org',
+    'address' => $address,
+    'default_currency' => $currency,
+  ]);
+  $store->save();
+
+  // If needed, this sets the store as the default store.
+  $store_storage = \Drupal::service('entity_type.manager')->getStorage('commerce_store');
+  $store_storage->markAsDefault($store);
+
+  // Create membership products.
+  $adult_join_electronic = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'adult_join_electronic',
+    'price' => new Price('25', 'USD'),
+    'title' => 'Adult Membership Join, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with electronic Idunna.',
+    ],
+    'field_membership_type' => 'single',
+  ]);
+  $adult_join_electronic->save();
+
+  $adult_join_paper_na = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'adult_join_paper_na',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Adult Membership Join, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_join_paper_na->save();
+
+  $adult_join_paper_other = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'adult_join_paper_other',
+    'price' => new Price('60', 'USD'),
+    'title' => 'Adult Membership Join, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_join_paper_other->save();
+
+  $adult_join_paper_usa = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'adult_join_paper_usa',
+    'price' => new Price('40', 'USD'),
+    'title' => 'Adult Membership Join, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_join_paper_usa->save();
+
+  $family_join_electronic = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'family_join_electronic',
+    'price' => new Price('30', 'USD'),
+    'title' => 'Family Membership Join, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is a family membership with electronic Idunna.',
+    ],
+    'field_membership_type' => 'family',
+  ]);
+  $family_join_electronic->save();
+
+  $family_join_paper_na = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'family_join_paper_na',
+    'price' => new Price('50', 'USD'),
+    'title' => 'Family Membership Join, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_join_paper_na->save();
+
+  $family_join_paper_other = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'family_join_paper_other',
+    'price' => new Price('65', 'USD'),
+    'title' => 'Family Membership Join, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_join_paper_other->save();
+
+  $family_join_paper_usa = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'family_join_paper_usa	',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Family Membership Join, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_join_paper_usa->save();
+
+  $product = Product::create([
+    'type' => 'membership_join',
+    'title' => 'Membership Join',
+    'stores' => [$store],
+    'variations' => [
+      $adult_join_electronic,
+      $adult_join_paper_usa,
+      $adult_join_paper_na,
+      $adult_join_paper_other,
+      $family_join_electronic,
+      $family_join_paper_usa,
+      $family_join_paper_na,
+      $family_join_paper_other,
+    ],
+    'body' => [
+      'format' => 'basic_html',
+      'value' => "<p><em>If you are already a Troth member, please log in to visit the&nbsp;<a href=\"http://www.thetroth.org/renew.html\">Renew</a> page.</em><br />
+<br />
+<strong>To join the Troth:&nbsp;</strong>Membership includes a 1-year subscription (four issues) to Idunna, access to our e-mail lists, and after one year, eligibility for our Clergy and Lore training programs. To see the cost of memberships, including electronic versus paper subscription to Idunna (our quarterly journal), tap on the drop menu below.</p>
+
+<p>We mail our journal, Idunna,&nbsp;from the Continental United States of America, thus it costs more to join if you are overseas or outside the country- but electronic membership (where you download your own PDF copy of Idunna from our member's website) is the same no matter where you live. We recommend joining electronically whenever possible, as mailing a check can take up to four weeks before you may have access to our site- and electronic should give you immediate access.<br />
+<br />
+In choosing to join The Troth, you agree to abide by the following:<br />
+\"I agree to treat all Troth members with respect regardless of tradition, race, ethnicity, sexual orientation, ability, gender, or family structure in accordance with the Bylaws and policies of The Troth.\"</p>
+
+<p><strong>Current and Former Members</strong>: To renew or re-join, you need to <a href=\"/user\" rel=\"nofollow\">log in</a>. &nbsp;Once logged in, you will see a renewal form in the menu instead of the join form. &nbsp;If you do not recall your password, that can be reset <a href=\"/user/password\" rel=\"nofollow\">here</a>&nbsp;using your username or email address. &nbsp;If you don't know what your username or email is, please <a href=\"/contact?cat=clerk&amp;sub=need username for renewal\" rel=\"nofollow\">email the clerk</a>.</p>",
+    ],
+  ]);
+  $product->save();
+  $path = \Drupal::service('path.alias_storage')->save("/product/" . $product->id(), "/join-troth.html", "en");
+
+  $inmate_join_electronic = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'inmate_join_electronic',
+    'price' => new Price('25', 'USD'),
+    'title' => 'Inmate Membership Join, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is a inmate membership with electronic Idunna.',
+    ],
+    'field_inmate' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_join_electronic->save();
+
+  $inmate_join_paper_na = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'inmate_join_paper_na',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Inmate Membership Join, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_join_paper_na->save();
+
+  $inmate_join_paper_other = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'inmate_join_paper_other',
+    'price' => new Price('60', 'USD'),
+    'title' => 'Inmate Membership Join, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_join_paper_other->save();
+
+  $inmate_join_paper_usa = ProductVariation::create([
+    'type' => 'membership_join',
+    'sku' => 'inmate_join_paper_usa	',
+    'price' => new Price('40', 'USD'),
+    'title' => 'Inmate Membership Join, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_join_paper_usa->save();
+
+  $product = Product::create([
+    'type' => 'membership_join',
+    'title' => 'Inmate Membership Join',
+    'stores' => [$store],
+    'variations' => [
+      $inmate_join_electronic,
+      $inmate_join_paper_usa,
+      $inmate_join_paper_na,
+      $inmate_join_paper_other,
+    ],
+    'body' => [
+      'format' => 'basic_html',
+      'value' => "<p><em>If you are already a Troth member, please log in to visit the&nbsp;<a href=\"http://www.thetroth.org/renew.html\">Renew</a> page.</em><br />
+<br />
+<strong>To join the Troth:&nbsp;</strong>Membership includes a 1-year subscription (four issues) to Idunna, access to our e-mail lists, and after one year, eligibility for our Clergy and Lore training programs. To see the cost of memberships, including electronic versus paper subscription to Idunna (our quarterly journal), tap on the drop menu below.</p>
+
+<p>We mail our journal, Idunna,&nbsp;from the Continental United States of America, thus it costs more to join if you are overseas or outside the country- but electronic membership (where you download your own PDF copy of Idunna from our member's website) is the same no matter where you live. We recommend joining electronically whenever possible, as mailing a check can take up to four weeks before you may have access to our site- and electronic should give you immediate access.<br />
+<br />
+In choosing to join The Troth, you agree to abide by the following:<br />
+\"I agree to treat all Troth members with respect regardless of tradition, race, ethnicity, sexual orientation, ability, gender, or family structure in accordance with the Bylaws and policies of The Troth.\"</p>
+
+<p><strong>Current and Former Members</strong>: To renew or re-join, you need to <a href=\"/user\" rel=\"nofollow\">log in</a>. &nbsp;Once logged in, you will see a renewal form in the menu instead of the join form. &nbsp;If you do not recall your password, that can be reset <a href=\"/user/password\" rel=\"nofollow\">here</a>&nbsp;using your username or email address. &nbsp;If you don't know what your username or email is, please <a href=\"/contact?cat=clerk&amp;sub=need username for renewal\" rel=\"nofollow\">email the clerk</a>.</p>",
+    ],
+  ]);
+  $product->save();
+
+  $adult_renew_electronic = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'adult_renew_electronic',
+    'price' => new Price('25', 'USD'),
+    'title' => 'Adult Membership Renew, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with electronic Idunna.',
+    ],
+    'field_membership_type' => 'single',
+  ]);
+  $adult_renew_electronic->save();
+
+  $adult_renew_paper_na = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'adult_renew_paper_na',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Adult Membership Renew, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_renew_paper_na->save();
+
+  $adult_renew_paper_other = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'adult_renew_paper_other',
+    'price' => new Price('60', 'USD'),
+    'title' => 'Adult Membership Renew, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_renew_paper_other->save();
+
+  $adult_renew_paper_usa = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'adult_renew_paper_usa',
+    'price' => new Price('40', 'USD'),
+    'title' => 'Adult Membership Renew, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an adult membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'single',
+  ]);
+  $adult_renew_paper_usa->save();
+
+  $family_renew_electronic = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'family_renew_electronic',
+    'price' => new Price('30', 'USD'),
+    'title' => 'Family Membership Renew, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is a family membership with electronic Idunna.',
+    ],
+    'field_membership_type' => 'family',
+  ]);
+  $family_renew_electronic->save();
+
+  $family_renew_paper_na = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'family_renew_paper_na',
+    'price' => new Price('50', 'USD'),
+    'title' => 'Family Membership Renew, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_renew_paper_na->save();
+
+  $family_renew_paper_other = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'family_renew_paper_other',
+    'price' => new Price('65', 'USD'),
+    'title' => 'Family Membership Renew, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_renew_paper_other->save();
+
+  $family_renew_paper_usa = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'family_renew_paper_usa	',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Family Membership Renew, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an family membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'family',
+  ]);
+  $family_renew_paper_usa->save();
+
+  $product = Product::create([
+    'type' => 'membership_renew',
+    'title' => 'Membership Renew',
+    'stores' => [$store],
+    'variations' => [
+      $adult_renew_electronic,
+      $adult_renew_paper_usa,
+      $adult_renew_paper_na,
+      $adult_renew_paper_other,
+      $family_renew_electronic,
+      $family_renew_paper_usa,
+      $family_renew_paper_na,
+      $family_renew_paper_other,
+    ],
+    'body' => [
+      'format' => 'basic_html',
+      'value' => "<p><strong>To renew your membership in the Troth:&nbsp;</strong>Membership includes a 1-year subscription (four issues) to Idunna, access to our e-mail lists, and after one year, eligibility for our Clergy and Lore training programs.</p>
+
+<p>In choosing to renew you agree&nbsp;to uphold the following:<br />
+\"I agree to treat all Troth members with respect regardless of tradition, race, ethnicity, sexual orientation, ability, gender, or family structure in accordance with the Bylaws and policies of The Troth.\"</p>",
+    ],
+  ]);
+  $product->save();
+  $path = \Drupal::service('path.alias_storage')->save("/product/" . $product->id(), "/renew.html", "en");
+
+  $inmate_renew_electronic = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'inmate_renew_electronic',
+    'price' => new Price('25', 'USD'),
+    'title' => 'Inmate Membership Renew, Electronic Idunna',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is a inmate membership with electronic Idunna.',
+    ],
+    'field_inmate' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_renew_electronic->save();
+
+  $inmate_renew_paper_na = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'inmate_renew_paper_na',
+    'price' => new Price('45', 'USD'),
+    'title' => 'Inmate Membership Renew, Paper Idunna (North America Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered only to Canada or Mexico.',
+    ],
+    'field_allowed_countries' => ['CA', 'MX'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_renew_paper_na->save();
+
+  $inmate_renew_paper_other = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'inmate_renew_paper_other',
+    'price' => new Price('60', 'USD'),
+    'title' => 'Inmate Membership Renew, Paper Idunna (Elsewhere)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered outside of the United States, Canada, or Mexico.',
+    ],
+    'field_disallowed_countries' => ['US', 'CA', 'MX'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_renew_paper_other->save();
+
+  $inmate_renew_paper_usa = ProductVariation::create([
+    'type' => 'membership_renew',
+    'sku' => 'inmate_renew_paper_usa	',
+    'price' => new Price('40', 'USD'),
+    'title' => 'Inmate Membership Renew, Paper Idunna (USA Only)',
+    'field_description' => [
+      'format' => 'basic_html',
+      'value' => 'This is an inmate membership with paper Idunna to be delivered only to the United States.',
+    ],
+    'field_allowed_countries' => ['US'],
+    'field_inmate' => 1,
+    'field_paper_idunna' => 1,
+    'field_membership_type' => 'inmate',
+  ]);
+  $inmate_renew_paper_usa->save();
+
+  $product = Product::create([
+    'type' => 'membership_renew',
+    'title' => 'Inmate Membership Renew',
+    'stores' => [$store],
+    'variations' => [
+      $inmate_renew_electronic,
+      $inmate_renew_paper_usa,
+      $inmate_renew_paper_na,
+      $inmate_renew_paper_other,
+    ],
+    'body' => [
+      'format' => 'basic_html',
+      'value' => "<p><strong>To renew your membership in the Troth:&nbsp;</strong>Membership includes a 1-year subscription (four issues) to Idunna, access to our e-mail lists, and after one year, eligibility for our Clergy and Lore training programs.</p>
+
+<p>In choosing to renew you agree&nbsp;to uphold the following:<br />
+\"I agree to treat all Troth members with respect regardless of tradition, race, ethnicity, sexual orientation, ability, gender, or family structure in accordance with the Bylaws and policies of The Troth.\"</p>",
+    ],
+  ]);
+  $product->save();
+}

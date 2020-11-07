@@ -1,0 +1,121 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership_join
+    - core.entity_form_mode.commerce_order_item.add_to_cart
+    - field.field.commerce_order_item.membership_join.field_membership_join
+  module:
+    - commerce_product
+    - field_states_ui
+    - inline_entity_form
+    - xnumber
+id: commerce_order_item.membership_join.add_to_cart
+targetEntityType: commerce_order_item
+bundle: membership_join
+mode: add_to_cart
+content:
+  field_membership_join:
+    type: inline_entity_form_simple
+    weight: 2
+    region: content
+    settings:
+      form_mode: default
+      revision: false
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+      collapsible: false
+      collapsed: false
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+  field_t:
+    type: entity_reference_autocomplete
+    weight: 3
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+  field_terms_of_service:
+    type: commerce_entity_select
+    weight: 3
+    region: content
+    settings:
+      autocomplete_threshold: 7
+      autocomplete_size: 60
+      autocomplete_placeholder: ''
+      hide_single_entity: false
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+  field_test:
+    type: inline_entity_form_complex
+    weight: 2
+    region: content
+    settings:
+      form_mode: default
+      revision: false
+      override_labels: false
+      label_singular: ''
+      label_plural: ''
+      collapsible: false
+      collapsed: false
+      allow_new: true
+      allow_existing: false
+      match_operator: CONTAINS
+      allow_duplicate: false
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+  purchased_entity:
+    type: commerce_product_variation_title
+    weight: 0
+    settings:
+      label_display: true
+      label_text: 'Please select'
+      hide_single: true
+    region: content
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+          add: Add
+  quantity:
+    type: xnumber
+    weight: 1
+    region: content
+    settings:
+      default_value: '1'
+      step: '1'
+      min: '1'
+      max: ''
+      prefix: ''
+      suffix: ''
+      placeholder: ''
+      qty_prices: '0'
+      disable_on_cart: '0'
+      qty_price:
+        - {  }
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+hidden:
+  created: true
+  unit_price: true

@@ -1,0 +1,5 @@
+troth_google.admin_settings_form:  
+  title: 'Troth Google configuration'  
+  route_name: troth_google.admin_settings_form  
+  description: 'Troth Google admin'  
+  parent: troth.group.admin 

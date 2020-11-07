@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies: {  }
+id: anonymous
+label: 'Anonymous user'
+weight: -11
+is_admin: false
+permissions:
+  - 'access checkout'
+  - 'access content'
+  - 'display eu cookie compliance popup'
+  - 'view Terms and Conditions'
+  - 'view commerce_product'
+  - 'view files'
+  - 'view media'

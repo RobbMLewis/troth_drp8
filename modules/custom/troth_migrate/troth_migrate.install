@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the dbtng_example module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Creates some default entries on this module custom table.
+ *
+ * @see hook_install()
+ *
+ * @ingroup troth_migrate
+ */
+function troth_migrate_install() {
+  $todel = ['article', 'page', 'book'];
+  foreach ($todel as $type) {
+    $content_type = \Drupal::entityManager()->getStorage('node_type')->load($type);
+    $content_type->delete();
+  }
+
+}

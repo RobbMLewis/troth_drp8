@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_order
+    - profile
+_core:
+  default_config_hash: mTNZ2jLLUDa5ihwHuD07kseCYi4Cj-emdno9xEWC6ek
+id: commerce_order_item.field_membership_join
+field_name: field_membership_join
+entity_type: commerce_order_item
+type: entity_reference
+settings:
+  target_type: profile
+module: core
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

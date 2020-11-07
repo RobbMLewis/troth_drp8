@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: social_media_coordinators
+label: 'Social Media Coordinators'
+weight: 16
+is_admin: null
+permissions: {  }

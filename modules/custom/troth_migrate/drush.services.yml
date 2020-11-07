@@ -1,0 +1,6 @@
+services:
+  troth_migrate.commands:
+    class: Drupal\troth_migrate\Commands\DrushBatchProcessingCommands
+    tags:
+      - { name: drush.command }
+    arguments: ['@logger.factory']

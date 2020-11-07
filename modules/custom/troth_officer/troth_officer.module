@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+/**
+ * Returns the officer grouping by ID.
+ */
+function troth_officer_office_groups($name = NULL) {
+  $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
+  $short = [];
+  if ($name) {
+    foreach ($groups as $id => $data) {
+      if ($data['shortname'] == $name) {
+        $short[$id] = $data['shortname'];
+      }
+    }
+  }
+  else {
+    foreach ($groups as $id => $data) {
+      $short[$id] = $data['shortname'];
+    }
+  }
+  return($short);
+}

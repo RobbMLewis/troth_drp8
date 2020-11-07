@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: merchandising
+label: Merchandising
+weight: 3
+is_admin: null
+permissions: {  }

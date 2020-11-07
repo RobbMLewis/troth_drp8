@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: 0qrSZD06sIvcPCPqI1bJlZwhceFduDbZ-LoTDv1GSIw
+id: troth_date
+label: 'Troth Date'
+locked: false
+pattern: 'j F, Y'

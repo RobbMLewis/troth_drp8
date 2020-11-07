@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+use Drupal\pfdp\Entity\DirectoryEntity;
+
+/**
+ * Returns if user has access to directory.
+ */
+function troth_files_has_permission($uri) {
+  // Code originally from pfdp.module of private_files_download_permission.
+  $settings = \Drupal::config('pfdp.settings');
+  $user = \Drupal::currentUser();
+
+  // Extract the path from $uri, removing the protocol prefix and the file name.
+  $uri_path = array_slice(explode('/', $uri), 2, -1);
+  // Add a leading slash to $uri_path.
+  $uri_path = '/' . implode('/', $uri_path);
+  // Find the directory which best matches $uri_path.
+  $best_matching_length = 0;
+  $best_matching_directory = NULL;
+  foreach (DirectoryEntity::loadMultiple() as $directory) {
+    // Search for the best matching substring.
+    $directory_path = $directory->path;
+    if (stripos($uri_path, $directory_path) === 0) {
+      if ($best_matching_length < mb_strlen($directory_path)) {
+        $best_matching_length = mb_strlen($directory_path);
+        $best_matching_directory = $directory;
+      }
+    }
+  }
+
+  if ($best_matching_directory != NULL) {
+    // Evaluate user and role permissions and optionally allow access to $uri.
+    if ($settings->get('by_user_checks')) {
+      if (in_array($user->id(), pfdp_get_proper_user_array($best_matching_directory->users))) {
+        return TRUE;
+      }
+    }
+    foreach ($user->getRoles() as $rid) {
+      if (in_array($rid, $best_matching_directory->roles)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
+}

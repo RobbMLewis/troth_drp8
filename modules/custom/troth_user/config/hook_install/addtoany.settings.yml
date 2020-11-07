@@ -1,0 +1,51 @@
+buttons_size: 32
+additional_html: "<a class=\"a2a_button_facebook\"></a>\r\n<a class=\"a2a_button_twitter\"></a>\r\n<a class=\"a2a_button_email\"></a>\r\n"
+additional_css: 'float: right;'
+additional_js: ''
+universal_button: default
+custom_universal_button: ''
+universal_button_placement: before
+no_3p: false
+entities:
+  media: 0
+  node: 1
+  comment: 0
+  aggregator_item: 0
+  aggregator_feed: 0
+  block_content: 0
+  commerce_log: 0
+  commerce_order: 0
+  commerce_order_item: 0
+  commerce_payment: 0
+  commerce_payment_method: 0
+  commerce_product: 0
+  commerce_product_attribute_value: 0
+  commerce_product_variation: 0
+  commerce_promotion: 0
+  commerce_promotion_coupon: 0
+  commerce_store: 0
+  contact_message: 0
+  file: 0
+  legal_accepted: 0
+  legal_conditions: 0
+  menu_link_content: 0
+  path_alias: 0
+  profile: 0
+  shortcut: 0
+  taxonomy_term: 0
+  troth_elections_nomination_vote: 0
+  troth_elections_emails: 0
+  troth_elections_nomination_voter: 0
+  troth_elections_nomination_bios: 0
+  troth_elections_proposition_vote: 0
+  troth_elections_nomination: 0
+  troth_google: 0
+  troth_maps_zipcodes: 0
+  troth_steward: 0
+  troth_maps_state: 0
+  troth_maps_regions: 0
+  troth_maps_country: 0
+  troth_maps_county: 0
+  troth_officer: 0
+  user: 0
+  webform_submission: 0

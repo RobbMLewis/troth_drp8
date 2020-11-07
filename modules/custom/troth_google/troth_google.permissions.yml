@@ -1,0 +1,6 @@
+administer troth_google types:
+  title: 'Administer TrothGoogleGroupEntity types'
+  restrict access: true
+
+permission_callbacks:
+  - '\Drupal\troth_google\TrothGooglePermissionsGenerator::trothGoogleGroupTypePermissions'

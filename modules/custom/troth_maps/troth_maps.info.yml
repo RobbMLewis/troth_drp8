@@ -1,0 +1,18 @@
+name: Troth Maps
+description: Add Map integration for Troth.
+package: Troth
+type: module
+dependencies:
+  - drupal:troth_user
+  - drupal:leaflet
+  - drupal:leaflet_markercluster
+  - drupal:leaflet_views
+  - drupal:geocoder
+  - drupal:geocoder_address
+  - drupal:geocoder_field
+  - drupal:geocoder_geofield
+  - drupal:geofield
+
+core: 8.x
+php: 7.3
+hidden: FALSE

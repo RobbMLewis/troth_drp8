@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function troth_donate_form_commerce_order_item_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  $product = $form_state->get('product');
+  // Change form to display amount instead of quantity.
+  if ($product->bundle() == 'donation') {
+    // Get the currrency of the default store.
+    $entity_manager = \Drupal::entityManager();
+    $store = $entity_manager->getStorage('commerce_store')->loadDefault();
+    $currency = $store->getDefaultCurrencyCode();
+
+    // Update the add to cart from.
+    $form['quantity']['widget'][0]['value']['#title'] = t('Amount (@cur)', ['@cur' => $currency]);
+    $form['quantity']['#attributes'] = ['class' => ['container-inline']];
+  }
+}

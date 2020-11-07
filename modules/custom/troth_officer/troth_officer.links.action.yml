@@ -1,0 +1,10 @@
+troth_officer_entity_action_add:
+  route_name: entity.troth_officer.add_page
+  title: 'New Officer'
+  appears_on:
+    - entity.troth_officer.collection
+troth_officer_type_entity_action_add:
+  route_name: entity.troth_officer_type.add_form	
+  title: 'New Office'
+  appears_on:
+    - entity.troth_officer_type.collection	

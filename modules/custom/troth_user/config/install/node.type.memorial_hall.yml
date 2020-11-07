@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+name: 'Memorial Hall'
+type: memorial_hall
+description: 'These pages to honor and remember those that have passed from this world.'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,105 @@
+troth_elections.admin_settings_form:
+  route_name: troth_elections.admin_settings_form	
+  title: 'Elections Admin'
+  base_route: troth_elections.admin_settings_form
+
+troth_elections_proposition_type_task_edit:
+  route_name: entity.troth_elections_proposition_type.edit_form	
+  base_route:  entity.troth_elections_proposition_type.canonical	
+  title: 'Edit'
+
+troth_elections_proposition_type_task_delete:
+  route_name:  entity.troth_elections_proposition_type.delete_form	
+  base_route:  entity.troth_elections_proposition_type.canonical	
+  title: Delete
+  weight: 10
+
+troth_elections.office_type_edit:
+  route_name: troth_elections_offices_type.listbuilder
+  base_route: troth_elections.admin_settings_form		
+  title: 'Edit Offices'
+
+troth_elections.proposition_type_edit:
+  route_name: entity.troth_elections_proposition_type.collection	
+  base_route: troth_elections.admin_settings_form
+  title: 'Edit Propositions'
+
+troth_elections.cfn_edit:
+  route_name: troth_elections.cfn_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Call For Nominations'
+
+troth_elections.make_nom_admin_form:
+  route_name: troth_elections.make_nom_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Make Nominations'
+
+troth_elections.accept_nom_admin_form:
+  route_name: troth_elections.accept_nom_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Accept Nominations'
+
+troth_elections.nom_bio_admin_form:
+  route_name: troth_elections.nom_bio_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Candidate Statements'
+
+troth_elections.nom_ballot_admin_form:
+  route_name: troth_elections.nom_ballot_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Ballot'
+
+troth_elections.vote_results_admin_form:
+  route_name: troth_elections.vote_results_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Results'
+
+troth_elections.log_file_admin_form:
+  route_name: troth_elections.log_file_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Log File'
+
+troth_elections.fix_names_admin_form:
+  route_name: troth_elections.fix_names_admin_form	
+  base_route: troth_elections.admin_settings_form
+  title: 'Fix Names'
+
+troth_elections.prop_results_admin:
+  route_name: troth_elections.prop_results_admin	
+  base_route: troth_elections.admin_settings_form
+  title: 'Propositions'
+
+troth_elections.proxy_admin:
+  route_name: troth_elections.proxy_admin	
+  base_route: troth_elections.admin_settings_form
+  title: 'Proxies'
+
+troth_elections.create_pages_admin:
+  route_name: troth_elections.create_pages_admin	
+  base_route: troth_elections.admin_settings_form
+  title: 'Create Pages'
+
+troth_elections.base_form:
+  route_name: troth_elections.base_form	
+  title: 'Elections'
+  base_route: troth_elections.base_form
+
+troth_elections.make_nom_form:
+  route_name: troth_elections.make_nom_form	
+  base_route: troth_elections.base_form
+  title: 'Make Nominations'
+
+troth_elections.accept_nom_form:
+  route_name: troth_elections.accept_nom_form	
+  base_route: troth_elections.base_form
+  title: 'Accept Nominations'
+
+troth_elections.nom_bio_form:
+  route_name: troth_elections.nom_bio_form	
+  base_route: troth_elections.base_form
+  title: 'Candidate Statements'
+
+troth_elections.nom_ballot_form:
+  route_name: troth_elections.nom_ballot_form	
+  base_route: troth_elections.base_form
+  title: 'Ballot'

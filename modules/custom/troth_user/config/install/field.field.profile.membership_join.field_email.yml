@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_email
+    - profile.type.membership_join
+_core:
+  default_config_hash: W2f6CN6Fk5_EH19zztOLuDNubBH407YsoB85LxT5hPY
+id: profile.membership_join.field_email
+field_name: field_email
+entity_type: profile
+bundle: membership_join
+label: Email
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email

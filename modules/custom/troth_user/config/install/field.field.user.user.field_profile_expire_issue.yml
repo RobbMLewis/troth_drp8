@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_expire_issue
+  module:
+    - user
+_core:
+  default_config_hash: TL2CVNx4z6Z0IS5QOKfyEdi3RWGLKBzvgG4srQSUeRQ
+id: user.user.field_profile_expire_issue
+field_name: field_profile_expire_issue
+entity_type: user
+bundle: user
+label: 'Idunna Expire Issue'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 1
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

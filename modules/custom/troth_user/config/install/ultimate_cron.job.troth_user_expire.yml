@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - troth_user
+title: 'Troth Expire'
+id: troth_user_expire
+weight: 0
+module: troth_user
+callback: troth_user_expire_callback
+scheduler:
+  id: simple
+  configuration:
+    rules:
+      - '0+@ 0 * * *'
+launcher:
+  id: serial
+  configuration:
+    timeouts:
+      lock_timeout: 3600
+    launcher:
+      max_threads: 1
+logger:
+  id: database
+  configuration:
+    method: '3'
+    expire: 1209600
+    retain: 1000

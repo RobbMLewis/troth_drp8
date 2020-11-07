@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: dVAAEY9GFCAv2wnP_mtgUJgIgDttYm0y5VGAQkkKk-Q
+id: user.field_profile_expire_issue
+field_name: field_profile_expire_issue
+entity_type: user
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

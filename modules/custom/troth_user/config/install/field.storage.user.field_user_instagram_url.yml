@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - user
+_core:
+  default_config_hash: bDeRhrYATgtRJqKRKY4vbzNlldiNMb9iSfuykOSGdbA
+id: user.field_user_instagram_url
+field_name: field_user_instagram_url
+entity_type: user
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

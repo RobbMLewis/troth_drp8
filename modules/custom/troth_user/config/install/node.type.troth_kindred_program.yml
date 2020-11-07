@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+name: 'Troth Kindred Program'
+type: troth_kindred_program
+description: 'These pages will fall under the Troth Kindred Program menu, and will be editable by those with Troth Kindred Program edit files role'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

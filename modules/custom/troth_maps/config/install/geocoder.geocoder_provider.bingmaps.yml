@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+id: bingmaps
+label: BingMaps
+plugin: bingmaps
+configuration:
+  apiKey: Au1yuJ18wjE8oB23PV9Wv7qtsYhXaXOj9RAv0ufr6RH9TOHkbK82X3nTF3Kt5iti
+  throttle:
+    period: null
+    limit: null

@@ -1,0 +1,51 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.date.body
+    - field.field.node.date.field_date
+    - field.field.node.date.field_location
+    - field.field.node.date.field_troth_approved
+    - field.field.node.date.field_url
+    - node.type.date
+  module:
+    - datetime_range
+    - text
+    - user
+id: node.date.teaser
+targetEntityType: node
+bundle: date
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 2
+    settings:
+      trim_length: 200
+    third_party_settings: {  }
+    region: content
+  field_date:
+    type: daterange_default
+    weight: 1
+    region: content
+    label: above
+    settings:
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  addtoany: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_location: true
+  field_troth_approved: true
+  field_url: true

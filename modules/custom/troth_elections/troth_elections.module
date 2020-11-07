@@ -1,0 +1,1223 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+use Drupal\troth_elections\Entity\TrothElectionsNominationBios;
+use Drupal\user\Entity\User;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Url;
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\troth_elections\Entity\TrothElectionsNominationType;
+use Drupal\troth_elections\Entity\TrothElectionsEmailsType;
+use Drupal\troth_elections\Entity\TrothElectionsEmails;
+
+/**
+ * Implements hook_token_info().
+ */
+function troth_elections_token_info() {
+  $info = [];
+
+  $info['types'] = [
+    'troth-elections' => [
+      'name' => t('Troth Elections'),
+      'description' => t('Tokens related to the Troth Elections'),
+    ],
+  ];
+
+  $info['tokens'] = [
+    'troth-elections' => [
+    // [troth-elections:offices].
+      'offices' => [
+        'name' => t('Offices'),
+        'description' => t('Offices up for election.'),
+      ],
+      // [troth-elections:offices-or].
+      'offices-or' => [
+        'name' => t('Offices-or'),
+        'description' => t('Offices up for election joined with "or".'),
+      ],
+      // [troth-elections:nom-url].
+      'nom-url' => [
+        'name' => t('Nomination URL'),
+        'description' => t('URL of page to make nominations.'),
+      ],
+      // [troth-elections:nom-accept-url].
+      'nom-accept-url' => [
+        'name' => t('Nomination Acceptance URL'),
+        'description' => t('URL of page to accept nominations.'),
+      ],
+      // [troth-elections:nom-bio-url].
+      'nom-bio-url' => [
+        'name' => t('Bio Statement URL'),
+        'description' => t('URL of page to update bio statements.'),
+      ],
+      // [troth-elections:nom-date].
+      'nom-date' => [
+        'name' => t('Nomination End Date'),
+        'description' => t('Date that nominations end.'),
+      ],
+      // [troth-elections:nom-accept-date].
+      'nom-accept-date' => [
+        'name' => t('End Date for Nomination Acceptance'),
+        'description' => t('Date that a nomination needs to be accepted by.'),
+      ],
+      // [troth-elections:nom-bio-date].
+      'nom-bio-date' => [
+        'name' => t('End Date for Bio Entry'),
+        'description' => t('Date that a nominee needs to enter their by by.'),
+      ],
+      // [troth-elections:eo-name].
+      'eo-name' => [
+        'name' => t('Elections Officer Name'),
+        'description' => t('Name of the Elections Officer'),
+      ],
+      // [troth-elections:eo-email].
+      'eo-email' => [
+        'name' => t('Elections Officer Email'),
+        'description' => t('Email address of Elections Officer.'),
+      ],
+      // [troth-elections:first-name].
+      'first-name' => [
+        'name' => t('First Name of person'),
+        'description' => t('First name of the person.'),
+        'needs-data' => ['uid'],
+      ],
+      // [troth-elections:nom-pos].
+      'nom-pos' => [
+        'name' => t('Office Name'),
+        'description' => t('Name of the Office.'),
+        'needs-data' => ['office_id'],
+      ],
+      // [troth-elections:ballot-url].
+      'ballot-url' => [
+        'name' => t('Ballot URL'),
+        'description' => t('URL for the ballot.'),
+      ],
+      // [troth-elections:voting-closed].
+      'voting-closed' => [
+        'name' => t('Electin End Date'),
+        'description' => t('End date of the election.'),
+      ],
+    ],
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function troth_elections_tokens($type, $tokens, array $data = [], array $options = []) {
+  $replacements = [];
+
+  // Replacement values for tokens that can be calculated without any additional
+  // data.
+  if ($type == 'troth-elections') {
+    global $base_url;
+    $storage = \Drupal::entityTypeManager()
+      ->getStorage('troth_officer_type');
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'offices':
+          $results = \Drupal::entityQuery('troth_officer_type')
+            ->condition('office_number_open', 0, '>')
+            ->condition('office_open', 1, '=')
+            ->execute();
+          $entities = $storage->loadMultiple($results);
+          $out = [];
+          foreach ($entities as $entity) {
+            $office = $entity->getName();
+            $num = $entity->getNumOpen();
+            $pos = ($num == 1 ? 'position' : 'positions');
+            $out[] = "$office ($num $pos)";
+          }
+
+          $replacements[$original] = implode(' and ', $out);
+          break;
+
+        case 'offices-or':
+          $results = \Drupal::entityQuery('troth_officer_type')
+            ->condition('office_number_open', 0, '>')
+            ->condition('office_open', 1, '=')
+            ->execute();
+          $entities = $storage->loadMultiple($results);
+          $out = [];
+          foreach ($entities as $entity) {
+            $out[] = $entity->getName();
+          }
+
+          $replacements[$original] = implode(' or ', $out);
+          break;
+
+        case 'nom-url':
+          $url = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_url');
+          if (substr($url, 4) != 'http') {
+            $url = $base_url . $url;
+          }
+          $replacements[$original] = $url;
+          break;
+
+        case 'nom-accept-url':
+          $url = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_accept_url');
+          if (substr($url, 4) != 'http') {
+            $url = $base_url . $url;
+          }
+          $replacements[$original] = $url;
+          break;
+
+        case 'nom-bio-url':
+          $url = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_bio_url');
+          if (substr($url, 4) != 'http') {
+            $url = $base_url . $url;
+          }
+          $replacements[$original] = $url;
+          break;
+
+        case 'nom-date':
+          $date = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_end_date');
+          $date = new DrupalDateTime($date);
+          $replacements[$original] = $date->format('j M, Y');
+          break;
+
+        case 'nom-accept-date':
+          $date = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_accept_date');
+          $date = new DrupalDateTime($date);
+          $replacements[$original] = $date->format('j M, Y');
+          break;
+
+        case 'nom-bio-date':
+          $date = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_bio_date');
+          $date = new DrupalDateTime($date);
+          $replacements[$original] = $date->format('j M, Y');
+          break;
+
+        case 'eo-name':
+          $replacements[$original] = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_eo_name');
+          break;
+
+        case 'eo-email':
+          $replacements[$original] = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_eo_email');
+          break;
+
+        case 'first-name':
+          if (!isset($data['uid'])) {
+            break;
+          }
+          $uid = $data['uid'];
+          $account = User::load($data['uid']);
+          $replacements[$original] = $account->field_profile_first_name->value;
+          break;
+
+        case 'nom-pos':
+          if (!isset($data['office_id'])) {
+            break;
+          }
+          $entity = $storage->loadMultiple($data['office_id']);
+
+          $replacements[$original] = $entity->getName();
+          break;
+
+        case 'ballot-url':
+          $url = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_ballot_url');
+          if (substr($url, 4) != 'http') {
+            $url = $base_url . $url;
+          }
+          $replacements[$original] = $url;
+          break;
+
+        case 'voting-closed':
+          $date = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_end_date');
+          $date = new DrupalDateTime($date);
+          $replacements[$original] = $date->format('j M, Y');
+          break;
+      }
+    }
+  }
+  // An array of replacement values keyed by original token string.
+  return $replacements;
+}
+
+/**
+ * Returns array of uids of valid voters.
+ */
+function troth_elections_eligible_voters($uid = NULL, $message = FALSE) {
+  /*
+   * Requirements to vote:
+   *   Over 18 years old.
+   *   Member for 1 year
+   *   Active
+   *   Control is self, primary,secondary
+   * or:
+   *   Lifetime Member
+   */
+
+  // Set up the dates.
+  $today = new DrupalDateTime();
+  $today->setTimezone(timezone_open('America/Los_Angeles'));
+  $electionStartDate = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_open_date'), 'America/Los_Angeles');
+  $eighteen = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_end_date'), 'America/Los_Angeles');
+  $eighteen->sub(new DateInterval('P18Y'));
+  $oneyear = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_end_date'), 'America/Los_Angeles');
+  $oneyear->sub(new DateInterval('P1Y'));
+
+  // Set allowed controls.
+  $control = [
+    'self',
+    'primary',
+    'secondary',
+  ];
+
+  // Set allowed statuses.
+  $status = [
+    'active',
+  ];
+
+  // Regular member query.
+  $query = \Drupal::entityQuery('user')
+    ->condition('field_profile_membership_status', $status . 'in')
+    ->condition('field_profile_member_expire_date', $electionStartDate->format('Y-m-d'), '>=')
+    ->condition('field_profile_member_start_date', $oneyear->format('Y-m-d'), '<=')
+    ->condition('field_profile_membership_control', $control, 'in')
+    ->condition('field_profile_birth_date', $eighteen->format('Y-m-d'), '>=');
+  if (is_numeric($uid)) {
+    $query->condition('uid', $uid, '=');
+  }
+  $uids = $query->execute();
+
+  // Lifetime member query.
+  $query = \Drupal::entityQuery('user')
+    ->condition('field_profile_membership_status', $status . 'in')
+    ->condition('field_profile_membership_control', $control, 'in')
+    ->condition('field_profile_expire_issue', '999', '>=');
+  if (is_numeric($uid)) {
+    $query->condition('uid', $uid, '=');
+  }
+  $lifeuids = $query->execute();
+
+  // Merge and unique the results.
+  $voters = array_unique(array_merge(array_values($uids), array_values($lifeuids)));
+
+  // Sort for logical and consistent order.
+  asort($voters);
+
+  // Check if UID was found and we want to throw errors.
+  if (!in_array($uid, $voters) && $message) {
+    // We want to throw errors for why they are not voters.
+    $account = user_load($uid);
+    if (!in_array($account->field_profile_membership_status->value, $control)) {
+      // They failed with status.
+      drupal_set_message(t("You are not an elgible voter because your membership status is @status.  Allowed statuses are @allowed.  Please contatct the clerk at clerk@thetroth.org for more information.", [
+        '@status' => $account->field_profile_membership_status->value,
+        '@allowed' => implode(', ', $status),
+      ]), 'warning');
+    }
+    if (!in_array($account->field_profile_membership_control->value, $status)) {
+      // They failed with control.
+      drupal_set_message(t("You are not an elgible voter because your membership control is @control.  Allowed controls are @allowed.  Please contatct the clerk at clerk@thetroth.org for more information.", [
+        '@control' => $account->field_profile_membership_control->value,
+        '@allowed' => implode(', ', $control),
+      ]), 'warning');
+    }
+    $birth = new DrupalDateTime($account->field_profile_birth_date->value, 'America/Los_Angeles');
+    if ($birth > $eighteen) {
+      // They are under 18 years old.
+      drupal_set_message(t("You are not an elgible voter because you are under 18 years old at the end of the election.  You must have been born before @date.  Please contatct the clerk at clerk@thetroth.org for more information.", [
+        '@date' => $eighteen->format('j M, Y'),
+      ]), 'warning');
+    }
+    $join = new DrupalDateTime($account->field_profile_member_start_date->value, 'America/Los_Angeles');
+    if ($join > $oneyear) {
+      // They have been a member for less than 1 year.
+      drupal_set_message(t("You are not an elgible voter because you have not been a member for 1 year.  Your join date is @join and the cutoff was @date.  Please contatct the clerk at clerk@thetroth.org for more information.", [
+        '@join' => $join->format('j M, Y'),
+        '@date' => $oneyear->format('j M, Y'),
+      ]), 'warning');
+    }
+    $expire = new DrupalDateTime($account->field_profile_member_expire_date->value, 'America/Los_Angeles');
+    if ($expire < $electionStartDate) {
+      // The member is expired.
+      drupal_set_message(t("You are not an elgible voter because your membership is expired.  Your expire date is @expire and the cutoff was @date.  Please contatct the clerk at clerk@thetroth.org for more information.", [
+        '@expire' => $expire->format('j M, Y'),
+        '@date' => $electionStartDate->format('j M, Y'),
+      ]), 'warning');
+    }
+  }
+
+  // Return a regular aray of uids.
+  return $voters;
+}
+
+/**
+ * Returns if a user is a valid voter.
+ */
+function troth_elections_valid_voter($uid = NULL) {
+  if ($uid == NULL) {
+    // No UID given, we will check current user.
+    $uid = \Drupal::currentUser()->id();
+  }
+
+  // Get array back from troth_elections_eligible_voters.
+  $uids = troth_elections_eligible_voters($uid, TRUE);
+  if (count($uids) == 1) {
+    // They passed.
+    return TRUE;
+  }
+  else {
+    // They failed.
+    // Messages should have been set when getting the UIDs.
+    return FALSE;
+  }
+}
+
+/**
+ * Returns a display of the nominees.
+ */
+function troth_elections_nomination_display() {
+  $officestorage = \Drupal::entityTypeManager()
+    ->getStorage('troth_officer_type');
+  $results = \Drupal::entityQuery('troth_officer_type')
+    ->condition('office_number_open', 0, '>')
+    ->condition('office_open', 1, '=')
+    ->execute();
+  $entities = $officestorage->loadMultiple($results);
+  $offices = [];
+  foreach ($entities as $office_id => $office) {
+    $offices[$office_id]['name'] = $office->getName();
+    $offices[$office_id]['noms'] = [];
+  }
+
+  // Get all the nominations.
+  $entityStorage = \Drupal::entityTypeManager()
+    ->getStorage('troth_elections_nomination_type');
+  $results = \Drupal::entityQuery('troth_elections_nomination_type')
+    ->execute();
+  $nominations = $entityStorage->loadMultiple($results);
+  // Build array with data to display.
+  $num_required = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_ballot_num_noms');
+  foreach ($nominations as $nomination) {
+    $uid = $nomination->getNominee();
+    $account = User::load($uid);
+    $name = $account->field_profile_last_name->value . ", " . $account->field_profile_first_name->value;
+    $office_id = $nomination->getOffice();
+    $id = $nomination->id();
+    $status = 'Waiting for Seconds';
+    if ($nomination->getNominated() == 1) {
+      $status = 'Queried';
+    }
+    elseif ($nomination->getAccepted() == 1) {
+      $status = 'Accepted';
+    }
+    elseif ($nomination->getDeclined() == 1) {
+      $status = 'Declined';
+    }
+    elseif ($nomination->getIneligible() == 1) {
+      $status = 'Ineligible';
+    }
+    $offices[$office_id]['noms'][$name . $uid] = [
+      'name' => $name,
+      'status' => $status,
+    ];
+  }
+  ksort($offices);
+
+  // Get variables needed for the text.
+  $votingStartDate = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_open_date'), 'America/Los_Angeles');
+  $nom_start = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_start_date'), 'America/Los_Angeles');
+  $nom_end = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_end_date'), 'America/Los_Angeles');
+  $today = new DrupalDateTime();
+  $today->setTimezone(timezone_open('America/Los_Angeles'));
+  $eomail = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_eo_email');
+  $bylaws = Url::fromUserInput('/about/bylaws.html');
+
+  $output[] = [
+    '#markup' => t("<p>The following are the Nominations for the @year Elections.</p>", [
+      '@year' => $votingStartDate->format('Y'),
+    ]),
+  ];
+
+  // Start building the render array.
+  // Add a day to make it midnight the night before.
+  $nom_end->add(new DateInterval('P1D'));
+  if ($today < $nom_end && $today >= $nom_start) {
+    // Correct date back.
+    $nom_end->sub(new DateInterval('P1D'));
+    $output[] = [
+      '#markup' => t('<p>Nominations are open @start through @end.  To nominate someone for a position, <a href="mailto:@eomail">e-mail the elections officer</a>.  Qualifications for office can be found in <a href=":bylaws">Bylaws Article 5</a>.</p>', [
+        '@start' => $nom_start->format('j M, Y'),
+        '@end' => $nom_end->format('j M, Y'),
+        '@eomail' => $eomail,
+        ':bylaws' => $bylaws->toString(),
+      ]),
+    ];
+  }
+  else {
+    // Correct date back.
+    $nom_end->sub(new DateInterval('P1D'));
+    $output[] = [
+      '#markup' => t('<p>Nominations are open @start through @end.  Qualifications for office can be found in <a href=":bylaws">Bylaws Article 5</a>.</p>', [
+        '@start' => $nom_start->format('j M, Y'),
+        '@end' => $nom_end->format('j M, Y'),
+        ':bylaws' => $bylaws->toString(),
+      ]),
+    ];
+    $output[] = ['#markup' => t('<H2>Nominations are closed</H2>')];
+  }
+  $output[] = ['#markup' => t('<p>Once a person has accepted the nomination, their name will become a link to e-mail them.  If you have questions for someone that has accepted a nomination, please use that link to e-mail them.</p>')];
+
+  // Build render table for offices and nominees.
+  foreach ($offices as $office) {
+    $header = ["Name", "Nomination Status"];
+    $rows = [];
+    foreach ($office['noms'] as $name => $data) {
+      $rows[] = [$data['name'], $data['status']];
+    }
+    $output[] = [
+      '#theme' => 'table',
+      '#cache' => ['disabled' => TRUE],
+      '#caption' => new FormattableMarkup('<h2>@office<h2>', ['@office' => $office['name']]),
+      '#header' => $header,
+      '#rows' => $rows,
+    ];
+  }
+
+  return $output;
+}
+
+/**
+ * Returns a list of who voted.
+ */
+function troth_elections_voters() {
+  // Get total voting membership.
+  $voters = troth_elections_eligible_voters();
+  $numMems = count($voters);
+
+  $connection = \Drupal::database();
+
+  $query = $connection->select('troth_elections_nomination_voter', 'v');
+  $numVotes = $query->countQuery()->execute()->fetchField();
+  $voterPct = round(($numVotes / $numMems) * 100, 2);
+
+  $query = $connection->select('troth_elections_nomination_voter', 'v');
+  $query->join('user__field_profile_visibility', 'u', 'u.entity_id = v.uid');
+  $query->fields('v', ['uid'])
+    ->condition('u.field_profile_visibility_value', 1, '=');
+  $results = $query->execute()->fetchCol();
+  $message =
+  $output[] = [
+    '#markup' => t('<p>There have been a total of @numVotes voters out of the voting membership of @numMems members. This is @voterPct% of the voting membership.</p>', [
+      '@numVotes' => $numVotes,
+      '@numMems' => $numMems,
+      '@voterPct' => $voterPct,
+    ]),
+  ];
+
+  $url = Url::fromUserInput('/user/' . \Drupal::currentUser()->id() . '/edit');
+
+  $output[] = [
+    '#markup' => t('<p>All names listed are visible within The Troth.  No confidential information is displayed.  If you do not want your name displayed here, or if you are not listed and wish to be displayed, please <a href= ":url">edit your information</a>.  Set your visibility appropriately.</p><ul>', [
+      ':url' => $url->toString(),
+    ]),
+  ];
+
+  $voters = [];
+  foreach ($results as $uid) {
+    $account = User::load($uid);
+    $name = $account->field_profile_last_name->value . ", " . $account->field_profile_first_name->value;
+    $voters[$name] = t("<li>@name</li>", ['@name' => $name]);
+  }
+
+  ksort($voters);
+  if (count($voters) == 0) {
+    $output[] = ['#markup' => t("<li>No voters with visible information have voted.</li>\n")];
+  }
+  else {
+    $output[] = ['#markup' => implode("\n", $voters)];
+  }
+  $output[] = ['#markup' => t("</ul>\n")];
+  return $output;
+}
+
+/**
+ * Returns the candidates statements.
+ */
+function troth_candidate_statements() {
+  // Get all open offices.
+  $officestorage = \Drupal::entityTypeManager()
+    ->getStorage('troth_officer_type');
+  $results = \Drupal::entityQuery('troth_officer_type')
+    ->condition('office_number_open', 0, '>')
+    ->condition('office_open', 1, '=')
+    ->execute();
+  $entities = $officestorage->loadMultiple($results);
+  $offices = [];
+
+  foreach ($entities as $office_id => $office) {
+    $offices[$office_id]['office'] = $office;
+    $results = \Drupal::entityQuery('troth_elections_nomination_type')
+      ->condition('office_id', $office_id, '=')
+      ->condition('accepted', 1, '=')
+      ->execute();
+    foreach ($results as $nomtype) {
+      $nomination = TrothElectionsNominationType::load($nomtype);
+      $candidate = User::load($nomination->getNominee());
+      $firstName = $candidate->field_profile_first_name->value;
+      $lastName = $candidate->field_profile_last_name->value;
+      $prefName = $candidate->field_profile_troth_name->value;
+      $joinDate = new DrupalDateTime($candidate->field_profile_member_start_date->value);
+      $candidate_id = $lastName . $firstName . $candidate->id();
+      $offices[$office_id][$candidate_id]['firstName'] = $firstName;
+      $offices[$office_id][$candidate_id]['lastName'] = $lastName;
+      if ($prefName != '') {
+        $prefName = " ($prefName)";
+      }
+      $offices[$office_id][$candidate_id]['prefName'] = $prefName;
+      $name = "$lastName, $firstName $prefName";
+      $offices[$office_id][$candidate_id]['name'] = rtrim($name);
+      $offices[$office_id][$candidate_id]['joinDate'] = $joinDate;
+      $offices[$office_id][$candidate_id]['uid'] = $candidate->id();
+      $offices[$office_id][$candidate_id]['bio'] = t("<p>No Candidate Statement was Provided</p>");
+      $bioresults = \Drupal::entityQuery('troth_elections_nomination_bios')
+        ->condition('bundle', $nomtype, '=')
+        ->condition('uid', $candidate->id(), '=')
+        ->execute();
+      foreach ($bioresults as $bioId) {
+        $bioEntity = TrothElectionsNominationBios::load($bioId);
+        if ($bioEntity != NULL) {
+          $offices[$office_id][$candidate_id]['bio'] = $bioEntity->getBio()->value;
+        }
+      }
+    }
+  }
+  // Check if there are offices open.
+  // If not, state that, otherwise process offices.
+  if (count($offices) == 0) {
+    $output[] = ['#markup' => t('<p>There are no offices up for election at this time.</p>')];
+  }
+  else {
+    ksort($offices);
+    $order = ['steer', 'rede'];
+    foreach ($order as $office_id) {
+      if (isset($offices[$office_id])) {
+        $office = $offices[$office_id]['office'];
+        $candidates = $offices[$office_id];
+        unset($candidates['office']);
+        unset($offices[$office_id]);
+        ksort($candidates);
+
+        $output[] = [
+          '#markup' => t('<H3>@name</H3>', [
+            '@name' => $office->getName(),
+          ]),
+        ];
+        $output[] = [
+          '#markup' => t('<p><b>Number Open: @open, Term Length: @term year(s)</b></p>', [
+            '@open' => $office->getNumOpen(),
+            '@term' => $office->getTerm(),
+          ]),
+        ];
+        $output[] = ['#markup' => $office->getDescription()['value']];
+        $output[] = ['#markup' => ('<H3>Candidates:</H3>')];
+        if (count($candidates) == 0) {
+          $output[] = ['#markup' => t('<p>There are no candidates for this office.</p>')];
+        }
+        foreach ($candidates as $candidate) {
+          $output[] = [
+            '#markup' => t('<p>Name: <b>@name</b><br \>Member Since: @year</p>', [
+              '@name' => $candidate['name'],
+              '@year' => $candidate['joinDate']->format('Y'),
+            ]),
+          ];
+          $output[] = ['#markup' => $candidate['bio']];
+        }
+      }
+    }
+
+    foreach ($offices as $office_id => $data) {
+      $office = $offices[$office_id]['office'];
+      $candidates = $offices[$office_id];
+      unset($candidates['office']);
+      unset($offices[$office_id]);
+      ksort($candidates);
+
+      $output[] = [
+        '#markup' => t('<H3>@name</H3>', [
+          '@name' => $office->getName(),
+        ]),
+      ];
+      $output[] = [
+        '#markup' => t('<p><b>Number Open: @open, Term Length: @term year(s)</b></p>', [
+          '@open' => $office->getNumOpen(),
+          '@term' => $office->getTerm(),
+        ]),
+      ];
+      $output[] = ['#markup' => $office->getDescription()['value']];
+      $output[] = ['#markup' => ('<H3>Candidates:</H3>')];
+      if (count($candidates) == 0) {
+        $output[] = ['#markup' => t('<p>There are no candidates for this office.</p>')];
+      }
+      foreach ($candidates as $candidate) {
+        $output[] = [
+          '#markup' => t('<p>Name: <b>@name</b><br \>Member Since: @year</p>', [
+            '@name' => $candidate['name'],
+            '@year' => $candidate['joinDate']->format('Y'),
+          ]),
+        ];
+        $output[] = ['#markup' => $candidate['bio']];
+      }
+    }
+  }
+
+  return $output;
+}
+
+/**
+ * Return the log file results.
+ */
+function troth_election_log_results($year = NULL) {
+  if (!is_numeric($year) || $year == NULL) {
+    $votingStartDate = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_open_date'), 'America/Los_Angeles');
+    $year = $votingStartDate->format('Y');
+  }
+
+  $logpath = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_path');
+  $logFile = "$logpath/" . $year . "_votes.txt";
+  $summary = [];
+  if (file_exists($logFile)) {
+    $f = fopen($logFile, "r");
+    $contents = fread($f, filesize($logFile));
+    fclose($f);
+    $rows = explode("\n", $contents);
+    $votes = [];
+    foreach ($rows as $row) {
+      if ($row != '') {
+        $data = explode("\t", $row);
+        $uid = $data[1];
+        $all_votes = unserialize($data[3]);
+        $votes[$uid] = $all_votes;
+      }
+    }
+    foreach ($votes as $uid => $vote_row) {
+      foreach ($vote_row as $office_id => $vote) {
+        foreach ($vote as $candidate => $vote_count) {
+          if (!isset($summary[$office_id][$candidate])) {
+            $summary[$office_id][$candidate] = 0;
+          }
+          $summary[$office_id][$candidate] += $vote_count;
+        }
+      }
+    }
+  }
+  return $summary;
+}
+
+/**
+ * Returns the election results.
+ */
+function troth_election_db_results($public = NULL) {
+  // Set default variables.
+  $votingStartDate = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_open_date'), 'America/Los_Angeles');
+
+  $connection = \Drupal::database();
+  $query = $connection->select('troth_elections_nomination_vote', 'v')
+    ->fields('v', ['office_id', 'candidate'])
+    ->condition('vote', 1, '=');
+  $query->addExpression('COUNT(vote)', 'vote_count');
+  $query->groupBy('office_id');
+  $query->groupBy('candidate');
+  $results = $query->execute();
+  $dbvotes = [];
+  while ($row = $results->fetch()) {
+    $dbvotes[$row->office_id][$row->candidate] = $row->vote_count;
+  }
+
+  // Get the log votes.
+  $logvotes = [];
+  if (!$public) {
+    $logvotes = troth_election_log_results($votingStartDate->format('Y'));
+  }
+
+  // Get all open offices.
+  $officestorage = \Drupal::entityTypeManager()
+    ->getStorage('troth_officer_type');
+  $results = \Drupal::entityQuery('troth_officer_type')
+    ->condition('office_number_open', 0, '>')
+    ->condition('office_open', 1, '=')
+    ->execute();
+  $offices = $officestorage->loadMultiple($results);
+  if (!isset($offices) || count($offices) == 0) {
+    $output[] = ['#markup' => t('<p>There are no results to display</p>')];
+  }
+
+  if (!$public) {
+    $header = [
+      'candidate' => 'Candidate',
+      'votes' => 'Num Votes',
+      'logvote' => 'Log Votes',
+      'pctvotes' => 'Pct Votes',
+      'winner' => 'Winner',
+    ];
+  }
+  else {
+    $header = [
+      'candidate' => 'Candidate',
+      'votes' => 'Num Votes',
+      'pctvotes' => 'Pct Votes',
+      'winner' => 'Winner',
+    ];
+  }
+
+  $users[-2] = 'Abstain/No Vote';
+  // Build render table for offices and nominees.
+  foreach ($offices as $office_id => $office) {
+    $numOpen = $office->getNumOpen();
+    $plural = '';
+    if ($numOpen > 1) {
+      $plural = 's';
+    }
+    $caption = new FormattableMarkup('<h2>@office (@open position@plural)<h2>', [
+      '@office' => $office->getName(),
+      '@open' => $numOpen,
+      '@plural' => $plural,
+    ]);
+    $rows = [];
+    $results = \Drupal::entityQuery('troth_elections_nomination_type')
+      ->condition('office_id', $office_id, '=')
+      ->condition('accepted', 1, '=')
+      ->execute();
+    foreach ($results as $nomtype) {
+      $nomination = TrothElectionsNominationType::load($nomtype);
+      $account = User::load($nomination->getNominee());
+      $name = $account->field_profile_last_name->value . ", " . $account->field_profile_first_name->value;
+      if ($account->field_profile_troth_name->value != '') {
+        $name .= " (" . $account->field_profile_troth_name->value . ")";
+      }
+      $users[$account->id()] = $name;
+      $rows[$name . $account->id()] = [
+        'candidate' => $name,
+        'votes' => 0,
+        'pctvotes' => 0,
+        'logvote' => 0,
+        'winner' => '',
+      ];
+    }
+
+    $voteTotal = 0;
+    foreach ($dbvotes[$office_id] as $candidate => $votes) {
+      if (is_numeric($candidate) && !isset($users[$candidate]) && $candidate > 0) {
+        $account = User::load($candidate);
+        $name = $account->field_profile_last_name->value . ", " . $account->field_profile_first_name->value;
+        if ($account->field_profile_troth_name->value != '') {
+          $name .= " (" . $account->field_profile_troth_name->value . ")";
+        }
+        $users[$candidate] = $name;
+      }
+      elseif (!is_numeric($candidate) && !isset($users[$candidate])) {
+        $users[$candidate] = $candidate;
+      }
+      $name = $users[$candidate];
+      if (!isset($rows[$name . $candidate])) {
+        $rows[$name . $candidate] = [
+          'candidate' => $name,
+          'votes' => 0,
+          'pctvotes' => 0,
+          'logvote' => 0,
+          'winner' => '',
+        ];
+      }
+      $rows[$name . $candidate]['votes'] = $votes;
+      $voteTotal += $votes;
+    }
+
+    if (!$public) {
+      foreach ($logvotes[$office_id] as $candidate => $votes) {
+        if (is_numeric($candidate) && !isset($users[$candidate]) && $candidate > 0) {
+          $account = User::load($candidate);
+          $name = $account->field_profile_last_name->value . ", " . $account->field_profile_first_name->value;
+          if ($account->field_profile_troth_name->value != '') {
+            $name .= " (" . $account->field_profile_troth_name->value . ")";
+          }
+          $users[$candidate] = $name;
+        }
+        elseif (!is_numeric($candidate) && !isset($users[$candidate])) {
+          $users[$candidate] = $candidate;
+        }
+        $name = $users[$candidate];
+        if (!isset($rows[$name . $candidate])) {
+          $rows[$name . $candidate] = [
+            'candidate' => $name,
+            'votes' => 0,
+            'pctvotes' => 0,
+            'logvote' => 0,
+            'winner' => '',
+          ];
+        }
+        $rows[$name . $candidate]['logvote'] = $votes;
+      }
+    }
+
+    // We set pct and winner by db results.
+    $winners = [];
+    foreach ($rows as $id => $data) {
+      $rows[$id]['pctvotes'] = $data['votes'] / $voteTotal * 100;
+      $winners[$data['votes']][] = $id;
+    }
+    ksort($winners);
+    $data = [];
+    while (count($winners) > 0) {
+      $winner = array_pop($winners);
+      if ($numOpen > 0) {
+        foreach ($winner as $id) {
+          if ($id != 'Abstain/No Vote-2') {
+            $rows[$id]['winner'] = '*';
+            $numOpen--;
+          }
+        }
+      }
+      foreach ($winner as $id) {
+        if ($id != 'Abstain/No Vote-2') {
+          if (!$public) {
+            if ($rows[$id]['votes'] != $rows[$id]['logvote']) {
+              $data[$id] = [
+                'data' => [
+                  $rows[$id]['candidate'],
+                  $rows[$id]['votes'],
+                  $rows[$id]['logvote'],
+                  $rows[$id]['pctvotes'],
+                  $rows[$id]['winner'],
+                ],
+                'style' => ['background-color:#FF0000; font-weight: bold'],
+              ];
+            }
+            else {
+              $data[$id] = [
+                $rows[$id]['candidate'],
+                $rows[$id]['votes'],
+                $rows[$id]['logvote'],
+                $rows[$id]['pctvotes'],
+                $rows[$id]['winner'],
+              ];
+            }
+          }
+          else {
+            $data[$id] = [
+              $rows[$id]['candidate'],
+              $rows[$id]['votes'],
+              $rows[$id]['pctvotes'],
+              $rows[$id]['winner'],
+            ];
+          }
+        }
+      }
+    }
+    $id = 'Abstain/No Vote-2';
+    if (!$public) {
+      if ($rows[$id]['votes'] != $rows[$id]['logvote']) {
+        $data[$id] = [
+          'data' => [
+            $rows[$id]['candidate'],
+            $rows[$id]['votes'],
+            $rows[$id]['logvote'],
+            $rows[$id]['pctvotes'],
+            $rows[$id]['winner'],
+          ],
+          'style' => ['background-color:#FF0000; font-weight: bold'],
+        ];
+      }
+      else {
+        $data[$id] = [
+          $rows[$id]['candidate'],
+          $rows[$id]['votes'],
+          $rows[$id]['logvote'],
+          $rows[$id]['pctvotes'],
+          $rows[$id]['winner'],
+        ];
+      }
+    }
+    else {
+      $data[$id] = [
+        $rows[$id]['candidate'],
+        $rows[$id]['votes'],
+        $rows[$id]['pctvotes'],
+        $rows[$id]['winner'],
+      ];
+    }
+
+    $output[] = [
+      '#theme' => 'table',
+      '#cache' => ['disabled' => TRUE],
+      '#caption' => $caption,
+      '#header' => $header,
+      '#rows' => $data,
+    ];
+  }
+
+  return $output;
+
+}
+
+/**
+ * Returns the proposition results.
+ */
+function troth_election_db_prop_results() {
+  // Get proposition data.
+  $propstorage = \Drupal::entityTypeManager()
+    ->getStorage('troth_elections_proposition_type');
+  $results = \Drupal::entityQuery('troth_elections_proposition_type')
+    ->execute();
+  $entities = $propstorage->loadMultiple($results);
+  $propositions = [];
+  foreach ($entities as $prop_id => $prop) {
+    $name = $prop->getName();
+    $text = $prop->getText();
+    $opts = explode(PHP_EOL, $prop->getOptions());
+    $options = [];
+    foreach ($opts as $option) {
+      $options[$option] = 0;
+    }
+    $propositions[$prop_id] = [
+      'name' => $prop->getName(),
+      'text' => $prop->getText()['value'],
+      'votes' => $options,
+    ];
+  }
+
+  $connection = \Drupal::database();
+  $query = $connection->select('troth_elections_proposition_vote', 'v')
+    ->fields('v', ['uidhash', 'proposition_id', 'vote']);
+  $results = $query->execute();
+
+  while ($row = $results->fetchAssoc()) {
+    $propositions[$row['proposition_id']]['votes'][$row['vote']]++;
+  }
+
+  if (count($propositions) > 0) {
+    $output[] = ['#markup' => t('<p>The following are the results for the propositions on the ballot.</p>')];
+    foreach ($propositions as $prop_id => $data) {
+      $output[] = [
+        '#markup' => t('<H3>@prop</H3>', [
+          '@prop' => $data['name'],
+        ]),
+      ];
+      $output[] = ['#markup' => $data['text']];
+      $options = $data['votes'];
+      arsort($options);
+      $output[] = ['#markup' => '<ul>'];
+      foreach ($options as $opt => $vote) {
+        $output[] = [
+          '#markup' => t('<li><b>@opt</b>: @vote</li>', [
+            '@opt' => $opt,
+            '@vote' => $vote,
+          ]),
+        ];
+      }
+      $output[] = ['#markup' => '</ul>'];
+    }
+  }
+  else {
+    $output[] = ['#markup' => t('<p>There are no results to display.</p>')];
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_cron().
+ */
+function troth_elections_email_cron($limit = 20) {
+  $today = new DrupalDateTime();
+  $today->setTimezone(timezone_open('America/Los_Angeles'));
+  // Get variables.
+  $debug = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_debug');
+  $from = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_eo_email');
+
+  // Get dates.
+  $nom_start = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_start_date'), 'America/Los_Angeles');
+  $nom_end = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_nom_end_date'), 'America/Los_Angeles');
+  $vote_start = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_open_date'), 'America/Los_Angeles');
+  $vote_end = new DrupalDateTime(\Drupal::config('troth_elections.adminsettings')->get('troth_elections_voting_end_date'), 'America/Los_Angeles');
+
+  // General things we will need.
+  $connection = \Drupal::database();
+  $mailManager = \Drupal::service('plugin.manager.mail');
+  $token_service = \Drupal::token();
+
+  // Get elgible voters.
+  $posVoters = troth_elections_eligible_voters();
+
+  // Call for Nominations.
+  if ($today >= $nom_start && $today <= $nom_end) {
+    // Get the email type entity.
+    $emailType = TrothElectionsEmailsType::load('cfn');
+    if ($emailType == NULL) {
+      // We haven't done this before, create the type.
+      $emailType = TrothElectionsEmailsType::create([
+        'id' => 'cfn',
+        'label' => 'Call for Nomination',
+      ]);
+      $emailType->save();
+    }
+
+    $query = $connection->select('troth_elections_emails', 'e')
+      ->fields('e', ['uid'])
+      ->condition('bundle', 'cfn', '=');
+    $sentEmails = $query->execute()->fetchCol();
+
+    // Get those we need to send emails to and take the first X.
+    $needEmails = array_diff($posVoters, $sentEmails);
+    asort($needEmails);
+    $sendEmails = array_slice($needEmails, 0, $limit);
+    if (count($sendEmails) > 0) {
+      // We need to send an email. Get the data.
+      $path = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_path');
+      $file = $path . '/cfn.txt';
+      if (!file_destination($file, FILE_EXISTS_ERROR)) {
+        $cfn = file_get_contents($emailfile);
+      }
+      else {
+        $tokendefault = DRUPAL_ROOT . '/' . drupal_get_path('module', 'troth_elections') . '/email_templates/default_cfn.txt';
+        $cfn_token = file_get_contents($tokendefault);
+        // Save the default for next run.
+        $file = $path . '/cfn_token.txt';
+        $fh = fopen($file, 'w');
+        fwrite($fh, $cfn_token);
+        fclose($fh);
+
+        $cfn = $token_service->replace($cfn_token);
+        $file = $path . '/cfn.txt';
+        $fh = fopen($file, 'w');
+        fwrite($fh, $cfn);
+        fclose($fh);
+      }
+
+      // Now go through the users and send emails.
+      $startUser = 0;
+      $endUser = 0;
+      foreach ($sendEmails as $uid) {
+        if ($startUser == 0) {
+          $startUser = $uid;
+        }
+        $endUser = $uid;
+        $account = User::load($uid);
+        $first = $account->field_profile_first_name->value;
+        $to = $account->getEmail();
+        $langcode = $account->getPreferredLangcode();
+        $message = preg_replace('/\[FIRSTNAME\]/', $first, $cfn);
+        $params['message'] = $message;
+        $params['sub'] = "Troth Elections, Call for Nominations ($uid)";
+        $params['from'] = $from;
+
+        // Send email.
+        if ($debug == 1) {
+          // We're debugging, just send the message to the EO.
+          $to = $from;
+          $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+          // Exit the script.
+          return;
+        }
+        else {
+          // Send to the member if there is an email address.
+          if ($to != '') {
+            $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+          }
+
+          // Save that we sent this so we don't send it again.
+          $now = new DrupalDateTime();
+          $now->setTimezone(timezone_open('America/Los_Angeles'));
+          $emailEntity = TrothElectionsEmails::create([
+            'bundle' => 'cfn',
+            'uid' => $uid,
+            'email' => $to,
+            'date_sent' => $now->format('Y-m-d H:i:s'),
+          ]);
+          $emailEntity->save();
+
+          // Limit emails to no more than 12 a min.
+          sleep(5);
+        }
+      }
+      \Drupal::logger('troth_elections')->notice("CFN emails have been sent to UID's %suid to %euid", [
+        '%suid' => $startUser,
+        '%euid' => $endUser,
+      ]);
+    }
+  }
+
+  // Ballot is open.
+  if ($today >= $vote_start && $today <= $vote_end) {
+    // Get the email type entity.
+    $emailType = TrothElectionsEmailsType::load('ballot');
+    if ($emailType == NULL) {
+      // We haven't done this before, create the type.
+      $emailType = TrothElectionsEmailsType::create([
+        'id' => 'ballot',
+        'label' => 'Ballot is open',
+      ]);
+      $emailType->save();
+    }
+
+    $query = $connection->select('troth_elections_emails', 'e')
+      ->fields('e', ['uid'])
+      ->condition('bundle', 'ballot', '=');
+    $sentEmails = $query->execute()->fetchCol();
+
+    // Get those we need to send emails to and take the first X.
+    $needEmails = array_diff($posVoters, $sentEmails);
+    asort($needEmails);
+    $sendEmails = array_slice($needEmails, 0, $limit);
+    if (count($sendEmails) > 0) {
+      $startUser = 0;
+      $endUser = 0;
+      $open = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_ballot_open');
+      foreach ($sendEmails as $uid) {
+        if ($startUser == 0) {
+          $startUser = $uid;
+        }
+        $endUser = $uid;
+        $message = $token_service->replace($open, ['uid' => $uid]);
+        $account = User::load($uid);
+        $to = $account->getEmail();
+        $langcode = $account->getPreferredLangcode();
+        $params['message'] = $message;
+        $params['sub'] = "Troth Elections, Ballot Open ($uid)";
+        $params['from'] = $from;
+
+        // Send email.
+        if ($debug == 1) {
+          // We're debugging, just send the message to the EO.
+          $to = $from;
+          $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+          // Exit the script.
+          return;
+        }
+        else {
+          // Send to the member if there is an email address.
+          if ($to != '') {
+            $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+          }
+
+          // Save that we sent this so we don't send it again.
+          $now = new DrupalDateTime();
+          $now->setTimezone(timezone_open('America/Los_Angeles'));
+          $emailEntity = TrothElectionsEmails::create([
+            'bundle' => 'ballot',
+            'uid' => $uid,
+            'email' => $to,
+            'date_sent' => $now->format('Y-m-d H:i:s'),
+          ]);
+          $emailEntity->save();
+
+          // Limit emails to no more than 12 a min.
+          sleep(5);
+        }
+      }
+      \Drupal::logger('troth_elections')->notice("CFN emails have been sent to UID's %suid to %euid", [
+        '%suid' => $startUser,
+        '%euid' => $endUser,
+      ]);
+    }
+  }
+}

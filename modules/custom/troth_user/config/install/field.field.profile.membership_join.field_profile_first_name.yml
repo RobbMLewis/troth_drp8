@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_first_name
+    - profile.type.membership_join
+_core:
+  default_config_hash: Hru8CwyOAFuPjgedrBNUKiGA-Pez7eekdm-xd0TIxG8
+id: profile.membership_join.field_profile_first_name
+field_name: field_profile_first_name
+entity_type: profile
+bundle: membership_join
+label: 'First Name'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

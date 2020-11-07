@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_profile_member_notes
+    - profile.type.membership_join
+  module:
+    - text
+id: profile.membership_join.field_profile_member_notes
+field_name: field_profile_member_notes
+entity_type: profile
+bundle: membership_join
+label: 'Messages/Comments to Administrators'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long

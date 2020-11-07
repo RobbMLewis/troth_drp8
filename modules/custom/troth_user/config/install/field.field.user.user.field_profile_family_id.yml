@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_family_id
+  module:
+    - user
+_core:
+  default_config_hash: gefuIGZk8OcDeLH3y5X6XEFxnsokeyZOR27105tqLDs
+id: user.user.field_profile_family_id
+field_name: field_profile_family_id
+entity_type: user
+bundle: user
+label: 'Family ID'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

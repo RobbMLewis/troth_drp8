@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_product
+    - options
+id: commerce_product_variation.field_membership_type
+field_name: field_membership_type
+entity_type: commerce_product_variation
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: single
+      label: 'Single Membership'
+    -
+      value: family
+      label: 'Family Membership'
+    -
+      value: subscription
+      label: 'Subscription Only'
+    -
+      value: inmate
+      label: 'Inmate Membership'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

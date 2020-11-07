@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_e_copies
+  module:
+    - user
+_core:
+  default_config_hash: x1ndcHmcPYqQGYTzWFIsD3uTPqPY6n3dI3V_WkGW3fw
+id: user.user.field_profile_e_copies
+field_name: field_profile_e_copies
+entity_type: user
+bundle: user
+label: 'E Copy'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'Received E-copies'
+  off_label: 'Don''t receive E-copies'
+field_type: boolean

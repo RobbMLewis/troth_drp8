@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_subscribe_mailing_lists
+    - profile.type.membership_join
+  module:
+    - options
+id: profile.membership_join.field_subscribe_mailing_lists
+field_name: field_subscribe_mailing_lists
+entity_type: profile
+bundle: membership_join
+label: 'Subscribe Mailing Lists'
+description: 'Check what mailing lists you wish to subscribe to when your membership is approved.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

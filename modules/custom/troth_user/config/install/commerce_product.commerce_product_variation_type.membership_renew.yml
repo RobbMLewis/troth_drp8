@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: a8FA-KOUMyjUgNzw1fpMAP2bXcPb00yHIEOlmmbM-qo
+id: membership_renew
+label: 'Membership Renew'
+orderItemType: membership_renew
+generateTitle: null
+traits: {  }
+locked: false

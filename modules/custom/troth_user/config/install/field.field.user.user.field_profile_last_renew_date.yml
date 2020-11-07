@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_last_renew_date
+  module:
+    - datetime
+    - user
+_core:
+  default_config_hash: CTwSiUNwDnKJhFOnnIhbRYHbBfMbVLdY1c8-hXrJZtI
+id: user.user.field_profile_last_renew_date
+field_name: field_profile_last_renew_date
+entity_type: user
+bundle: user
+label: 'Last Renewed Date'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    default_date_type: now
+    default_date: now
+default_value_callback: ''
+settings: {  }
+field_type: datetime

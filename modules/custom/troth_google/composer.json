@@ -1,0 +1,17 @@
+{
+    "name": "custom/troth_google",
+    "description": "Troth Google provides an interface to the Google Groups API",
+    "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Robert Lewis",
+            "homepage": "https://ghosti.net",
+            "role": "Maintainer"
+        }
+    ],
+    "license": "GPL-2.0-or-later",
+    "minimum-stability": "dev",
+    "require": {
+        "google/apiclient": "^2.0"
+    }
+}

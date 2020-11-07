@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: tcpdfv1
+settings:
+  page_format: LETTER
+  orientation: portrait

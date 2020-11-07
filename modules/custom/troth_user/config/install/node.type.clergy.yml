@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+name: Clergy
+type: clergy
+description: 'These pages will fall under the Clergy menu, and will be editable by those with Clergy edit files role'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: elections_officer
+label: 'Elections officer'
+weight: -2
+is_admin: null
+permissions: {  }

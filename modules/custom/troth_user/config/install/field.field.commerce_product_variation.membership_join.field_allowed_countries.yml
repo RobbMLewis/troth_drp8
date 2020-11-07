@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_variation_type.membership_join
+    - field.storage.commerce_product_variation.field_allowed_countries
+  module:
+    - address
+id: commerce_product_variation.membership_join.field_allowed_countries
+field_name: field_allowed_countries
+entity_type: commerce_product_variation
+bundle: membership_join
+label: 'Allowed Countries'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  available_countries: {  }
+field_type: address_country

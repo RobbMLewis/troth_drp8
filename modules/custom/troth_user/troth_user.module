@@ -1,0 +1,830 @@
+<?php
+
+/**
+ * @file
+ * Custom functions for the event handling.
+ */
+
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\user\Entity\User;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Component\Utility\Html;
+use CommerceGuys\Addressing\Country\CountryRepository;
+use Drupal\commerce_product\Entity\ProductVariation;
+
+/**
+ * For testing purposes.
+ */
+function troth_user_test($id = 6) {
+}
+
+/**
+ * Implements hook_entity_view_mode_alter().
+ */
+function troth_user_entity_view_mode_alter(&$view_mode, EntityInterface $entity, $context) {
+  if ($entity->getEntityTypeId() == 'user') {
+    $uid = $entity->uid->value;
+    $account = \Drupal::currentUser();
+    $roles = $account->getRoles();
+    $visible = $entity->field_profile_visibility->value ?: 0;
+    if ($uid == $account->id()) {
+      $view_mode = 'full';
+    }
+    elseif (in_array('administrator', $roles)) {
+      $view_mode = 'administrator';
+    }
+    elseif (in_array('officer', $roles)) {
+      $view_mode = 'officer';
+    }
+    elseif (in_array('tech', $roles)) {
+      $view_mode = 'tech';
+    }
+    elseif (in_array('member', $roles) && $visible == 1) {
+      $view_mode = 'member';
+    }
+    else {
+      $view_mode = 'empty';
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_form_display_alter().
+ */
+function troth_user_entity_form_display_alter(EntityFormDisplayInterface &$form_display, $context) {
+  if ($context['entity_type'] == 'user' && $context['bundle'] == 'user') {
+    $account = \Drupal::currentUser();
+    $roles = $account->getRoles();
+    /* We only care about showing administrator form for those that are
+     * officers or admins. The default form should only be shown to the user.
+     */
+    if (in_array('administrator', $roles) || in_array('officer', $roles)) {
+      $id = 'user.user.administrator';
+      $storage = \Drupal::entityManager()->getStorage('entity_form_display');
+      $change_display = $storage->load($id);
+      if ($change_display) {
+        $form_display = $change_display;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function troth_user_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
+  if ($entity_type->id() == 'profile' && $bundle == 'membership_join') {
+    if (isset($fields['field_preferred_username'])) {
+      $fields['field_preferred_username']->addConstraint('MemberProfileUsername');
+    }
+    if (isset($fields['field_profile_alt_email'])) {
+      $fields['field_profile_alt_email']->addConstraint('MemberProfileAltMail');
+    }
+    if (isset($fields['field_email'])) {
+      $fields['field_email']->addConstraint('MemberProfileMail');
+    }
+  }
+  if ($entity_type->id() === 'user') {
+    if (isset($fields['field_profile_alt_email'])) {
+      $fields['field_profile_alt_email']->addConstraint('UserAltMail');
+    }
+  }
+  if ($entity_type->id() == 'profile' && $bundle == 'membership_renew') {
+    if (isset($fields['field_member_id'])) {
+      $fields['field_member_id']->addConstraint('MemberRenewId');
+    }
+    if (isset($fields['field_renew_email'])) {
+      $fields['field_renew_email']->addConstraint('MemberRenewMail');
+    }
+    if (isset($fields['field_preferred_username'])) {
+      $fields['field_preferred_username']->addConstraint('MemberRenewUsername');
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function troth_user_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
+  // Alter the email text field to allow duplicates.
+  if ($entity_type->id() === 'user') {
+    if (isset($fields['mail'])) {
+      $fields['mail']->addConstraint('UserMail');
+      $fields['mail']->setDisplayConfigurable('view', TRUE);
+    }
+  }
+}
+
+/**
+ * Implements hook_local_tasks_alter().
+ */
+function troth_user_local_tasks_alter(&$local_tasks) {
+  foreach ($local_tasks as $id => $data) {
+    if ($id == 'entity.user.canonical') {
+      $local_tasks[$id]['weight'] = -50;
+    }
+    if ($id == 'entity.user.edit_form') {
+      $local_tasks[$id]['weight'] = -49;
+    }
+    if ($id == 'change_pwd_page.change_password_form') {
+      $local_tasks[$id]['weight'] = -48;
+    }
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function troth_user_token_info() {
+  $info = [];
+
+  $info['types'] = [
+    'troth-user' => [
+      'name' => t('troth User'),
+      'description' => t('Tokens related to the troth User'),
+    ],
+  ];
+
+  $info['tokens'] = [
+    'troth-user' => [
+    // [troth-user:first-name].
+      'first-name' => [
+        'name' => t('First Name of person'),
+        'description' => t('First name of the person.'),
+        'needs-data' => ['uid'],
+      ],
+      // [troth-user:last-name].
+      'last-name' => [
+        'name' => t('Last Name of person'),
+        'description' => t('Last name of the person.'),
+        'needs-data' => ['uid'],
+      ],
+      // [troth-user:preferred-name].
+      'preferred-name' => [
+        'name' => t('Preferred Name of person'),
+        'description' => t('Preferred name of the person.'),
+        'needs-data' => ['uid'],
+      ],
+      // [troth-user:expire-date].
+      'expire-date' => [
+        'name' => t('Expiration Date'),
+        'description' => t('Membership Expiration Date.'),
+        'needs-data' => ['uid'],
+      ],
+      // [troth-user:clerk-name].
+      'clerk-name' => [
+        'name' => t('Clerk Name'),
+        'description' => t('Name of the Clerk.'),
+      ],
+      // [troth-user:steer-name].
+      'steer-name' => [
+        'name' => t('Steer Name'),
+        'description' => t('Name of the Steer.'),
+      ],
+      // [troth-user:code-conduct].
+      'code-conduct' => [
+        'name' => t('Code of Conduct'),
+        'description' => t('Code of Conduct as saved in Legal.'),
+      ],
+    ],
+  ];
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function troth_user_tokens($type, $tokens, array $data = [], array $options = []) {
+  $replacements = [];
+
+  // Replacement values for tokens that can be calculated without any additional
+  // data.
+  if ($type == 'troth-user') {
+    if (isset($data['uid'])) {
+      $account = User::load($data['uid']);
+    }
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'first-name':
+          if (isset($account)) {
+            $replacements[$original] = $account->field_profile_first_name->value;
+          }
+          break;
+
+        case 'last-name':
+          if (isset($account)) {
+            $replacements[$original] = $account->field_profile_last_name->value;
+          }
+          break;
+
+        case 'preferred-name':
+          if (isset($account)) {
+            $replacements[$original] = $account->field_profile_troth_name->value;
+          }
+          break;
+
+        case 'expire-date':
+          if (isset($account)) {
+            $date = new DrupalDateTime($account->field_profile_member_expire_date->value);
+            $replacements[$original] = $date->format('j F, Y');
+          }
+          break;
+
+        case 'clerk-name':
+          $replacements[$original] = \Drupal::config('troth_user.adminsettings')->get('clerk_name');
+          break;
+
+        case 'steer-name':
+          $replacements[$original] = \Drupal::config('troth_user.adminsettings')->get('steer_name');
+          break;
+
+        case 'code-conduct':
+          $conditions = legal_get_conditions();
+          $replacements[$original] = Markup::create($conditions['conditions']);
+          break;
+
+      }
+    }
+  }
+
+  // An array of replacement values keyed by original token string.
+  return $replacements;
+}
+
+/**
+ * Implements hook_user_login().
+ */
+function troth_user_user_login($account) {
+  $today = new DrupalDateTime();
+  $one_month = new DrupalDateTime('+1 month');
+  $expire = new DrupalDateTime($account->field_profile_member_expire_date->value);
+  if ($expire <= $one_month && $expire > $today) {
+    drupal_set_message(t("Your membership will be expiring on @date.  If you don't want to lose access, please renew at <a href=\"/renew.html\">http://www.thetroth.org/renew.html</a>", ['@date' => $expire->format('j F, Y')]), 'warning');
+  }
+  elseif ($expire <= $today) {
+    drupal_set_message(t("Your membership expired on @date.  If you don't want to lose access, please renew at <a href=\"/renew.html\">http://www.thetroth.org/renew.html</a>", ['@date' => $expire->format('j F, Y')]), 'error');
+  }
+}
+
+/**
+ * The callback for the cron job.
+ */
+function troth_user_expire_callback() {
+  // Get config and default values.
+  $param['from'] = \Drupal::config('troth_user.adminsettings')->get('send_email');
+  $params['cc'] = \Drupal::config('troth_user.adminsettings')->get('email_address_on_expire');
+  $today = new DrupalDateTime();
+  $today = $today->format('Y-m-d');
+  $grace = \Drupal::config('troth_user.adminsettings')->get('grace_period');
+  $memberWarn = explode(',', \Drupal::config('troth_user.adminsettings')->get('email_about_to_expire_when'));
+  $memberGrace = explode(',', \Drupal::config('troth_user.adminsettings')->get('email_grace_expire_when'));
+  $memberExpired = explode(',', \Drupal::config('troth_user.adminsettings')->get('email_expire_when'));
+  $warnEmail = \Drupal::config('troth_user.adminsettings')->get('email_about_to_expire');
+  $graceEmail = \Drupal::config('troth_user.adminsettings')->get('email_grace_expire');
+  $expiredEmail = \Drupal::config('troth_user.adminsettings')->get('email_on_expire');
+  $mnOneWeek = new DrupalDateTime('-1 week');
+  $mnOneWeek = $mnOneWeek->format('Y-m-d');
+  $token_service = \Drupal::token();
+  $mailManager = \Drupal::service('plugin.manager.mail');
+
+  // Set up dates array of when to send emails.
+  foreach ($memberWarn as $weeks) {
+    $date = new DrupalDateTime('+' . $weeks . ' weeks');
+    $dates['warn'][] = $date->format('Y-m-d');
+  }
+  foreach ($memberGrace as $weeks) {
+    $date = new DrupalDateTime('-' . $weeks . ' weeks');
+    $dates['grace'][] = $date->format('Y-m-d');
+  }
+  foreach ($memberExpired as $weeks) {
+    $weeks = intval($weeks) + intval($grace);
+    $date = new DrupalDateTime('-' . $weeks . ' weeks');
+    $dates['expire'][] = $date->format('Y-m-d');
+  }
+
+  foreach ($dates as $type => $values) {
+    foreach ($values as $key => $date) {
+      $dateMnOne = new DrupalDateTime($date);
+      $dateMnOne->modify('-1 week');
+      $dateMnOne = $dateMnOne->format('Y-m-d');
+      // We want a user query to get uids.
+      $query = \Drupal::entityQuery('user')
+        ->condition('field_profile_dont_contact', 1, '!=')
+        ->condition('field_profile_member_expire_date', $date, '<=')
+        ->condition('field_profile_member_expire_date', $dateMnOne, '>');
+
+      // Not contacted in the last week.
+      $or = $query->orConditionGroup()
+        ->condition('field_profile_last_contact_date', NULL, 'IS NULL')
+        ->condition('field_profile_last_contact_date', $mnOneWeek, '<');
+      $query->condition($or);
+      $uids = $query->execute();
+      if (!isset($dates[$type]['uids'])) {
+        $dates[$type]['uids'] = [];
+      }
+      if (count($uids) > 0) {
+        $dates[$type]['uids'] = array_unique(array_merge($dates[$type]['uids'], array_values($uids)));
+      }
+    }
+  }
+  // Take care of warning.
+  $uids = $dates['warn']['uids'];
+  $param['sub'] = "Troth membership is about to expire";
+  foreach ($uids as $uid) {
+    $account = User::load($uid);
+    $langcode = $account->getPreferredLangcode();
+    $to = $account->getEmail();
+    $param['message'] = $token_service->replace($warnEmail, [
+      'uid' => $uid,
+      'user' => $account,
+    ]);
+    $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+    if ($result['result'] != TRUE) {
+      \Drupal::logger('troth_user')->error('Warning Email did not send to %uid. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+    }
+    else {
+      \Drupal::logger('troth_user')->notice('Warning Email sent. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+      $account->field_profile_last_contact_date = $today;
+      $account->save();
+    }
+  }
+
+  // Take care of grace.
+  $uids = $dates['grace']['uids'];
+  $param['sub'] = "Troth membership has expirede";
+  foreach ($uids as $uid) {
+    $account = User::load($uid);
+    $account->field_profile_membership_status = 'warning';
+    $account->save();
+    $langcode = $account->getPreferredLangcode();
+    $to = $account->getEmail();
+    $param['message'] = $token_service->replace($memberGrace, [
+      'uid' => $uid,
+      'user' => $account,
+    ]);
+    $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
+    if ($result['result'] != TRUE) {
+      \Drupal::logger('troth_user')->error('Grace Email did not send to %uid. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+    }
+    else {
+      \Drupal::logger('troth_user')->notice('Grace Email sent. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+      $account->field_profile_last_contact_date = $today;
+      $account->save();
+    }
+  }
+
+  // Take care of expire.
+  $uids = $dates['expire']['uids'];
+  $param['sub'] = "Troth membership has expirede";
+  foreach ($uids as $uid) {
+    $account = User::load($uid);
+    $account->field_profile_membership_status = 'inactive';
+    $account->save();
+    $langcode = $account->getPreferredLangcode();
+    $to = $account->getEmail();
+    $param['message'] = $token_service->replace($expiredEmail, [
+      'uid' => $uid,
+      'user' => $account,
+    ]);
+    $result = $mailManager->mail('troth_user', 'troth_mai', $to, $langcode, $params, NULL, TRUE);
+    if ($result['result'] != TRUE) {
+      \Drupal::logger('troth_user')->error('Expire Email did not send to %uid. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+    }
+    else {
+      \Drupal::logger('troth_user')->notice('Expire Email sent. %to, %message', [
+        '%uid' => $uid,
+        '%to' => $to,
+        '%message' => $param['message'],
+      ]);
+      $account->field_profile_last_contact_date = $today;
+      $account->save();
+    }
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function troth_user_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'troth_mail':
+      if (isset($params['from'])) {
+        $message['from'] = $params['from'];
+      }
+      else {
+        $message['from'] = \Drupal::config('system.site')->get('mail');
+      }
+      $message['subject'] = $params['sub'];
+      $message['body'][] = Html::escape($params['message']);
+      if (isset($params['cc'])) {
+        $message['headers']['Cc'] = $params['cc'];
+      }
+      if (isset($params['bcc'])) {
+        $message['headers']['Bcc'] = $params['bcc'];
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function troth_user_form_contact_message_form_alter(&$form, &$form_state, $form_id) {
+  // Set fields to value from url.
+  if (\Drupal::request()->query->get('sub') != '') {
+    $form['subject']['widget'][0]['value']['#default_value'] = \Drupal::request()->query->get('sub');
+  }
+  if (\Drupal::request()->query->get('mes') != '') {
+    $form['message']['widget'][0]['value']['#default_value'] = t('@mes', ['@mes' => \Drupal::request()->query->get('mes')]);
+  }
+  if (\Drupal::request()->query->get('msg') != '') {
+    $form['message']['widget'][0]['value']['#default_value'] = t('@msg', ['@msg' => \Drupal::request()->query->get('msg')]);
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function troth_user_form_commerce_order_item_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  $product = $form_state->get('product');
+  $variation = ProductVariation::load($form_state->get('selected_variation'));
+  if ($product->bundle() == 'membership_join' || $product->bundle() == 'membership_renew') {
+    if (isset($form['field_membership_join'])) {
+      $form['field_membership_join']['widget']['add_more']['#value'] = t('Add Another Member');
+    }
+    $form['quantity']['widget'][0]['value']['#title'] = t('Years');
+    $form['quantity']['widget'][0]['value']['#description'] = t('Enter the number of years you desire to purchase.');
+  }
+
+  // Change form display to include inmate number if it's an inmate variation.
+  if ($product->bundle() == 'membership_join' && $variation->field_inmate->value) {
+    $form['field_membership_join']['widget'][0]['inline_entity_form']['#form_mode'] = 'inmate';
+  }
+
+  // Add validation for paper Idunnas.
+  $form['#validate'][] = '_troth_user_form_paper_validate';
+  $form['#validate'][] = '_troth_user_form_profile_validate';
+}
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function troth_user_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  if ($entity_form['#bundle'] == 'membership_renew') {
+    $entity_form['#element_validate'][] = '_troth_user_inline_entity_form_entity_form_validate';
+  }
+}
+
+/**
+ * Paper Idunna Validation for membership form.
+ */
+function _troth_user_form_paper_validate(&$form, FormStateInterface $form_state) {
+  // Get the storage variable.
+  $product = $form_state->get('product');
+
+  if ($product->bundle() == 'membership_join') {
+    // If it's a membership_join product,
+    // we get the country from the form_state.
+    $country = $form_state->getValue('field_membership_join')[0]['inline_entity_form']['address'][0]['address']['country_code'];
+  }
+  elseif ($product->bundle() == 'membership_renew') {
+    // If it's a membership_renew product, we get info to load the user.
+    $member_id = $form_state->getValue('field_membership_renew')[0]['inline_entity_form']['field_member_id'][0]['value'];
+    $username = $form_state->getValue('field_membership_renew')[0]['inline_entity_form']['field_preferred_username'][0]['value'];
+    $email = $form_state->getValue('field_membership_renew')[0]['inline_entity_form']['field_renew_email'][0]['value'];
+    $self = $form_state->getValue('field_membership_renew')[0]['inline_entity_form']['field_renew_self']['value'];
+
+    // We get the user account using appropriate information.
+    $account = NULL;
+    if ($self == 1) {
+      $account = user_load(\Drupal::currentUser()->id());
+    }
+    elseif ($member_id != '') {
+      $account = user_load($member_id);
+    }
+    elseif ($username != '') {
+      $account = user_load_by_name($username);
+    }
+    elseif ($email != '') {
+      $account = user_load_by_mail($email);
+    }
+    if ($account == NULL) {
+      // If there is no account, information is missing.  Throw error.
+      $form_state->setErrorByName('field_membership_join', t('Please provide information to search for the member.'));
+    }
+    // Now set the country from the account information.
+    $country = $account->field_profile_location->getValue()[0]['country_code'];
+  }
+  else {
+    // It's not a join or renew product, this should not have been set,
+    // return without error.
+    return;
+  }
+
+  // Check the allowed countries to see if their country is allowed.
+  $variation = ProductVariation::load($form_state->get('selected_variation'));
+  if ($variation->field_paper_idunna->value) {
+    $allowed_countries = $variation->field_allowed_countries->getValue();
+    if (count($allowed_countries) > 0) {
+      foreach ($allowed_countries as $k => $v) {
+        $allowed[] = $v['value'];
+      }
+      if (!in_array($country, $allowed)) {
+        // The country is not in the allowed countries, set error.
+        $form_state->setErrorByName("", t('You have selected a product available <b>ONLY</b> in @avail, but your address is in @country.  Please either change product or update your address.', [
+          '@avail' => implode(',', $allowed),
+          '@country' => $country,
+        ]));
+      }
+    }
+
+    // Check the disallowed countries to see if their country is not allowed.
+    $disallowed_countries = $variation->field_disallowed_countries->getValue();
+    if (count($disallowed_countries) > 0) {
+      foreach ($disallowed_countries as $k => $v) {
+        $disallowed[] = $v['value'];
+      }
+      if (in_array($country, $disallowed)) {
+        // Their country is not allowed, set error.
+        $form_state->setErrorByName("", t('You have selected a product <b>NOT</b> available in @avail, but your address is in @country.  Please either change product or update your address.', [
+          '@avail' => implode(',', $disallowed),
+          '@country' => $country,
+        ]));
+      }
+    }
+  }
+}
+
+/**
+ * Profile Validation for membership form.
+ */
+function _troth_user_form_profile_validate(&$form, FormStateInterface $form_state) {
+  $triggeringElement = $form_state->getTriggeringElement()['#name'];
+  $product = $form_state->get('product');
+  $variation = ProductVariation::load($form_state->get('selected_variation'));
+
+  if ($triggeringElement != "field_membership_join_add_more" && $product->bundle() == 'membership_join') {
+    // Add in validation that there is 1 or more profiles
+    // for single or family memberships
+    // and check for inmate # for inmates.
+    // Get all profiles.
+    $profiles = $form_state->getValue('field_membership_join');
+    // Remove the add more button.
+    unset($profiles['add_more']);
+    // Get variation membership type.
+    // Family needs 2 or more profiles, Single needs only 1.
+    $mtype = $variation->field_membership_type->value;
+    if ($mtype == 'family' && count($profiles) < 2) {
+      $form_state->setErrorByName("", t('You have chosen a family membership but have not entered in multiple members.  Please use the "Add Another Member" button at the bottom of the form to add a second or more profile, scroll up, and fill in the form.  To delete an extra profile, please click the "X" on the right of that profile.'));
+      $form_state->setErrorByName("field_membership_join", '');
+    }
+    elseif ($mtype != 'family' && count($profiles) > 1) {
+      $form_state->setErrorByName("", t('You have chosen a single membership and have entered multiple profiles.  Please either change to a single membership, or delete the extra profiles.  You can delete profiles by clicking on the "X" on the right side of the profile.'));
+      $form_state->setErrorByName("field_membership_join", '');
+    }
+
+    if ($variation->field_inmate->value) {
+      // We have an inmate purchase, make sure that the inmate # is filled in.
+      // This should not happen, but we check just in cae.
+      $profile = $profiles[0];
+      $inmateNo = trim($profile['inline_entity_form']['field_inmate_number'][0]['value']);
+      if ($inmateNo == '') {
+        $form_state->setErrorByName("field_membership_join'][0]['field_inmate_number", t('You are purchasing an Inmate membership, but have not provided an inmate number.  Please enter an inmate number to continue.'));
+      }
+    }
+  }
+}
+
+/**
+ * Validation for membership_renew profile.
+ */
+function _troth_user_inline_entity_form_entity_form_validate(&$entity_form, &$form_state) {
+  $product = $form_state->get('product');
+  $variation = ProductVariation::load($form_state->get('selected_variation'));
+  $profile = $form_state->getValue('field_membership_renew')[0]['inline_entity_form'];
+  if ($profile == '') {
+    return;
+  }
+  $orderUid = \Drupal::currentUser()->id();
+  $renewMail = '';
+  $renewUid = '';
+  $renewSelf = '';
+  $renewUsername = '';
+  $change = '';
+  if (isset($profile['field_renew_email'])) {
+    $renewMail = $profile['field_renew_email'][0]['value'];
+  }
+  if (isset($profile['field_member_id'])) {
+    $renewUid = $profile['field_member_id'][0]['value'];
+  }
+  if (isset($profile['field_renew_self'])) {
+    $renewSelf = $profile['field_renew_self']['value'];
+  }
+  if (isset($profile['field_preferred_username'])) {
+    $renewUsername = $profile['field_preferred_username'][0]['value'];
+  }
+  if (isset($profile['field_confirm'])) {
+    $change = $profile['field_confirm'][0]['value'];
+  }
+  $change = strtolower(trim($change));
+
+  // Figure out the UID of the user renewing.
+  $uid = '';
+  if ($renewSelf == 1) {
+    $uid = $orderUid;
+  }
+  elseif ($renewUid != '') {
+    $uid = $renewUid;
+  }
+  elseif ($renewUsername != '') {
+    $query = \Drupal::entityQuery('user')
+      ->condition('name', $renewUsername, 'like');
+    $uids = $query->execute();
+    $uid = reset($uids);
+  }
+  elseif ($renewMail != '') {
+    $query = \Drupal::entityQuery('user');
+    $or = $query->orConditionGroup()
+      ->condition('mail', $renewMail, 'like')
+      ->condition('field_profile_alt_email', $renewMail, 'like');
+    $query->condition($or);
+    $uids = $query->execute();
+    $uid = reset($uids);
+  }
+  $account = User::load($uid);
+  $atype = $account->field_profile_membership_type->value;
+  $mtype = $variation->field_membership_type->value;
+
+  if ($mtype != $atype) {
+    // We are changing membership type.
+    if ($mtype == 'single' && $atype == 'family' && $change != 'yes') {
+      // Family to Single we just need a confirmation.
+      $form_state->setErrorByName("[field_membership_renew][0][inline_entity_form][field_confirm_wrapper]", t('You have requested to change your membership from Family to Single.  To continue, you need to confirm that you want to do this by typing "YES" in the confirmation box.  This will remove you from a family membership, nobody else will be renews.  If you did not intend to change your membership, please choose a family renew product.'));
+    }
+    elseif ($mtype == 'family' && $change != 'yes') {
+      // Single to Family, we need them to confirm.
+      $form_state->setErrorByName('[field_membership_renew][0][inline_entity_form][field_confirm_wrapper]', t('You have requested to change your membership from Single to Family.  To continue, you need to confirm that you want to do this by typing "YES" in the confirmation box.  This will change your membership to a family membership.  You will receive an email upon completion of the order with instructions on how to add more members to your membership.  If you did not intend to change your membership, please choose a non-family renew product.'));
+    }
+  }
+}
+
+/**
+ * Member Search Form.
+ */
+function troth_user_member_search_form(array $fields = NULL) {
+  $ffield['uid'] = [
+    '#type' => 'number',
+    '#title' => t('Member ID'),
+    '#required' => FALSE,
+    '#min' => 2,
+    '#step' => 1,
+  ];
+
+  $ffield['username'] = [
+    '#type' => 'textfield',
+    '#title' => t('Username'),
+    '#required' => FALSE,
+  ];
+
+  $ffield['first_name'] = [
+    '#type' => 'textfield',
+    '#title' => t('First Name'),
+    '#required' => FALSE,
+  ];
+
+  $ffield['last_name'] = [
+    '#type' => 'textfield',
+    '#title' => t('Last Name'),
+    '#required' => FALSE,
+  ];
+
+  $ffield['email'] = [
+    '#type' => 'email',
+    '#title' => t('Email Address'),
+    '#required' => FALSE,
+  ];
+
+  $ffield['city'] = [
+    '#type' => 'textfield',
+    '#title' => t('City'),
+    '#required' => FALSE,
+  ];
+
+  $ffield['state'] = [
+    '#type' => 'textfield',
+    '#title' => t('State'),
+    '#required' => FALSE,
+    '#description' => t('use two-letter abbrevious for USA/Canada.  Multiple states can be searched as comma deliminated values.'),
+  ];
+
+  $ffield['postal'] = [
+    '#type' => 'textfield',
+    '#title' => t('Postal Code'),
+    '#required' => FALSE,
+  ];
+
+  $countryRepository = new CountryRepository();
+  $countries = $countryRepository->getList();
+  $ffield['country'] = [
+    '#type' => 'select',
+    '#title' => t('Country'),
+    '#required' => FALSE,
+    '#description' => t('Select one or more values'),
+    '#options' => $countries,
+    '#multiple' => TRUE,
+
+  ];
+
+  if ($fields == NULL) {
+    $form = $ffield;
+  }
+  else {
+    foreach ($fields as $field) {
+      if (isset($ffield[$field])) {
+        $form[$field] = $ffield[$field];
+      }
+    }
+  }
+
+  $form['actions'] = [
+    '#type' => 'actions',
+  ];
+
+  $form['actions']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Search'),
+  ];
+
+  return $form;
+}
+
+/**
+ * Member Search Query.
+ */
+function troth_user_member_search($search, $limit = 50) {
+  $keymap = [
+    'uid' => 'uid',
+    'username' => 'name',
+    'first_name' => 'field_profile_first_name',
+    'last_name' => 'field_profile_last_name',
+    'email' => 'mail',
+    'city' => 'field_profile_location.locality',
+    'state' => 'field_profile_location.administrative_area',
+    'postal' => 'field_profile_location.postal_code',
+    'country' => 'field_profile_location.country_code',
+    'status' => 'field_profile_membership_status',
+  ];
+  $query = \Drupal::entityQuery('user')
+    ->range(0, $limit);
+  foreach ($search as $field => $value) {
+    if ($value != '') {
+      $field = $keymap[$field];
+      if ($field == 'uid') {
+        $query->condition($field, "$value", '=');
+      }
+      elseif ($field == 'mail') {
+        $or = $query->orConditionGroup()
+          ->condition('mail', "%$value%", 'like')
+          ->condition('field_profile_alt_email', "%$value%", 'like');
+        $query->condition($or);
+      }
+      elseif (is_array($value)) {
+        if (count($value) > 0) {
+          $query->condition($field, $value, 'in');
+        }
+      }
+      else {
+        $query->condition($field, "%$value%", 'like');
+      }
+    }
+  }
+
+  $uids = $query->execute();
+  return $uids;
+}

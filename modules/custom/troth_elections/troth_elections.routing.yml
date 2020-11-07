@@ -1,0 +1,188 @@
+troth_elections.admin_settings_form:  
+  path: '/admin/config/troth/elections'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsAdminForm'  
+    _title: 'TrothElectionsAdminForm'  
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections_offices_type.listbuilder:  
+  path: '/admin/config/troth/elections/office'  
+  defaults:  
+    _entity_list: 'troth_officer_type'
+    _title: 'TrothElectionsOfficerTypeListBuilder'  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.cfn_form:  
+  path: '/admin/config/troth/elections/cfn'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsCFNForm'  
+    _title: 'Modify Call for Nominations'  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.make_nom_admin_form:  
+  path: '/admin/config/troth/elections/make-nominations'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsMakeNomForm'  
+    _title: 'Make Nominations (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.accept_nom_admin_form:  
+  path: '/admin/config/troth/elections/accept-nominations'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsAcceptNomForm'  
+    _title: 'Accept Nominations (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.nom_bio_admin_form:  
+  path: '/admin/config/troth/elections/nominations-bios'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsNomBioForm'  
+    _title: 'Candidate Statements (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.nom_ballot_admin_form:  
+  path: '/admin/config/troth/elections/ballot'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsBallot'  
+    _title: 'Ballot (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.log_file_admin_form:  
+  path: '/admin/config/troth/elections/logfile'  
+  defaults:  
+    _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::logFile'
+    _title: 'Results Log File (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.fix_names_admin_form:  
+  path: '/admin/config/troth/elections/fix_names'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsFixNames'  
+    _title: 'Fix Names (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.vote_results_admin_form:  
+  path: '/admin/config/troth/elections/results'  
+  defaults:  
+    _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::voteResults'
+    _title: 'Vote Results (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.proxy_admin:  
+  path: '/admin/config/troth/elections/proxies'  
+  defaults:  
+    _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::voteProxy'
+    _title: 'Proxies (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.prop_results_admin:  
+  path: '/admin/config/troth/elections/prop-results'  
+  defaults:  
+    _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::voteProp'
+    _title: 'Proposition (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.create_pages_admin:  
+  path: '/admin/config/troth/elections/create_pages'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsCreatePageForm'  
+    _title: 'Create Pages (Admin)'
+    page: 1  
+  requirements:  
+    _permission: 'access administration pages,troth elections officer'  
+  options:  
+    _admin_route: TRUE  
+
+troth_elections.base_form:  
+  path: '/members/elections'  
+  title: 'Elections'
+  menu_name: main 
+  defaults:  
+    _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::mainPage'
+    _title: 'Elections'
+  requirements:  
+    _role: member+administrator
+
+troth_elections.make_nom_form:  
+  path: '/members/elections/nominate'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsMakeNomForm'  
+    _title: 'Make Nominations'
+    page: 3  
+  requirements:  
+    _custom_access: '\Drupal\troth_elections\Controller\TrothElectionsAccessController::accessNom'
+
+troth_elections.accept_nom_form:  
+  path: '/members/elections/accept'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsAcceptNomForm'  
+    _title: 'Accept Nomination'
+    page: 2  
+  requirements:  
+    _custom_access: '\Drupal\troth_elections\Controller\TrothElectionsAccessController::accessAccept'
+
+troth_elections.nom_bio_form:  
+  path: '/members/elections/bios'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsNomBioForm'  
+    _title: 'Candidate Statement'
+    page: 2  
+  requirements:  
+    _custom_access: '\Drupal\troth_elections\Controller\TrothElectionsAccessController::accessBio'
+
+troth_elections.nom_ballot_form:  
+  path: '/members/elections/ballot'  
+  defaults:  
+    _form: '\Drupal\troth_elections\Form\TrothElectionsBallot'  
+    _title: 'Ballot'
+    page: 3  
+  requirements:  
+    _custom_access: '\Drupal\troth_elections\Controller\TrothElectionsAccessController::accessBallot'
+
+route_callbacks:
+  - '\Drupal\troth_elections\Routing\TrothElectionsRoutes::routes'

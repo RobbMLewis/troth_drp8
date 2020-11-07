@@ -1,0 +1,54 @@
+troth_officer.admin_settings_form:  
+  path: '/admin/config/troth/officer'  
+  defaults:  
+    _form: '\Drupal\troth_officer\Form\TrothOfficerAdminForm'  
+    _title: 'Officer Settings'  
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+
+troth_officer.groups_page:
+  path: 'about/leadership/{group}'
+  defaults:
+    _controller: '\Drupal\troth_officer\Controller\TrothOfficerController::groupPage'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'
+
+troth_officer.office_page:
+  path: 'about/leadership/{group}/{office}'
+  defaults:
+    _controller: '\Drupal\troth_officer\Controller\TrothOfficerController::officePage'
+  requirements:
+    _permission: 'access content'
+  options:
+    no_cache: 'TRUE'
+
+troth_officer.archive_main_page:
+  path: 'about/leadership/archives'
+  defaults:
+    _controller: '\Drupal\troth_officer\Controller\TrothOfficerController::archiveMainPage'
+  requirements:
+    _role: 'member+administrator'
+  options:
+    no_cache: 'TRUE'
+
+troth_officer.archive_page:
+  path: 'about/leadership/archives/{group}'
+  defaults:
+    _controller: '\Drupal\troth_officer\Controller\TrothOfficerController::archivePage'
+  requirements:
+    _role: 'member+administrator'
+  options:
+    no_cache: 'TRUE'
+
+troth_officer.archive_office_page:
+  path: 'about/leadership/archives/{group}/{office}'
+  defaults:
+    _controller: '\Drupal\troth_officer\Controller\TrothOfficerController::archiveOfficePage'
+  requirements:
+    _role: 'member+administrator'
+  options:
+    no_cache: 'TRUE'

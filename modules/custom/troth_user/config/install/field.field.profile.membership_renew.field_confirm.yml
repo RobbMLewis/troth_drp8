@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_confirm
+    - profile.type.membership_renew
+id: profile.membership_renew.field_confirm
+field_name: field_confirm
+entity_type: profile
+bundle: membership_renew
+label: 'Changing Membership Type? Type "YES"'
+description: 'If you are changing your membership type, please type the letters "YES" to confirm that you want to change your membership type. '
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

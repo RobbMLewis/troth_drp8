@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_membership_control
+  module:
+    - options
+    - user
+_core:
+  default_config_hash: StDIKNjMgBTUXIssxl5vlcz_FMwLs5NsnB0sBQ0evTw
+id: user.user.field_profile_membership_control
+field_name: field_profile_membership_control
+entity_type: user
+bundle: user
+label: Control
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    value: self
+default_value_callback: ''
+settings: {  }
+field_type: list_string

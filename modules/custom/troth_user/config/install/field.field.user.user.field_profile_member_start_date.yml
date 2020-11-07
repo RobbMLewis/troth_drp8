@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_profile_member_start_date
+  module:
+    - datetime
+    - user
+_core:
+  default_config_hash: _fF4rZgF9tfLLhjUKNDQo0WFvMNO85NL2pWswdz0kAA
+id: user.user.field_profile_member_start_date
+field_name: field_profile_member_start_date
+entity_type: user
+bundle: user
+label: 'Troth Membership Join Date'
+description: ''
+required: true
+translatable: false
+default_value:
+  -
+    default_date_type: now
+    default_date: now
+default_value_callback: ''
+settings: {  }
+field_type: datetime

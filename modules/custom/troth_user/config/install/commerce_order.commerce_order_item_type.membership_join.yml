@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: BabX_flVryQi-RLs6U3J1p8a4N7MxixuWsXbjI_ixx0
+label: 'Membership Join'
+id: membership_join
+purchasableEntityType: commerce_product_variation
+orderType: default
+traits: {  }
+locked: false

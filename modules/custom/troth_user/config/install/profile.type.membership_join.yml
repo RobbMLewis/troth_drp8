@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+third_party_settings:
+  commerce_order:
+    customer_profile_type: false
+_core:
+  default_config_hash: X_sL3wY9OX4FZNA_5U_hPK8cunAfLzLIBcY2mWqMthg
+id: membership_join
+label: 'Membership Join'
+display_label: Membershp
+multiple: true
+registration: false
+roles: {  }
+allow_revisions: false
+new_revision: false

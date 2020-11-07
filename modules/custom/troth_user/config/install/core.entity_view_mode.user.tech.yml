@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: fi02yFTf8gx-unvqenLQGqjCjJwv8NCh8q_e7T9FfvA
+id: user.tech
+label: Tech
+targetEntityType: user
+cache: true

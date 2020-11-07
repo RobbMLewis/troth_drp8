@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: tech
+label: Tech
+weight: 12
+is_admin: null
+permissions: {  }

@@ -1,0 +1,37 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_product.commerce_product_type.membership_renew
+    - field.field.commerce_product.membership_renew.body
+  module:
+    - commerce_product
+    - text
+id: commerce_product.membership_renew.default
+targetEntityType: commerce_product
+bundle: membership_renew
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  variations:
+    type: commerce_add_to_cart
+    weight: 2
+    region: content
+    label: hidden
+    settings:
+      combine: true
+    third_party_settings: {  }
+hidden:
+  created: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  stores: true
+  title: true
+  uid: true

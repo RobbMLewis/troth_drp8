@@ -1,0 +1,5 @@
+troth_elections_admin:  
+  title: 'Troth Elections configuration'  
+  route_name: troth_elections.admin_settings_form  
+  description: 'Troth Elections admin'  
+  parent: troth.group.admin 

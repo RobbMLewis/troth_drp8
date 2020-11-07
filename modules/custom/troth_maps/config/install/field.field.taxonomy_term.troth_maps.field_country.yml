@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_country
+    - taxonomy.vocabulary.troth_maps
+  module:
+    - address
+id: taxonomy_term.troth_maps.field_country
+field_name: field_country
+entity_type: taxonomy_term
+bundle: troth_maps
+label: Country
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: US
+default_value_callback: ''
+settings:
+  available_countries: {  }
+field_type: address_country

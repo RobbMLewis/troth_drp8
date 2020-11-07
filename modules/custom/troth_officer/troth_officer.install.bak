@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Install file.
+ */
+
+use Drupal\node\Entity\Node;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+
+/**
+ * Implements hook_install().
+ */
+function troth_officer_install() {
+  $path = \Drupal::service('path.alias_manager')->getPathByAlias('/about/leadership');
+  if (!empty($path)) {
+    $node = Node::create([
+      'type' => "public_page",
+      'title' => "Our Leaders",
+      'uid' => 1,
+      'path' => ['alias' => '/about/leadership'],
+      'body' => [
+        'format' => 'basic_html',
+        'value' => '<p>The Troth is run by many dedicated leaders.</p>
+<ul>
+<li><a href="/about/leadership/rede.html">High Rede</a></li>
+<li><a href="/about/leadership/clerk.html">Clerk</a></li>
+<li><a href="/about/leadership/ombudsman.html">Ombudsman</a></li>
+<li><a href="/about/leadership/public-relations.html">Public Relations</a></li>
+<li><a href="/about/leadership/reckoner.html">Reckoner</a></li>
+<li><a href="/about/leadership/shope.html">Shope</a></li>
+<li><a href="/about/leadership/stewards.html">Stewards</a></li>
+<li><a href="/about/leadership/tech-team.html">Tech Team</a></li>
+<li><a href="/about/leadership/elders.html">Elders</a></li>
+</ul>',
+      ],
+    ]);
+    $node->save();
+
+    $menu_link = MenuLinkContent::create([
+      'title' => 'Leadership',
+      'link' => ['uri' => 'internal:/about/leadership'],
+      'menu_name' => 'main',
+      'expanded' => TRUE,
+      'weight' => 0,
+    ]);
+    $menu_link->save();
+  }
+
+}

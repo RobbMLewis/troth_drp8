@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: P7ccmIUKo18PDSJVUJNps-YQ4Oq-1aLRbHUnYNa24Lc
+id: membership_join
+label: 'Membership Join'
+orderItemType: membership_join
+generateTitle: false
+traits: {  }
+locked: false

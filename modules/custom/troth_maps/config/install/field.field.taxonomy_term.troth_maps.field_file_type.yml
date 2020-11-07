@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_file_type
+    - taxonomy.vocabulary.troth_maps
+  module:
+    - options
+id: taxonomy_term.troth_maps.field_file_type
+field_name: field_file_type
+entity_type: taxonomy_term
+bundle: troth_maps
+label: 'File Type'
+description: 'Choose the file type you''re downloading'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

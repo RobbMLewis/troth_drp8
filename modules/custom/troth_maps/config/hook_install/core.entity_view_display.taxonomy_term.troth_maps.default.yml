@@ -1,0 +1,64 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.troth_maps.field_country
+    - field.field.taxonomy_term.troth_maps.field_entity
+    - field.field.taxonomy_term.troth_maps.field_file_type
+    - field.field.taxonomy_term.troth_maps.field_mapping
+    - field.field.taxonomy_term.troth_maps.field_url
+    - taxonomy.vocabulary.troth_maps
+  module:
+    - address
+    - link
+    - options
+id: taxonomy_term.troth_maps.default
+targetEntityType: taxonomy_term
+bundle: troth_maps
+mode: default
+content:
+  field_country:
+    weight: 0
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: address_country_default
+    region: content
+  field_entity:
+    type: list_default
+    weight: 1
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_file_type:
+    type: list_default
+    weight: 2
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_mapping:
+    type: basic_string
+    weight: 3
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_url:
+    type: link
+    weight: 4
+    region: content
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+hidden:
+  description: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true

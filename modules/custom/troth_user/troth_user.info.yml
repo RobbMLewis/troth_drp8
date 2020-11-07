@@ -1,0 +1,20 @@
+name: Troth User
+description: Creates user based functions unique to Troth.
+package: Troth
+type: module
+dependencies:
+  - drupal:link
+  - drupal:telephone
+  - drupal:address
+  - drupal:datetime
+  - drupal:profile
+  - drupal:text
+  - drupal:path
+  - drupal:inline_entity_form
+  - drupal:token
+
+core: 8.x
+php: 7.3
+hidden: FALSE
+
+configure: troth_user.admin_settings_form

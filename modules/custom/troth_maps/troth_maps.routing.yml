@@ -1,0 +1,91 @@
+troth_maps.steward_archive_listbuilder:
+  path: admin/config/troth/maps/steward/archive
+  defaults:
+    _entity_list: 'troth_steward'
+    _title: 'Archived Stewards'
+    stewardtype: 'archive'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.region_listbuilder:
+  path: admin/config/troth/maps/region
+  defaults:
+    _entity_list: 'troth_maps_regions'
+    _title: 'Major Regions'
+    regiontype: 'region'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.local_region_listbuilder:
+  path: admin/config/troth/maps/local
+  defaults:
+    _entity_list: 'troth_maps_regions'
+    _title: 'Local Regions'
+    regiontype: 'local'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.special_region_listbuilder:
+  path: admin/config/troth/maps/special
+  defaults:
+    _entity_list: 'troth_maps_regions'
+    _title: 'Special Regions'
+    regiontype: 'special'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.region_archive_listbuilder:
+  path: admin/config/troth/maps/region/archive
+  defaults:
+    _entity_list: 'troth_maps_regions'
+    _title: 'Archived Regions'
+    regiontype: 'archive'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+    
+troth_maps.region_add_region:
+  path: admin/config/troth/maps/region/add
+  defaults:
+    _entity_form: 'troth_maps_regions'  
+    _title: 'Add Region'
+    regiontype: 'region'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.region_add_local_region:
+  path: admin/config/troth/maps/local/add
+  defaults:
+    _entity_form: 'troth_maps_regions'  
+    _title: 'Add Region'
+    regiontype: 'local'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_maps.region_add_special_region:
+  path: admin/config/troth/maps/special/add
+  defaults:
+    _entity_form: 'troth_maps_regions'  
+    _title: 'Add Region'
+    regiontype: 'special'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+    
+troth_maps.update_shapes_form:
+  path: 'admin/config/troth/maps/shapes'  
+  defaults:  
+    _form: '\Drupal\troth_maps\Form\TrothMapsUpdateShapes'  
+    _title: 'Update Shape Files'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE

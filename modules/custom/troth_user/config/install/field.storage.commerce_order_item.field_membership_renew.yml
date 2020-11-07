@@ -1,0 +1,21 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - commerce_order
+    - profile
+_core:
+  default_config_hash: iKyhHhvDSw1CBin0qyw92AmYkkmvTCXDe-O70AE91Ys
+id: commerce_order_item.field_membership_renew
+field_name: field_membership_renew
+entity_type: commerce_order_item
+type: entity_reference
+settings:
+  target_type: profile
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

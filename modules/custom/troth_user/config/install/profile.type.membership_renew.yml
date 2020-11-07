@@ -1,0 +1,13 @@
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: BatfnDCFsZaYRokU1vlAs6iD7GuocGqYArnDVyS2r0s
+id: membership_renew
+label: 'Membership Renew'
+display_label: Renew
+multiple: true
+registration: false
+roles: {  }
+allow_revisions: false
+new_revision: false

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+name: Shop
+type: shop
+description: 'These pages will fall under the Shop menu, and will be editable by those with Shop edit files or Merchandising edit files role'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

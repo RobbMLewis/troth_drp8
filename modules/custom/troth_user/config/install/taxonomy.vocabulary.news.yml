@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+name: News
+vid: news
+description: 'Tags for blog'
+weight: 0

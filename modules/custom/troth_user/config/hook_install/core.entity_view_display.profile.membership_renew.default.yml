@@ -1,0 +1,143 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.profile.membership_renew.field_code_of_conduct
+    - field.field.profile.membership_renew.field_confirm
+    - field.field.profile.membership_renew.field_member_id
+    - field.field.profile.membership_renew.field_preferred_username
+    - field.field.profile.membership_renew.field_renew_email
+    - field.field.profile.membership_renew.field_renew_self
+    - profile.type.membership_renew
+  module:
+    - field_states_ui
+id: profile.membership_renew.default
+targetEntityType: profile
+bundle: membership_renew
+mode: default
+content:
+  field_code_of_conduct:
+    weight: 4
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+  field_member_id:
+    weight: 1
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list:
+            e3772e8e-e046-4448-b22c-cabd66e88c32:
+              operations:
+                edit: Edit
+                delete: Delete
+          add: Add
+        field_states:
+          e3772e8e-e046-4448-b22c-cabd66e88c32:
+            uuid: e3772e8e-e046-4448-b22c-cabd66e88c32
+            id: invisible
+            data:
+              target: field_renew_self
+              comparison: checked
+              value: ''
+              submit: 'Add Cancel'
+    type: number_integer
+    region: content
+    label: above
+  field_preferred_username:
+    weight: 2
+    settings:
+      link_to_entity: false
+    third_party_settings:
+      field_states_ui:
+        field_states:
+          9b70e2b9-9033-44e8-9e7d-497dac1be44a:
+            uuid: 9b70e2b9-9033-44e8-9e7d-497dac1be44a
+            id: invisible
+            data:
+              target: field_renew_self
+              comparison: checked
+              value: true
+              submit:
+                save: Add
+                cancel: Cancel
+    type: string
+    region: content
+    label: above
+  field_renew_email:
+    type: string
+    weight: 3
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list:
+            0aa205f6-3927-4457-aa52-0be35c6b751c:
+              operations:
+                edit: Edit
+                delete: Delete
+          add: Add
+        field_states:
+          0aa205f6-3927-4457-aa52-0be35c6b751c:
+            uuid: 0aa205f6-3927-4457-aa52-0be35c6b751c
+            id: invisible
+            data:
+              target: field_renew_self
+              comparison: checked
+              value: ''
+              submit: 'Add Cancel'
+    label: above
+  field_renew_self:
+    weight: 0
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+    label: above
+  field_rewnew_email:
+    weight: 3
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list:
+            dfb60b65-c406-4902-8764-17f69fcd2893:
+              operations:
+                edit: Edit
+                delete: Delete
+          add: Add
+        field_states:
+          dfb60b65-c406-4902-8764-17f69fcd2893:
+            uuid: dfb60b65-c406-4902-8764-17f69fcd2893
+            id: invisible
+            data:
+              target: field_renew_self
+              comparison: checked
+              value: ''
+              submit: 'Add Cancel'
+    type: email_default
+    region: content
+hidden:
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
+  field_confirm: true
+  is_default: true

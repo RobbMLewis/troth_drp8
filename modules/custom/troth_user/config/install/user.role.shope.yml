@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: shope
+label: Shope
+weight: 8
+is_admin: null
+permissions: {  }

@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_preferred_username
+    - profile.type.membership_renew
+_core:
+  default_config_hash: lLNv3oj-6t5_P4l9Saf1M0kMZVDPKwPbN6Kch7y4fHA
+id: profile.membership_renew.field_preferred_username
+field_name: field_preferred_username
+entity_type: profile
+bundle: membership_renew
+label: Username
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

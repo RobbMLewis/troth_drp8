@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_telephone_number
+    - profile.type.membership_join
+  module:
+    - telephone
+_core:
+  default_config_hash: 8eTjKttaSDxUy-7BBhlHOSEI4j3VVseHgz0on5LamIM
+id: profile.membership_join.field_telephone_number
+field_name: field_telephone_number
+entity_type: profile
+bundle: membership_join
+label: 'Telephone Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: telephone

@@ -1,0 +1,49 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.donation
+    - core.entity_form_mode.commerce_order_item.add_to_cart
+  module:
+    - commerce_product
+    - field_states_ui
+    - xnumber
+id: commerce_order_item.donation.add_to_cart
+targetEntityType: commerce_order_item
+bundle: donation
+mode: add_to_cart
+content:
+  purchased_entity:
+    type: commerce_product_variation_title
+    weight: 0
+    settings:
+      label_display: true
+      label_text: 'Please select'
+      hide_single: true
+    region: content
+    third_party_settings: {  }
+  quantity:
+    type: xnumber
+    weight: 1
+    region: content
+    settings:
+      default_value: '5'
+      step: ''
+      min: '0'
+      max: ''
+      prefix: ''
+      suffix: ''
+      placeholder: ''
+      qty_prices: '0'
+      disable_on_cart: '0'
+      qty_price:
+        - {  }
+    third_party_settings:
+      field_states_ui:
+        form:
+          type: ''
+          list: ''
+          add: Add
+hidden:
+  created: true
+  unit_price: true

@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - commerce_order.commerce_order_item_type.membership_renew
+    - field.storage.commerce_order_item.field_membership_renew
+    - profile.type.membership_renew
+_core:
+  default_config_hash: rg_02ewLgbJdkwDVJGHqYIHUURNP-AGBnUw0uIIYi4Q
+id: commerce_order_item.membership_renew.field_membership_renew
+field_name: field_membership_renew
+entity_type: commerce_order_item
+bundle: membership_renew
+label: 'Membership Renew'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:profile'
+  handler_settings:
+    target_bundles:
+      membership_renew: membership_renew
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

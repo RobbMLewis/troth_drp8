@@ -1,0 +1,41 @@
+troth_google.admin_settings_form:
+  route_name: troth_google.admin_settings_form  
+  title: 'Google Group Settings'
+  base_route: troth_google.admin_settings_form
+
+troth_google_type_entity_task_edit:
+  route_name: entity.troth_google_type.edit_form
+  base_route: entity.troth_google_type.canonical		
+  title: 'Edit'
+
+troth_google_type_entity_task_delete:
+  route_name:  entity.troth_google_type.delete_form
+  base_route:  entity.troth_google_type.canonical	
+  title: Delete
+  weight: 10
+
+troth_google_entity_task_edit:
+  route_name: entity.troth_google.edit_form
+  base_route: entity.troth_google.canonical		
+  title: 'Edit'
+
+troth_google_entity_task_view:
+  route_name: entity.troth_google.canonical		
+  base_route: entity.troth_google.canonical	
+  title: 'View'
+  weight: -1
+
+troth_google_type_entity_task_groups:
+  route_name: entity.troth_google_type.collection
+  base_route: troth_google.admin_settings_form		
+  title: 'Groups'
+
+troth_google_entity_task_users:
+  route_name: entity.troth_google.collection		
+  base_route: troth_google.admin_settings_form	
+  title: 'Users'
+
+troth_google.summary_page:
+  route_name: troth_google.summary_page
+  base_route: entity.user.canonical
+  title: 'Mailing Lists'

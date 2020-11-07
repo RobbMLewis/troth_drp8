@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_entity
+    - taxonomy.vocabulary.troth_maps
+  module:
+    - options
+id: taxonomy_term.troth_maps.field_entity
+field_name: field_entity
+entity_type: taxonomy_term
+bundle: troth_maps
+label: Entity
+description: 'Choose the what entity you are adding this to.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

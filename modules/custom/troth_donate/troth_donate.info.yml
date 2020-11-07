@@ -1,0 +1,12 @@
+name: Troth Donate
+description: 'Provides donation functionality.'
+package: Troth
+type: module
+dependencies:
+  - commerce_order
+  - commerce_price
+  - select_or_other
+
+core: 8.x
+php: 7.3
+hidden: FALSE

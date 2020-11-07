@@ -1,0 +1,6 @@
+services:
+  troth_maps.commands:
+    class: Drupal\troth_maps\Commands\DrushBatchProcessingCommands
+    tags:
+      - { name: drush.command }
+    arguments: ['@logger.factory']

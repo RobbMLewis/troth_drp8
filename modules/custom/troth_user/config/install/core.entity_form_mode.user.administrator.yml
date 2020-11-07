@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+_core:
+  default_config_hash: Do-JPu7P98JCxzXfLIdxy5QL6EfIsOTMhl8NgW6Z2UM
+id: user.administrator
+label: Administrator
+targetEntityType: user
+cache: true

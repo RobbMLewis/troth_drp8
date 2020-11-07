@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_inmate_number
+    - profile.type.membership_join
+id: profile.membership_join.field_inmate_number
+field_name: field_inmate_number
+entity_type: profile
+bundle: membership_join
+label: 'Inmate Number'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+name: 'Children and Youth'
+type: children_and_youth
+description: 'These pages will fall under the Children and Youth menu, and will be editable by those with Children and Youth edit files role'
+help: ''
+new_revision: true
+preview_mode: 1
+display_submitted: false

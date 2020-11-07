@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.profile.field_preferred_username
+    - profile.type.membership_join
+_core:
+  default_config_hash: 6TU6tLhbaOf2Vh81a4XjdJuZToUYKMg8AwikGnDLOX4
+id: profile.membership_join.field_preferred_username
+field_name: field_preferred_username
+entity_type: profile
+bundle: membership_join
+label: 'Preferred Username'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

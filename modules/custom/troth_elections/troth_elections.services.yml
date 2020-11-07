@@ -1,0 +1,5 @@
+services:
+  troth_elections.route_subscriber:
+    class: Drupal\troth_elections\Routing\TrothElectionsRouteSubscriber
+    tags:
+      - { name: event_subscriber }

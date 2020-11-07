@@ -1,0 +1,4 @@
+troth elections officer:
+  title: 'Troth Elections Officer'
+  description: 'This will allow access to elections officer only pages'
+  restrict access: TRUE
