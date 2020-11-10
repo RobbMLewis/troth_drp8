@@ -1,0 +1,21 @@
+{
+    "name": "drupal/troth_migrate",
+    "description": "An example module for Drush 9 batch processing.",
+    "type": "drupal-drush",
+    "autoload": {
+        "psr-4": {
+            "Drupal\\troth_migrate\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.6.0"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}
+

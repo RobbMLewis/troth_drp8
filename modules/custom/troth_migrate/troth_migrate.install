@@ -18,7 +18,9 @@ function troth_migrate_install() {
   $todel = ['article', 'page', 'book'];
   foreach ($todel as $type) {
     $content_type = \Drupal::entityManager()->getStorage('node_type')->load($type);
-    $content_type->delete();
+    if ($content_type) {
+      $content_type->delete();
+    }
   }
 
 }

@@ -44,8 +44,7 @@ function migrate_roles(&$context) {
  * Function to migrate the users.
  */
 function migrate_users(&$context) {
-  $context['message'] = t('Migrating Users');
-  $limit = 20;
+  $limit = 100;
   $con = Database::getConnection('default', 'migrate');
   // Prepare the sandbox.
   if (empty($context['sandbox'])) {
@@ -56,11 +55,15 @@ function migrate_users(&$context) {
     $count = $query->countQuery()->execute()->fetchField();
     $context['sandbox']['max'] = $count + 1;
     $context['sandbox']['current'] = 2;
+    $context['sandbox']['current'] = 422;
+    $context['sandbox']['roles'] = get_roles();
   }
 
   // We need to build the query to get all the user info we need.
   $current = $context['sandbox']['current'] + 1;
-  $roles = get_roles();
+  $roles = $context['sandbox']['roles'];
+  $context['message'] = t('Migrating Users @current', ['@current' => $current]);
+
   $query = $con->select('users', 'users')
     ->fields('users');
   $query->leftjoin('field_data_field_profile_first_name', 'firstname', 'firstname.entity_type =:user and firstname.bundle= :user and firstname.entity_id = users.uid', [':user' => 'user']);
@@ -597,7 +600,7 @@ function menu_hierarchy(&$context) {
  */
 function migrate_order(&$context) {
   $context['message'] = t('Migrating Orders');
-  $limit = 111;
+  $limit = 50;
   $con = Database::getConnection('default', 'migrate');
   // Prepare the sandbox.
   if (empty($context['sandbox'])) {
@@ -623,6 +626,7 @@ function migrate_order(&$context) {
     $count = $query->countQuery()->execute()->fetchField();
     $context['sandbox']['max'] = $count - 1;
     $context['sandbox']['current'] = -1;
+    $context['sandbox']['current'] = 2400;
   }
   $variations = $context['sandbox']['variations'];
   $current = $context['sandbox']['current'] + 1;
@@ -635,6 +639,11 @@ function migrate_order(&$context) {
     $order_id = $row['order_id'];
     $order = Order::load($order_id);
     $uid = $row['uid'];
+    $order_data = unserialize($row['data']);
+    $cutoffdate = '1597622400';
+    if ($uid == '') {
+      $uid = 0;
+    }
     $liquery = $con->select('commerce_line_item', 'li')
       ->fields('li')
       ->condition('li.order_id', $order_id, '=');
@@ -649,8 +658,8 @@ function migrate_order(&$context) {
       $price = new Price($liprice['commerce_total_amount'] / 100, $liprice['commerce_total_currency_code']);
       $sku = $lirow['line_item_label'];
       $qty = $lirow['quantity'];
-      if(!$variations[$sku]){
-        $context['message'] = t('BAD SKU:@sku:',['@sku'=>$sku]);
+      if (!$variations[$sku]) {
+        $context['message'] = t('BAD SKU:@sku:', ['@sku' => $sku]);
       }
 
       // Check if the order item exists already.
@@ -674,6 +683,84 @@ function migrate_order(&$context) {
           'changed' => $lirow['changed'],
           'data' => $lirow['data'],
         ]);
+        if ($lirow['created'] > $cutoffdate && preg_match('/join/', $sku)) {
+          // We create the profile if needed.
+          if (isset($order_data['pending_ids'])) {
+            foreach ($order_data['pending_ids'] as $pendingid) {
+              // Get profile data.
+              $query = $con->select('troth_user_pending_membership', 'p')
+                ->fields('p')
+                ->condition('pendingship_id', $pendingid, '=');
+              $results = $query->execute();
+
+              // Create profile.
+              while ($row = $results->fetchAssoc()) {
+                $storedaddress = unserialize($row['pendingship_address']);
+                $address = [
+                  'country_code' => $storedaddress['country'],
+                  'administrative_area' => $storedaddress['administrative_area'],
+                  'locality' => $storedaddress['locality'],
+                  'dependent_locality' => $storedaddress['dependent_locality'],
+                  'postal_code' => $storedaddress['postal_code'],
+                  'address_line1' => $storedaddress['thoroughfare'],
+                  'address_line2' => $storedaddress['premise'],
+                ];
+                $birthdate = new DrupalDateTime($row['pendingmem_dob']);
+
+                $profile = Profile::create([
+                  'type' => 'membership_join',
+                  'uid' => 0,
+                  'field_profile_birth_date' => $birthdate->format('Y-m-d'),
+                  'field_email' => $row['pendingmem_email'],
+                  'field_code_of_conduct' => 1,
+                  'field_inmate_number' => $row['pendingmem_inmate_no'],
+                  'field_profile_last_name' => $row['pendingmem_last'],
+                  'field_profile_member_notes' => $row['pendingmem_membernotes'],
+                  'field_profile_troth_name' => $row['pendingmem_trothname'],
+                  'field_preferred_username' => $row['pending_username'],
+                  'field_profile_first_name' => $row['pendingmem_first'],
+                  'address' => $address,
+                ]);
+                if (isset($row['pendingmem_dphone'])) {
+                  $profile->field_telephone_number = $row['pendingmem_dphone'];
+                }
+                elseif (isset($row['pendingmem_dphone'])) {
+                  $profile->field_telephone_number = $row['pendingmem_nphone'];
+                }
+                if (isset($row['pendingship_facebook'])) {
+                  $profile->field_user_facebook_url = [
+                    'uri' => $row['pendingship_facebook'],
+                    'title' => '',
+                    'options' => [],
+                  ];
+                }
+                if (isset($row['pendingship_instagram'])) {
+                  $profile->field_user_instagram_url = [
+                    'uri' => $row['pendingship_instagram'],
+                    'title' => '',
+                    'options' => [],
+                  ];
+                }
+                if (isset($row['pendingship_twitter'])) {
+                  $profile->field_user_twitter_url = [
+                    'uri' => $row['pendingship_twitter'],
+                    'title' => '',
+                    'options' => [],
+                  ];
+                }
+                if (isset($row['pendingship_linkedin'])) {
+                  $profile->field_user_linkedin_url = [
+                    'uri' => $row['pendingship_linkedin'],
+                    'title' => '',
+                    'options' => [],
+                  ];
+                }
+                $profile->save();
+                $order_item->field_membership_join = $profile->id();
+              }
+            }
+          }
+        }
         $order_item->save();
         $order_items[] = $order_item;
       }
@@ -683,6 +770,7 @@ function migrate_order(&$context) {
       ->condition('entity_id', $order_id, '=')
       ->fields('b', ['commerce_customer_billing_profile_id']);
     $profid = $query->distinct()->execute()->fetchField();
+
     $query = $con->select('field_revision_commerce_customer_address', 'a')
       ->condition('entity_id', $profid, '=')
       ->fields('a');
@@ -699,6 +787,7 @@ function migrate_order(&$context) {
       'address_line2' => $profdata['commerce_customer_address_premise'],
       'organization' => $profdata['commerce_customer_address_organisation_name'],
     ];
+
     if ($order) {
       $profile = Profile::load($order->billing_profile->target_id);
       $profile->setOwnerId($uid);
@@ -724,6 +813,7 @@ function migrate_order(&$context) {
 
     }
     $profile->save();
+
     if ($order) {
       if (count($order_items) > 0) {
         foreach ($order_items as $item) {
