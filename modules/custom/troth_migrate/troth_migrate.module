@@ -4,10 +4,3 @@
  * @file
  * Custom functions for the event handling.
  */
-
-/**
- * Test migration function.
- */
-function troth_migrate_test() {
-
-}

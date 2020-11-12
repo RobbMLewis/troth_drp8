@@ -52,8 +52,8 @@ class DrushBatchProcessingCommands extends DrushCommands {
       'file' => drupal_get_path('module', 'troth_migrate') . '/troth_migrate.batch.inc',
       'finished' => 'batch_finish_callback',
     ];
-    $batch['operations'][] = ['migrate_roles', []];
-    $batch['operations'][] = ['migrate_users', []];
+    // $batch['operations'][] = ['migrate_roles', []];
+    // $batch['operations'][] = ['migrate_users', []];
     // $batch['operations'][] = ['migrate_nodes', []];
     // $batch['operations'][] = ['menu_hierarchy', []];
     $batch['operations'][] = ['migrate_order', []];

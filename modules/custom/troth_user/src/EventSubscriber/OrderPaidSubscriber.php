@@ -21,7 +21,7 @@ class OrderPaidSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     $events = [
-      'commerce_order.order.paid' => 'onPaid',
+      'commerce_order.order.paid' => 'trothOnPaid',
     ];
     return $events;
   }
@@ -32,10 +32,7 @@ class OrderPaidSubscriber implements EventSubscriberInterface {
    * @param \Drupal\commerce_order\Event\OrderEvent $event
    *   The event.
    */
-  public function onPaid(OrderEvent $event) {
-    $order = $event->getOrder();
-    $mailManager = \Drupal::service('plugin.manager.mail');
-
+  public function trothOnPaid(OrderEvent $event) {
     // Get order items.
     $order_items = $order->getItems();
     foreach ($order_items as $line_item) {

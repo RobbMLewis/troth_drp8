@@ -55,7 +55,6 @@ function migrate_users(&$context) {
     $count = $query->countQuery()->execute()->fetchField();
     $context['sandbox']['max'] = $count + 1;
     $context['sandbox']['current'] = 2;
-    $context['sandbox']['current'] = 422;
     $context['sandbox']['roles'] = get_roles();
   }
 
@@ -626,7 +625,6 @@ function migrate_order(&$context) {
     $count = $query->countQuery()->execute()->fetchField();
     $context['sandbox']['max'] = $count - 1;
     $context['sandbox']['current'] = -1;
-    $context['sandbox']['current'] = 2400;
   }
   $variations = $context['sandbox']['variations'];
   $current = $context['sandbox']['current'] + 1;
@@ -636,6 +634,7 @@ function migrate_order(&$context) {
     ->range($current, $limit);
   $results = $query->execute();
   while ($row = $results->fetchAssoc()) {
+    // dpm($row);
     $order_id = $row['order_id'];
     $order = Order::load($order_id);
     $uid = $row['uid'];
@@ -650,6 +649,7 @@ function migrate_order(&$context) {
     $liresults = $liquery->execute();
     $order_items = [];
     while ($lirow = $liresults->fetchAssoc()) {
+      // dpm($lirow);
       $lid = $lirow['line_item_id'];
       $lipquery = $con->select('field_data_commerce_total', 'p')
         ->fields('p', ['commerce_total_amount', 'commerce_total_currency_code'])
@@ -694,8 +694,8 @@ function migrate_order(&$context) {
               $results = $query->execute();
 
               // Create profile.
-              while ($row = $results->fetchAssoc()) {
-                $storedaddress = unserialize($row['pendingship_address']);
+              while ($profrow = $results->fetchAssoc()) {
+                $storedaddress = unserialize($profrow['pendingship_address']);
                 $address = [
                   'country_code' => $storedaddress['country'],
                   'administrative_area' => $storedaddress['administrative_area'],
@@ -705,52 +705,52 @@ function migrate_order(&$context) {
                   'address_line1' => $storedaddress['thoroughfare'],
                   'address_line2' => $storedaddress['premise'],
                 ];
-                $birthdate = new DrupalDateTime($row['pendingmem_dob']);
+                $birthdate = new DrupalDateTime($profrow['pendingmem_dob']);
 
                 $profile = Profile::create([
                   'type' => 'membership_join',
                   'uid' => 0,
                   'field_profile_birth_date' => $birthdate->format('Y-m-d'),
-                  'field_email' => $row['pendingmem_email'],
+                  'field_email' => $profrow['pendingmem_email'],
                   'field_code_of_conduct' => 1,
-                  'field_inmate_number' => $row['pendingmem_inmate_no'],
-                  'field_profile_last_name' => $row['pendingmem_last'],
-                  'field_profile_member_notes' => $row['pendingmem_membernotes'],
-                  'field_profile_troth_name' => $row['pendingmem_trothname'],
-                  'field_preferred_username' => $row['pending_username'],
-                  'field_profile_first_name' => $row['pendingmem_first'],
+                  'field_inmate_number' => $profrow['pendingmem_inmate_no'],
+                  'field_profile_last_name' => $profrow['pendingmem_last'],
+                  'field_profile_member_notes' => $profrow['pendingmem_membernotes'],
+                  'field_profile_troth_name' => $profrow['pendingmem_trothname'],
+                  'field_preferred_username' => $profrow['pending_username'],
+                  'field_profile_first_name' => $profrow['pendingmem_first'],
                   'address' => $address,
                 ]);
-                if (isset($row['pendingmem_dphone'])) {
-                  $profile->field_telephone_number = $row['pendingmem_dphone'];
+                if (isset($profrow['pendingmem_dphone'])) {
+                  $profile->field_telephone_number = $profrow['pendingmem_dphone'];
                 }
-                elseif (isset($row['pendingmem_dphone'])) {
-                  $profile->field_telephone_number = $row['pendingmem_nphone'];
+                elseif (isset($profrow['pendingmem_dphone'])) {
+                  $profile->field_telephone_number = $profrow['pendingmem_nphone'];
                 }
-                if (isset($row['pendingship_facebook'])) {
+                if (isset($profrow['pendingship_facebook'])) {
                   $profile->field_user_facebook_url = [
-                    'uri' => $row['pendingship_facebook'],
+                    'uri' => $profrow['pendingship_facebook'],
                     'title' => '',
                     'options' => [],
                   ];
                 }
-                if (isset($row['pendingship_instagram'])) {
+                if (isset($profrow['pendingship_instagram'])) {
                   $profile->field_user_instagram_url = [
-                    'uri' => $row['pendingship_instagram'],
+                    'uri' => $profrow['pendingship_instagram'],
                     'title' => '',
                     'options' => [],
                   ];
                 }
-                if (isset($row['pendingship_twitter'])) {
+                if (isset($profrow['pendingship_twitter'])) {
                   $profile->field_user_twitter_url = [
-                    'uri' => $row['pendingship_twitter'],
+                    'uri' => $profrow['pendingship_twitter'],
                     'title' => '',
                     'options' => [],
                   ];
                 }
-                if (isset($row['pendingship_linkedin'])) {
+                if (isset($profrow['pendingship_linkedin'])) {
                   $profile->field_user_linkedin_url = [
-                    'uri' => $row['pendingship_linkedin'],
+                    'uri' => $profrow['pendingship_linkedin'],
                     'title' => '',
                     'options' => [],
                   ];
@@ -775,44 +775,31 @@ function migrate_order(&$context) {
       ->condition('entity_id', $profid, '=')
       ->fields('a');
     $profdata = $query->execute()->fetchAssoc();
-    $address = [
-      'country_code' => $profdata['commerce_customer_address_country'],
-      'postal_code' => $profdata['commerce_customer_address_postal_code'],
-      'locality' => $profdata['commerce_customer_address_locality'],
-      'address_line1' => $profdata['commerce_customer_address_thoroughfare'],
-      'administrative_area' => $profdata['commerce_customer_address_administrative_area'],
-      'given_name' => $profdata['commerce_customer_address_first_name'],
-      'family_name' => $profdata['commerce_customer_address_last_name'],
-      'dependent_locality' => $profdata['commerce_customer_address_dependent_locality'],
-      'address_line2' => $profdata['commerce_customer_address_premise'],
-      'organization' => $profdata['commerce_customer_address_organisation_name'],
-    ];
+    if ($profdata) {
+      if ($order) {
+        $profile = Profile::load($order->billing_profile->target_id);
+        $profile->setOwnerId($uid);
+      }
+      else {
+        $profile = Profile::create([
+          'type' => 'customer',
+          'uid' => $uid,
+          'status' => TRUE,
+        ]);
+        $profile->address->country_code = $address['country_code'];
+        $profile->address->administrative_area = $address['administrative_area'];
+        $profile->address->locality = $address['locality'];
+        $profile->address->dependent_locality = $address['dependent_locality'];
+        $profile->address->postal_code = $address['postal_code'];
+        $profile->address->address_line1 = $address['address_line1'];
+        $profile->address->address_line2 = $address['address_line2'];
+        $profile->address->organization = $address['organization'];
+        $profile->address->given_name = $address['given_name'];
+        $profile->address->family_name = $address['family_name'];
 
-    if ($order) {
-      $profile = Profile::load($order->billing_profile->target_id);
-      $profile->setOwnerId($uid);
-      $profile->address->country_code = $address['country_code'];
-      $profile->address->administrative_area = $address['administrative_area'];
-      $profile->address->locality = $address['locality'];
-      $profile->address->dependent_locality = $address['dependent_locality'];
-      $profile->address->postal_code = $address['postal_code'];
-      $profile->address->address_line1 = $address['address_line1'];
-      $profile->address->address_line2 = $address['address_line2'];
-      $profile->address->organization = $address['organization'];
-      $profile->address->given_name = $address['given_name'];
-      $profile->address->family_name = $address['family_name'];
+      }
+      $profile->save();
     }
-    else {
-
-      $profile = Profile::create([
-        'type' => 'customer',
-        'uid' => $uid,
-        'status' => TRUE,
-        'address' => $address,
-      ]);
-
-    }
-    $profile->save();
 
     if ($order) {
       if (count($order_items) > 0) {
@@ -822,26 +809,39 @@ function migrate_order(&$context) {
       }
       $order->setEmail($row['mail']);
       $order->setIpAddress($row['hostname']);
-      $order->state = $row['status'];
-      $order->setRefreshState('refresh_on_save');
     }
     else {
       $order = Order::create([
         'order_id' => $order_id,
         'type' => 'default',
-        'state' => $row['status'],
+        'state' => 'completed',
         'mail' => $row['mail'],
         'uid' => $uid,
         'ip_address' => $row['hostname'],
         'order_number' => $order_id,
-        'billing_profile' => $profile,
         'store_id' => 1,
         'order_items' => $order_items,
-        'placed' => $row['created'],
         'created' => $row['created'],
         'data' => $row['data'],
       ]);
     }
+    if (isset($profile)) {
+      $order->billing_profile = $profile;
+    }
+    if ($row['status'] == 'completed' || $row['status'] == 'canceled') {
+      $order->state = 'completed';
+      $order->placed = $row['created'];
+      $order->completed = $row['created'];
+    }
+    elseif ($row['status'] == 'processing' || $row['status'] == 'pending') {
+      $order->state = 'validation';
+      $order->placed = $row['created'];
+    }
+    elseif ($row['status'] == 'cart' ||$row['status'] == 'checkout_' ||$row['status'] == 'checkout_payment' ||$row['status'] == 'checkout_review') {
+      $order->state = 'draft';
+      $order->cart = 1;
+    }
+    $order->setRefreshState('refresh_on_save');
     $order->save();
 
     // Get payments.
@@ -851,6 +851,7 @@ function migrate_order(&$context) {
     $payresult = $query->execute();
 
     while ($payrow = $payresult->fetchAssoc()) {
+      // dpm($payrow);
       // Check if the payment exists already.
       $query = \Drupal::entityQuery('commerce_payment')
         ->condition('order_id', $order_id, '=')
@@ -863,27 +864,65 @@ function migrate_order(&$context) {
 
       if (count($pids) == 0) {
         $price = new Price($payrow['amount'] / 100, $payrow['currency_code']);
+        if ($payrow['payment_method'] == 'paypal_ec') {
+          $payment_type = 'paypal_checkout';
+          $payment_gateway = 'paypal_ec';
+        }
+        elseif ($payrow['payment_method'] == 'commerce_cheque') {
+          $payment_type = 'payment_manual';
+          $payment_gateway = 'cheque';
+        }
+        $order->payment_gateway = $payment_gateway;
 
         $payment = Payment::create([
-          'type' => 'paypal_checkout',
-          'payment_gateway' => 'paypal_sandbox',
+          'type' => $payment_type,
+          'payment_gateway' => $payment_gateway,
           'order_id' => $order->id(),
           'amount' => $price,
-          'state' => 'completed',
+          'state' => $payrow['status'],
           'remote_id' => $payrow['remote_id'],
-          'payment_method' => $payrow['payment_method'],
           'remote_state' => $payrow['remote_status'],
-          'completed' => $payrow['changed'],
-
+          'payment_method' => $payrow['payment_method'],
         ]);
+        if ($payrow['status'] == 'completed') {
+          $payment->completed = $payrow['changed'];
+        }
         $payment->save();
+        $order->checkout_step = 'complete';
+        $order->checkout_flow = 'default';
+        $order->setRefreshState('refresh_on_save');
+        $order->save();
       }
     }
     $context['sandbox']['current']++;
   }
 
   $context['finished'] = $context['sandbox']['current'] / $context['sandbox']['max'];
-
+  if ($context['finished'] >= 1) {
+    $database = \Drupal::database();
+    $query = $database->select('commerce_order', 'o');
+    $query->addExpression('MAX(o.order_id)', 'order_id');
+    $number = $query->execute()->fetchField();
+    $query = $database->select('commerce_number_pattern_sequence', 'n')
+      ->condition('store_id', 1, '=');
+    $count = $query->countQuery()->execute()->fetchField();
+    if ($count == 1) {
+      $query = $database->update('commerce_number_pattern_sequence')
+        ->fields(['number' => $number, 'generated' => time()])
+        ->condition('store_id', 1, '=')
+        ->execute();
+    }
+    else {
+      $query = $database->insert('commerce_number_pattern_sequence')
+        ->fields([
+          'entity_id' => 'order_default',
+          'store_id' => 1,
+          'number' => $number,
+          'generated' => time(),
+        ])
+        ->execute();
+    }
+  }
 }
 
 /**
