@@ -273,7 +273,6 @@ function migrate_users(&$context) {
  * Function to migrate nodes.
  */
 function migrate_nodes(&$context) {
-  $context['message'] = t('Migrating Nodes');
   $limit = 10;
   $con = Database::getConnection('default', 'migrate');
   // Prepare the sandbox.
@@ -310,6 +309,7 @@ function migrate_nodes(&$context) {
 
   $nids = $context['sandbox']['nids'];
   $current = $context['sandbox']['current'];
+  $context['message'] = t('Migrating Nodes: @nid',['@nid'=>$current]);
   $nids = array_slice($nids, $current, $limit, TRUE);
   $searchnids = [];
   $curnid = 0;
