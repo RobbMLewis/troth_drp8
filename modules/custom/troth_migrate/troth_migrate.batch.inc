@@ -598,7 +598,6 @@ function menu_hierarchy(&$context) {
  * Migrates Orders.
  */
 function migrate_order(&$context) {
-  $context['message'] = t('Migrating Orders');
   $limit = 50;
   $con = Database::getConnection('default', 'migrate');
   // Prepare the sandbox.
@@ -628,6 +627,7 @@ function migrate_order(&$context) {
   }
   $variations = $context['sandbox']['variations'];
   $current = $context['sandbox']['current'] + 1;
+  $context['message'] = t('Migrating Orders: @id',['@id'=>$current]);
   $query = $con->select('commerce_order', 'o')
     ->fields('o')
     ->orderBy('order_id')
