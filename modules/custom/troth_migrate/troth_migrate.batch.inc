@@ -303,7 +303,7 @@ function migrate_nodes(&$context) {
     $nids = $query->execute()->fetchAllAssoc(0, 0);
 
     $context['sandbox']['nids'] = $nids;
-    $context['sandbox']['max'] = count($nids);
+    $context['sandbox']['max'] = count($nids)-1;
     $context['sandbox']['current'] = 0;
   }
 
