@@ -21,3 +21,12 @@ troth_user.member_search:
     _form: '\Drupal\troth_user\Form\TrothUserSearchForm'  
   requirements:
     _permission: 'troth user view member pages'
+troth_user.index:  
+  path: '/index'  
+  title: 'Welcome to the New Troth Website!'
+  menu_name: main 
+  defaults:  
+    _controller: '\Drupal\troth_user\Controller\TrothUserController::mainPage'
+    _title: 'Welcome to the New Troth Website!'
+  requirements:  
+    _access: 'TRUE'

@@ -1,0 +1,4 @@
+troth_user.index:  
+  route_name: troth_user.index
+  title: 'Welcome to the New Troth Website!'
+  base_route: troth_user.index
