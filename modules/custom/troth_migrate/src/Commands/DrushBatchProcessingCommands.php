@@ -54,8 +54,8 @@ class DrushBatchProcessingCommands extends DrushCommands {
     ];
     $batch['operations'][] = ['migrate_roles', []];
     $batch['operations'][] = ['migrate_users', []];
-    $batch['operations'][] = ['migrate_nodes', []];
-    $batch['operations'][] = ['menu_hierarchy', []];
+    //$batch['operations'][] = ['migrate_nodes', []];
+    //$batch['operations'][] = ['menu_hierarchy', []];
     $batch['operations'][] = ['migrate_order', []];
     // 5. Add batch operations as new batch sets.
     batch_set($batch);
