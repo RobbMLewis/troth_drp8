@@ -9,6 +9,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\troth_maps\Entity\TrothMapsDownloads;
 use Drupal\troth_maps\Entity\TrothMapsZipcodes;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\geofield\GeoPHP\GeoPHPWrapper;
 
 /**
  * Function to delete old files.
@@ -257,13 +258,15 @@ function troth_maps_valid_url($url) {
  * Use MySQL to union geoms.
  */
 function troth_maps_mysql_union($geom1, $geom2) {
+  $geophp = new GeoPHPWrapper();
   $database = \Drupal::database();
   $query = $database->query("select ST_AsText(ST_Union(ST_GeomFromText(:geom1), ST_GeomFromText(:geom2))) as geom", [
     ':geom1' => $geom1->out('wkt'),
     ':geom2' => $geom2->out('wkt'),
   ]);
   $result = $query->fetchAssoc();
-  return $result['geom'];
+  $geom = $geophp->load($result['geom'], 'wkt');
+  return $geom;
 }
 
 /**
