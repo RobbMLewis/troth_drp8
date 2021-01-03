@@ -108,7 +108,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
         ],
       ];
 
-      if (count($build_values['country']) == 0) {
+      if (!isset($build_values['country']) || count($build_values['country']) == 0) {
         $form['multi_country']['#default_value'] = 0;
         $form['country_multi']['#default_value'] = 'US';
       }
