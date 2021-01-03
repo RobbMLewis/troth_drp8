@@ -136,8 +136,8 @@ function troth_maps_download_zips() {
               $valid = FALSE;
               while ($valid == FALSE) {
                 $testurl = str_replace('{year}', $year, $zurl);
-                $response = get_headers($testurl)[0];
-                if (preg_match('/ok/i', $response)) {
+                file_get_contents($testurl);
+                if (preg_match('/ok/i', $http_response_header[0])) {
                   $zurl = $testurl;
                   $valid = TRUE;
                 }
