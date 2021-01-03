@@ -78,8 +78,7 @@ function troth_maps_download_zips() {
       $valid = FALSE;
       while ($valid == FALSE) {
         $testurl = str_replace('{year}', $year, $url);
-        $response = get_headers($testurl)[0];
-        if (preg_match('/ok/i', $response)) {
+        if (troth_maps_valid_url($testurl) == TRUE) {
           $url = $testurl;
           $valid = TRUE;
         }
@@ -136,18 +135,9 @@ function troth_maps_download_zips() {
               $valid = FALSE;
               while ($valid == FALSE) {
                 $testurl = str_replace('{year}', $year, $zurl);
-                $curl = curl_init($testurl);
-                curl_setopt($curl, CURLOPT_NOBODY, TRUE);
-                $cresult = curl_exec($curl);
-                if ($result !== FALSE) {
-                  $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-                  if ($statusCode != '404') {
-                    $zurl = $testurl;
-                    $valid = TRUE;
-                  }
-                  else {
-                    $year = $year - 1;
-                  }
+                if (troth_maps_valid_url($testurl) == TRUE) {
+                  $zurl = $testurl;
+                  $valid = TRUE;
                 }
                 else {
                   $year = $year - 1;
@@ -242,6 +232,25 @@ function troth_maps_entity_presave(EntityInterface $entity) {
     }
     $entity->field_major_region = $majorregion;
   }
+}
+
+/**
+ * Checks url exists.
+ */
+function troth_maps_valid_url($url) {
+  $curl = curl_init($url);
+  curl_setopt($curl, CURLOPT_NOBODY, TRUE);
+  $result = curl_exec($curl);
+  if ($result !== FALSE) {
+    $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($statusCode == '404') {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 /**
