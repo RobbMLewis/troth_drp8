@@ -254,6 +254,19 @@ function troth_maps_valid_url($url) {
 }
 
 /**
+ * Use MySQL to union geoms.
+ */
+function troth_maps_mysql_union($geom1, $geom2) {
+  $database = \Drupal::database();
+  $query = $database->query("select ST_AsText(ST_Union(ST_GeomFromText(:geom1), ST_GeomFromText(:geom2))) as geom", [
+    ':geom1' => $geom1,
+    ':geom2' => $geom2,
+  ]);
+  $result = $query->fetchAssoc();
+  return $result['geom'];
+}
+
+/**
  * Testing Function.
  */
 function troth_maps_test() {

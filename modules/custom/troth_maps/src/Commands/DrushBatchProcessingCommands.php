@@ -164,6 +164,7 @@ class DrushBatchProcessingCommands extends DrushCommands {
     // 7. Log some information.
     $this->loggerChannelFactory->get('troth_maps')->info('Update batch operations end.');
   }
+
   /**
    * Update User Region.
    *
@@ -191,4 +192,5 @@ class DrushBatchProcessingCommands extends DrushCommands {
     // 7. Log some information.
     $this->loggerChannelFactory->get('troth_maps')->info('Update batch operations end.');
   }
+
 }

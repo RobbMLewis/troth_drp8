@@ -766,7 +766,12 @@ function create_region_shape($regid, &$context) {
           }
           else {
             $geom = $context['sandbox']['geom'];
-            $context['sandbox']['geom'] = $geom->union($cgeom);
+            if ($geom->geos() != FALSE) {
+              $context['sandbox']['geom'] = $geom->union($cgeom);
+            }
+            else {
+              $context['sandbox']['geom'] = troth_maps_mysql_union($geom, $cgeom);
+            }
           }
           unset($context['sandbox']['country'][$key]);
           break;
@@ -785,7 +790,12 @@ function create_region_shape($regid, &$context) {
           }
           else {
             $geom = $context['sandbox']['geom'];
-            $context['sandbox']['geom'] = $geom->union($sgeom);
+            if ($geom->geos() != FALSE) {
+              $context['sandbox']['geom'] = $geom->union($sgeom);
+            }
+            else {
+              $context['sandbox']['geom'] = troth_maps_mysql_union($geom, $sgeom);
+            }
           }
           unset($context['sandbox']['state'][$key]);
           break;
@@ -804,7 +814,12 @@ function create_region_shape($regid, &$context) {
           }
           else {
             $geom = $context['sandbox']['geom'];
-            $context['sandbox']['geom'] = $geom->union($cgeom);
+            if ($geom->geos() != FALSE) {
+              $context['sandbox']['geom'] = $geom->union($cgeom);
+            }
+            else {
+              $context['sandbox']['geom'] = troth_maps_mysql_union($geom, $cgeom);
+            }
           }
           unset($context['sandbox']['county'][$key]);
           break;
@@ -823,7 +838,12 @@ function create_region_shape($regid, &$context) {
           }
           else {
             $geom = $context['sandbox']['geom'];
-            $context['sandbox']['geom'] = $geom->union($zgeom);
+            if ($geom->geos() != FALSE) {
+              $context['sandbox']['geom'] = $geom->union($zgeom);
+            }
+            else {
+              $context['sandbox']['geom'] = troth_maps_mysql_union($geom, $zgeom);
+            }
           }
           unset($context['sandbox']['zipcode'][$key]);
           break;
@@ -855,21 +875,21 @@ function update_user_region(&$context) {
   // Prepare the sandbox.
   if (empty($context['sandbox'])) {
     $count = \Drupal::entityQuery('user')
-      ->condition('uid',10,'>=')
+      ->condition('uid', 10, '>=')
       ->count()->execute();
-    $context['sandbox']['max'] = $count -1;
+    $context['sandbox']['max'] = $count - 1;
     $context['sandbox']['current'] = 0;
   }
   $context['message'] = t("Update User's region, update # @current of @max.", [
     '@current' => $context['sandbox']['current'],
-    '@max'=>$context['sandbox']['max'],
-    ]);
+    '@max' => $context['sandbox']['max'],
+  ]);
   $current = $context['sandbox']['current'];
   $uids = \Drupal::entityQuery('user')
-     ->condition('uid',10,'>=')
-    ->range($current,$limit)
+    ->condition('uid', 10, '>=')
+    ->range($current, $limit)
     ->execute();
-  foreach($uids as $uid){
+  foreach ($uids as $uid) {
     $account = User::load($uid);
     $account->save();
     $context['sandbox']['current']++;
