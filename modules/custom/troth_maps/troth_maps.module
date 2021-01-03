@@ -136,13 +136,21 @@ function troth_maps_download_zips() {
               $valid = FALSE;
               while ($valid == FALSE) {
                 $testurl = str_replace('{year}', $year, $zurl);
-                file_get_contents($testurl);
-                if (preg_match('/ok/i', $http_response_header[0])) {
-                  $zurl = $testurl;
-                  $valid = TRUE;
-                }
-                else {
-                  $year = $year - 1;
+                $curl = curl_init($testurl);
+                curl_setopt($curl, CURLOPT_NOBODY, TRUE);
+                $cresult = curl_exec($curl);
+                if ($result !== FALSE) {
+                  $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                  if ($statusCode != '404') {
+                    $zurl = $testurl;
+                    $valid = TRUE;
+                  }
+                  else {
+                    $year = $year - 1;
+                  }
+                  else {
+                    $year = $year - 1;
+                  }
                 }
               }
             }
@@ -231,18 +239,21 @@ function troth_maps_entity_presave(EntityInterface $entity) {
     else {
       $entity->field_region = $majorregion;
     }
-      $entity->field_major_region = $majorregion;
+    $entity->field_major_region = $majorregion;
   }
 }
 
-function troth_maps_test(){
-    $batch = [
-      'title' => t('Importing Shapes'),
-      'init_message' => t('The shape files are being imported'),
-      'operations' => [],
-      'file' => drupal_get_path('module', 'troth_maps') . '/troth_maps_import.batch.inc',
-      'finished' => 'batch_finish_callback',
-    ];
-    $batch['operations'][] = ['update_user_region', []];
-    batch_set($batch);
+/**
+ * Testing Function.
+ */
+function troth_maps_test() {
+  $batch = [
+    'title' => t('Importing Shapes'),
+    'init_message' => t('The shape files are being imported'),
+    'operations' => [],
+    'file' => drupal_get_path('module', 'troth_maps') . '/troth_maps_import.batch.inc',
+    'finished' => 'batch_finish_callback',
+  ];
+  $batch['operations'][] = ['update_user_region', []];
+  batch_set($batch);
 }
