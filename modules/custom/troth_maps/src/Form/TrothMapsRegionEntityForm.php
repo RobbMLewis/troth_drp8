@@ -62,7 +62,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
         $form['kml_color'] = [
           '#type' => 'jquery_colorpicker',
           '#title' => t('Map Color'),
-          '#default_value' => $this->entity->getKmlColor() ?: $this->entity->getKmlColor(),
+          '#default_value' => $this->entity->getKmlColor() ? $this->entity->getKmlColor() : '#FFFFFF',
         ];
       }
 
