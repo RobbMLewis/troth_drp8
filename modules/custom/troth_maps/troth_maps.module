@@ -148,9 +148,10 @@ function troth_maps_download_zips() {
                   else {
                     $year = $year - 1;
                   }
-                  else {
-                    $year = $year - 1;
-                  }
+                }
+                else {
+                  $year = $year - 1;
+
                 }
               }
             }
