@@ -357,7 +357,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
       }
       elseif ($type == 'region') {
         $border_color = NULL;
-        $transparency = '0.1';
+        $transparency = '0.3';
         $create_shape = 1;
       }
       else {
