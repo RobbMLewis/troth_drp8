@@ -24,7 +24,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
     else {
       $regiontype = $this->entity->getRegionType();
     }
-
+    
     $form['prefix'] = [
       '#type' => 'item',
       '#markup' => t('<p>Modify or update various map and region related parts of the website</p>'),
@@ -58,11 +58,11 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
     ];
     if ($regiontype != 'special') {
       // Get countries from address module and create entities.
-      if (\Drupal::moduleHandler()->moduleExists('jquery_colorpicker') && $this->entity->getRegionType() == 'region') {
+      if (\Drupal::moduleHandler()->moduleExists('jquery_colorpicker') && $regiontype == 'region') {
         $form['kml_color'] = [
           '#type' => 'jquery_colorpicker',
           '#title' => t('Map Color'),
-          '#default_value' => $this->entity->getKmlColor() ? $this->entity->getKmlColor() : '#FFFFFF',
+          '#default_value' => $this->entity->getKmlColor() ? $this->entity->getKmlColor() : '#FF0000',
         ];
       }
 
