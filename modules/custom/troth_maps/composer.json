@@ -12,7 +12,7 @@
     "license": "GPL-2.0-or-later",
     "minimum-stability": "dev",
     "require": {
-        "drupal/leaflet": "^1.0",
+        "drupal/leaflet": "^2.0",
         "drupal/geocoder": "^3.0",
         "geocoder-php/bing-maps-provider": "^4.0",
         "gasparesganga/php-shapefile": "^3.0"

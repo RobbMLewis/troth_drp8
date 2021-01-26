@@ -10,6 +10,7 @@ use Drupal\troth_maps\Entity\TrothMapsDownloads;
 use Drupal\troth_maps\Entity\TrothMapsZipcodes;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\geofield\GeoPHP\GeoPHPWrapper;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Function to delete old files.
@@ -273,6 +274,9 @@ function troth_maps_mysql_union($geom1, $geom2) {
  * Testing Function.
  */
 function troth_maps_test() {
+  $fname = \Drupal::service('module_handler')->getModule('troth_maps')->getPath() . '/source_data/tmp/gpr_000b11a_e.shp';
+  $term = Term::load(140);
+
   $batch = [
     'title' => t('Importing Shapes'),
     'init_message' => t('The shape files are being imported'),
@@ -280,6 +284,7 @@ function troth_maps_test() {
     'file' => drupal_get_path('module', 'troth_maps') . '/troth_maps_import.batch.inc',
     'finished' => 'batch_finish_callback',
   ];
-  $batch['operations'][] = ['update_user_region', []];
+  $batch['operations'][] = ['import_state', [$term, $fname]];
+//  $batch['operations'][] = ['update_user_region', []];
   batch_set($batch);
 }

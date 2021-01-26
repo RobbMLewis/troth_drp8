@@ -140,11 +140,11 @@ troth_elections.create_pages_admin:
 
 troth_elections.base_form:  
   path: '/members/elections'  
-  title: 'Elections'
+  title: 'Troth Elections'
   menu_name: main 
   defaults:  
     _controller: '\Drupal\troth_elections\Controller\TrothElectionsController::mainPage'
-    _title: 'Elections'
+    _title: 'Troth Elections'
   requirements:  
     _role: member+administrator
 

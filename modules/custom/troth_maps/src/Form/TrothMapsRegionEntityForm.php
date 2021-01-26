@@ -365,6 +365,18 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
         $transparency = NULL;
         $create_shape = 0;
       }
+
+      $entity->setRegionName($region_name);
+      $entity->setRegionEmail($region_email);
+      $entity->setRegionType($type);
+      $entity->setBuildValues(['placeholder'=>'']);
+      $entity->setKmlColor($kml_color);
+      $entity->setBorderColor($border_color);
+      $entity->setTransparency($transparency);
+      $entity->setCreateShape($create_shape);
+      $entity->setArchived($archived);
+      $entity->save();
+      $regid = $entity->getRegid();
       $data = [
         'regid' => $regid,
         'region_name' => $region_name,
@@ -374,16 +386,9 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
         'county' => $county,
         'zipcode' => $zipcode,
       ];
-
-      $entity->setRegionName($region_name);
-      $entity->setRegionEmail($region_email);
-      $entity->setRegionType($type);
       $entity->setBuildValues($data);
-      $entity->setKmlColor($kml_color);
-      $entity->setBorderColor($border_color);
-      $entity->setTransparency($transparency);
-      $entity->setCreateShape($create_shape);
-      $entity->setArchived($archived);
+      $entity->save();
+
 
       // Update zipcode entity.
       if ($type == 'local') {
@@ -477,6 +482,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
       }
       $unset = array_values(array_diff($current, $new));
       $set = array_values(array_diff($new, $current));
+
       $batch = [
         'title' => t('Updating Tables'),
         'init_message' => t('The tables are being updated with new region information'),
