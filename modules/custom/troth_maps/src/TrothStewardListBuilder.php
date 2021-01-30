@@ -76,10 +76,10 @@ class TrothStewardListBuilder extends EntityListBuilder {
     $today = new DrupalDateTime();
     $query = $this->getStorage()->getQuery();
     if ($stewardtype == 'archive') {
-      $query->condition('enddate', $today, '<');
+      $query->condition('enddate', $today->getTimestamp(), '<');
     }
     else {
-      $query->condition('enddate', $today, '>=');
+      $query->condition('enddate', $today->getTimestamp(), '>=');
     }
     $query->sort('enddate', 'DESC');
     return $query->execute();

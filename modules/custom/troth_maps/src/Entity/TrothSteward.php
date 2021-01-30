@@ -29,7 +29,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\troth_maps\TrothStewardListBuilder",
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "Drupal\troth_maps\StewardsViewsData",
  *     "form" = {
  *       "default" = "Drupal\troth_maps\Form\TrothStewardEntityForm",
  *       "add" = "Drupal\troth_maps\Form\TrothStewardEntityForm",
@@ -47,6 +47,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *     "delete-form" = "/admin/config/troth/maps/steward/{troth_steward}/delete",
  *     "collection" = "/admin/config/troth/maps/steward",
  *   },
+
  *   admin_permission = "administer site configuration",
  * )
  */
@@ -110,8 +111,7 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
    * {@inheritdoc}
    */
   public function getStartTimestamp() {
-    $date = new DrupalDateTime($this->get('startdate')->value);
-    return $date->getTimestamp();
+    return $this->get('startdate')->value;
   }
 
   /**
@@ -133,8 +133,7 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
    * {@inheritdoc}
    */
   public function getEndTimestamp() {
-    $date = new DrupalDateTime($this->get('enddate')->value);
-    return $date->getTimestamp();
+    return$this->get('enddate')->value;
   }
 
   /**
@@ -210,7 +209,7 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
       ])
       ->setDescription(t('The user ID of Officer.'));
 
-    $fields['startdate'] = BaseFieldDefinition::create('datetime')
+    $fields['startdate'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Start Date'))
       ->setSettings([
         'datetime_type' => 'date',
@@ -227,9 +226,10 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
         ],
         'weight' => 4,
       ])
+      ->setDefaultValue('1611512773')
       ->setDescription(t("The date the person's term starts."));
 
-    $fields['enddate'] = BaseFieldDefinition::create('datetime')
+    $fields['enddate'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('End Date'))
       ->setSettings([
         'datetime_type' => 'date',
