@@ -226,7 +226,6 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
         ],
         'weight' => 4,
       ])
-      ->setDefaultValue('1611512773')
       ->setDescription(t("The date the person's term starts."));
 
     $fields['enddate'] = BaseFieldDefinition::create('timestamp')

@@ -99,8 +99,7 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
    * {@inheritdoc}
    */
   public function getStartTimestamp() {
-    $date = new DrupalDateTime($this->get('startdate')->value);
-    return $date->getTimestamp();
+    return $this->get('startdate')->value;
   }
 
   /**
@@ -122,8 +121,7 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
    * {@inheritdoc}
    */
   public function getEndTimestamp() {
-    $date = new DrupalDateTime($this->get('enddate')->value);
-    return $date->getTimestamp();
+    return $this->get('enddate')->value;
   }
 
   /**
@@ -176,7 +174,7 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
       ])
       ->setDescription(t('The user ID of Officer.'));
 
-    $fields['startdate'] = BaseFieldDefinition::create('datetime')
+    $fields['startdate'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Start Date'))
       ->setSettings([
         'datetime_type' => 'date',
@@ -194,7 +192,7 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
       ])
       ->setDescription(t("The date the person's term starts."));
 
-    $fields['enddate'] = BaseFieldDefinition::create('datetime')
+    $fields['enddate'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('End Date'))
       ->setSettings([
         'datetime_type' => 'date',

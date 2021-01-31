@@ -89,7 +89,7 @@ class TrothOfficerTypeEntityForm extends BundleEntityFormBase {
       '#type' => 'text_format',
       '#title' => $this->t('Description'),
       '#default_value' => $entity_type->getDescription() ? $entity_type->getDescription()['value'] : '',
-      '#format' => $entity_type->getDescription() ? $entity_type->getDescription()['value'] : 'basic_html',
+      '#format' => $entity_type->getDescription() ? $entity_type->getDescription()['format'] : 'basic_html',
       '#description' => $this->t('Please enter the description of this office.  This should be from the bylaws if possible as it will be used on both the officer page and elections (if enabled).'),
       '#required' => TRUE,
     ];
@@ -220,10 +220,12 @@ class TrothOfficerTypeEntityForm extends BundleEntityFormBase {
         'title' => $entity_type->getName(),
         'link' => ['uri' => $path],
         'menu_name' => 'main',
-        'parent' => 'menu_link_content:' . $parent->uuid(),
         'expanded' => TRUE,
         'weight' => 0,
       ]);
+      if($parent != Null){
+          $menu_link->parent = 'menu_link_content:' . $parent->uuid();
+      }
       $menu_link->save();
     }
 
