@@ -42,6 +42,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\DefaultHtmlRouteProvider",
  *     },
+ *     "storage_schema" = "Drupal\troth_officer\TrothOfficerEntityStorageSchema",
  *   },
  *   links = {
  *     "canonical" = "/admin/config/troth/officer/office/{troth_office}",
