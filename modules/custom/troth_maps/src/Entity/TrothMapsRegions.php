@@ -239,7 +239,7 @@ class TrothMapsRegions extends ContentEntityBase implements TrothMapsRegionsEnti
     $fields['region_name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Region Name'));
 
-    $fields['region_email'] = BaseFieldDefinition::create('string')
+    $fields['region_email'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Region Email'));
 
     $fields['archived'] = BaseFieldDefinition::create('boolean')
