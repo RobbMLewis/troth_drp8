@@ -15,10 +15,11 @@ class TrothOfficerEntityStorageSchema extends SqlContentEntityStorageSchema {
    */
   protected function getEntitySchema(ContentEntityTypeInterface $entity_type, $reset = FALSE) {
     $schema = parent::getEntitySchema($entity_type, $reset);
+    dpm($schema);
 
     // Then target your annoying field and set the 'not null' key to FALSE!
-    if (!empty($schema['troth_office_office_email']['fields']['state'])) {
-      $schema['troth_office_office_email']['fields']['state']['not null'] = FALSE;
+    if (!empty($schema['troth_office']['fields']['office_email'])) {
+      $schema['troth_office']['fields']['office_email']['not null'] = FALSE;
     }
     return $schema;
   }
