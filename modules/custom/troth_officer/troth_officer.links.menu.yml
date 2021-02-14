@@ -1,5 +1,5 @@
-troth_officer_type_entity_task_offices:  
+troth_officer_entity_task_offices:  
   title: 'Troth Officer configuration'  
   route_name: troth_officer.admin_settings_form  
-  description: 'Troth Officer admin'  
+  description: 'Troth Officer admin'
   parent: troth.group.admin 

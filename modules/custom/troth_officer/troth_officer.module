@@ -25,3 +25,15 @@ function troth_officer_office_groups($name = NULL) {
   }
   return($short);
 }
+
+/**
+ * Returns the officer human name by ID.
+ */
+function troth_officer_office_groups_name($id = NULL) {
+  if ($id == NULL) {
+    $groups = [];
+    return $groups;
+  }
+  $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
+  return($groups[$id]['name']);
+}

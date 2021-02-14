@@ -9,7 +9,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\troth_officer\Entity\TrothOfficerType;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\troth_officer\Entity\TrothOfficer;
 
 /**
  * Class TrothOfficerTypeListBuilder.
@@ -52,12 +53,6 @@ class TrothOfficerListBuilder extends EntityListBuilder {
     parent::__construct($entity_type, $storage);
     $this->dateFormatter = $date_formatter;
     $this->renderer = $renderer;
-    $bundles = \Drupal::entityManager()->getBundleInfo('troth_officer');
-    foreach ($bundles as $bundle => $data) {
-      $type = TrothOfficerType::load($bundle);
-      $names[$bundle] = $type->getName();
-    }
-    $this->names = $names;
   }
 
   /**
@@ -75,10 +70,55 @@ class TrothOfficerListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
+  protected function getEntityIds() {
+    $pagetype = \Drupal::routeMatch()->getParameter('pagetype');
+    $today = new DrupalDateTime();
+    $query = $this->getStorage()->getQuery();
+    if ($pagetype == 'archive') {
+      $query->condition('enddate', $today->getTimestamp(), '<');
+      $query->sort('enddate', 'desc');
+      return $query->execute();
+    }
+    else {
+      $query->condition('enddate', $today->getTimestamp(), '>=');
+
+      $query->sort('enddate', 'ASC');
+      $results = $query->execute();
+      $office = [];
+      foreach ($results as $id) {
+        $entity = TrothOfficer::load($id);
+        $office_name = $entity->getOffice()->getName();
+        $group = $entity->getOffice()->getOfficeType();
+        if (!isset($office[$group])) {
+          $office[$group] = [];
+        }
+        if (!isset($office[$group][$office_name])) {
+          $office[$group][$office_name] = [];
+        }
+        $office[$group][$office_name][] = $id;
+      }
+      ksort($office);
+      $ret = [];
+      foreach ($office as $group => $data) {
+        ksort($data);
+        foreach ($data as $name => $ids) {
+          foreach ($ids as $id) {
+            $ret[$id] = $id;
+          }
+        }
+      }
+      return $ret;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
     $header['id'] = $this->t('Entry');
     $header['name'] = $this->t('Office');
     $header['user'] = $this->t('User');
+    $header['email'] = $this->t('Office Email');
     $header['start'] = $this->t('Term Start');
     $header['end'] = $this->t('Term End');
     return $header + parent::buildHeader();
@@ -89,9 +129,13 @@ class TrothOfficerListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\practical\Entity\TrothOfficerEntityInterface $entity */
+    $account = $entity->getOfficer();
+                $fname = $account->field_profile_first_name->value;
+            $lname = $account->field_profile_last_name->value;
     $row['id'] = $entity->toLink($entity->id());
-    $row['list'] = $this->names[$entity->bundle()];
-    $row['name'] = $entity->getOfficer()->toLink($entity->getOfficer()->label());
+    $row['list'] = $entity->getOffice()->getName();
+    $row['name'] = $entity->getOfficer()->toLink("$fname $lname");
+    $row['email'] = $entity->getOffice()->getEmail();
     $row['start'] = $this->dateFormatter->format($entity->getStartTimestamp(), 'troth_date');
     $row['end'] = $this->dateFormatter->format($entity->getEndTimestamp(), 'troth_date');
     return $row + parent::buildRow($entity);

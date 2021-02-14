@@ -3,14 +3,14 @@ troth_officer.admin_settings_form:
   title: 'Officer Groups'
   base_route: troth_officer.admin_settings_form	
 
-troth_officer_type_entity_task_edit:
-  route_name: entity.troth_officer_type.edit_form
-  base_route: entity.troth_officer_type.canonical		
+troth_office_entity_task_edit:
+  route_name: entity.troth_office.edit_form
+  base_route: entity.troth_office.canonical		
   title: 'Edit'
 
-troth_officer_type_entity_task_delete:
-  route_name:  entity.troth_officer_type.delete_form
-  base_route:  entity.troth_officer_type.canonical	
+troth_office_entity_task_delete:
+  route_name:  entity.troth_office.delete_form
+  base_route:  entity.troth_office.canonical	
   title: Delete
   weight: 10
 
@@ -32,8 +32,8 @@ troth_officer_entity_task_delete:
   weight: 10
 
 
-troth_officer_type_entity_task_offices:
-  route_name: entity.troth_officer_type.collection
+troth_office_entity_task_offices:
+  route_name: entity.troth_office.collection
   base_route: troth_officer.admin_settings_form	
   title: 'Offices'
 
@@ -41,3 +41,8 @@ troth_officer_entity_task_officers:
   route_name: entity.troth_officer.collection		
   base_route: troth_officer.admin_settings_form
   title: 'Officers'
+  
+troth_officer_entity_task_officers_archives:
+  route_name: troth_officer.officer_archive_listbuilder		
+  base_route: troth_officer.admin_settings_form
+  title: 'Officer Archives'

@@ -52,3 +52,34 @@ troth_officer.archive_office_page:
     _role: 'member+administrator'
   options:
     no_cache: 'TRUE'
+
+
+troth_officer.add_office:
+  path: admin/config/troth/officer/office/add
+  defaults:
+    _entity_form: 'troth_office'  
+    _title: 'Add Office'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+troth_officer.add_officer:
+  path: admin/config/troth/officer/officer/add
+  defaults:
+    _entity_form: 'troth_officer'  
+    _title: 'Add Officer'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE
+    
+troth_officer.officer_archive_listbuilder:
+  path: admin/config/troth/officer/officer_archive
+  defaults:
+    _entity_list: 'troth_officer'
+    _title: 'Archived Officers'
+    pagetype: 'archive'
+  requirements:  
+    _permission: 'access administration pages'  
+  options:  
+    _admin_route: TRUE

@@ -50,6 +50,43 @@ interface TrothOfficerEntityInterface extends EntityChangedInterface {
   public function setOfficerId($uid);
 
   /**
+   * Returns the entity office entity.
+   *
+   * @return \Drupal\troth_officer\Entity\TrothOfficeEntityInterface
+   *   The office entity.
+   */
+  public function getOffice();
+
+  /**
+   * Sets the entity office entity.
+   *
+   * @param \Drupal\troth_officer\Entity\TrothOfficeEntityInterface $office
+   *   The office entity.
+   *
+   * @return $this
+   */
+  public function setOffice(TrothOfficeEntityInterface $office);
+
+  /**
+   * Returns the entity office ID.
+   *
+   * @return int|null
+   *   The office ID, or NULL in case the office ID field has not been set
+   *   on the entity.
+   */
+  public function getOfficeId();
+
+  /**
+   * Sets the entity office ID.
+   *
+   * @param int $office_id
+   *   The office id.
+   *
+   * @return $this
+   */
+  public function setOfficeId($office_id);
+
+  /**
    * Gets the TrothOfficer entity creation timestamp.
    *
    * @return int

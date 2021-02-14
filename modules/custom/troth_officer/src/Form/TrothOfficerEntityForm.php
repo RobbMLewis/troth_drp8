@@ -13,10 +13,20 @@ class TrothOfficerEntityForm extends ContentEntityForm {
   /**
    * {@inheritdoc}
    */
+  public function form(array $form, FormStateInterface $form_state) {
+    $form = parent::form($form, $form_state);
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function save(array $form, FormStateInterface $form_state) {
     $entity = &$this->entity;
     $account = $entity->getOfficer();
-    $roles = $entity->bundle->entity->getRoles();
+    // $roles = $entity->bundle->entity->getRoles();
+    $roles = [];
     $added = [];
     foreach ($roles as $rid => $name) {
       if ($name === $rid) {
@@ -32,7 +42,7 @@ class TrothOfficerEntityForm extends ContentEntityForm {
     ]));
     $message_params = [
       '%entity_label' => $entity->id(),
-      '%bundle_label' => $entity->bundle->entity->getName(),
+    // '%bundle_label' => $entity->bundle->entity->getName(),
     ];
     $status = parent::save($form, $form_state);
     switch ($status) {

@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\user\UserInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Defines the troth_officer entity.
@@ -18,7 +17,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *   base_table = "troth_officer",
  *   entity_keys = {
  *     "id" = "id",
- *     "bundle" = "bundle",
+ *     "office_id" = "office_id",
  *     "uid" = "uid",
  *     "startdate" = "startdate",
  *     "enddate" = "enddate",
@@ -43,15 +42,11 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *   },
  *   links = {
  *     "canonical" = "/admin/config/troth/officer/officer/{troth_officer}",
- *     "add-page" = "/admin/config/troth/officer/officer/add",
- *     "add-form" = "/admin/config/troth/officer/officer/add/{troth_officer_type}",
  *     "edit-form" = "/admin/config/troth/officer/officer/{troth_officer}/edit",
  *     "delete-form" = "/admin/config/troth/officer/officer/{troth_officer}/delete",
  *     "collection" = "/admin/config/troth/officer/officer",
  *   },
  *   admin_permission = "administer site configuration",
- *   bundle_entity_type = "troth_officer_type",
- *   field_ui_base_route = "entity.troth_officer_type.edit_form",
  * )
  */
 class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterface {
@@ -85,6 +80,36 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
    */
   public function setOfficerId($uid) {
     $this->set('uid', $uid);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOffice() {
+    return $this->get('office_id')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOffice(TrothOfficeEntityInterface $office) {
+    $this->set('office_id', $office->id());
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOfficeId() {
+    return $this->get('office_id')->target_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setOfficeId($office_id) {
+    $this->set('office_id', $office_id);
     return $this;
   }
 
@@ -173,6 +198,27 @@ class TrothOfficer extends ContentEntityBase implements TrothOfficerEntityInterf
         ],
       ])
       ->setDescription(t('The user ID of Officer.'));
+
+    $fields['office_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Office Name'))
+      ->setSetting('target_type', 'troth_office')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('view', [
+        'label' => 'visible',
+        'type' => 'string',
+        'weight' => 1,
+      ])
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ])
+      ->setDescription(t('The Office Name.'));
 
     $fields['startdate'] = BaseFieldDefinition::create('timestamp')
       ->setLabel(t('Start Date'))
