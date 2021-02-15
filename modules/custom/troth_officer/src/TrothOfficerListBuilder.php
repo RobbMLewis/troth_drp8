@@ -130,8 +130,8 @@ class TrothOfficerListBuilder extends EntityListBuilder {
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\practical\Entity\TrothOfficerEntityInterface $entity */
     $account = $entity->getOfficer();
-                $fname = $account->field_profile_first_name->value;
-            $lname = $account->field_profile_last_name->value;
+    $fname = $account->field_profile_first_name->value;
+    $lname = $account->field_profile_last_name->value;
     $row['id'] = $entity->toLink($entity->id());
     $row['list'] = $entity->getOffice()->getName();
     $row['name'] = $entity->getOfficer()->toLink("$fname $lname");
