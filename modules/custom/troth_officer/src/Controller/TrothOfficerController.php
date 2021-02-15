@@ -6,8 +6,9 @@ use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\troth_officer\Entity\TrothOfficer;
-use Drupal\troth_officer\Entity\TrothOfficerType;
+use Drupal\troth_officer\Entity\TrothOffice;
 use Drupal\Core\Url;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Provides route responses for the Example module.
@@ -21,11 +22,15 @@ class TrothOfficerController extends ControllerBase {
    *   A simple renderable array.
    */
   public function groupPage($group = NULL) {
+    $group = $this->stripHtml($group);
+
     if ($group == NULL || $group == '') {
       throw new NotFoundHttpException();
     }
 
     $group = troth_officer_office_groups($group);
+    $groupid = key($group);
+
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
@@ -33,6 +38,7 @@ class TrothOfficerController extends ControllerBase {
     // We have a valid path, lets get the group information:
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
+
     if ($group['archive']) {
       throw new NotFoundHttpException();
     }
@@ -43,18 +49,24 @@ class TrothOfficerController extends ControllerBase {
     ];
 
     $items = [];
-    $types = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_officer');
+    $query = \Drupal::entityQuery('troth_office');
+    $query->condition('office_type', $groupid, '=');
+    $types = $query->execute();
+
     $current_path = \Drupal::service('path.current')->getPath();
     $current_path = \Drupal::request()->getRequestUri();
-    foreach ($types as $bundle => $data) {
-      $type = TrothOfficerType::load($bundle);
+    $current_path = $this->stripHtml($current_path);
+    foreach ($types as $office_id => $data) {
+      $type = TrothOffice::load($office_id);
+      $office_name = $type->getName();
+      $path = $this->getMachineName($office_name);
       $now = new DateTimePlus();
       $query = \Drupal::entityQuery('troth_officer')
         ->condition('enddate', $now->format('U'), '>=')
-        ->condition('bundle', $bundle, '=');
+        ->condition('office_id', $office_id, '=');
       $entids = $query->execute();
       if (count($entids) == 0) {
-        $items[$bundle] = ['#markup' => "<a href=\"$current_path/$bundle\">" . $data['label'] . "</a>: Open"];
+        $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path\">" . $office_name . "</a>: Open"];
       }
       else {
         $names = [];
@@ -64,7 +76,7 @@ class TrothOfficerController extends ControllerBase {
           $names[] = $officer->field_profile_first_name->value . " " . $officer->field_profile_last_name->value;
         }
         $name = implode(', ', $names);
-        $items[$bundle] = ['#markup' => "<a href=\"$current_path/$bundle\">" . $data['label'] . "</a>: $name"];
+        $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>: $name"];
       }
     }
     $output[] = [
@@ -72,6 +84,7 @@ class TrothOfficerController extends ControllerBase {
       '#list_type' => 'ul',
       '#items' => $items,
     ];
+
     $output = $this->addEditLink($output);
     return $output;
   }
@@ -86,17 +99,27 @@ class TrothOfficerController extends ControllerBase {
     if ($group == NULL || $group == '' || $office == NULL || $office == '') {
       throw new NotFoundHttpException();
     }
+    $group = $this->stripHtml($group);
+    $office = $this->stripHtml($office);
 
     $group = troth_officer_office_groups($group);
+    $groupid = key($group);
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
-    $types = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_officer');
-    if (!in_array($office, array_keys($types))) {
+    $query = \Drupal::entityQuery('troth_office');
+    $query->condition('office_type', $groupid, '=');
+    $query->condition('office_name', $office, 'like');
+    $types = $query->execute();
+    $query = \Drupal::entityQuery('troth_officer');
+    $query->condition('office_id', $types, 'in');
+    $count = $query->count()->execute();
+
+    if ($count == 0) {
       throw new NotFoundHttpException();
     }
 
-    $type = TrothOfficerType::load($office);
+    $type = TrothOffice::load(key($types));
     // We have a valid path, lets get the group information:
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
@@ -109,11 +132,13 @@ class TrothOfficerController extends ControllerBase {
     $output[] = [
       '#markup' => $type->getDescription()['value'],
     ];
+
     $now = new DateTimePlus();
     $query = \Drupal::entityQuery('troth_officer')
       ->condition('enddate', $now->format('U'), '>=')
-      ->condition('bundle', $office, '=');
+      ->condition('office_id', $types, 'in');
     $entids = $query->execute();
+
     if (count($entids) == 0) {
       $output[] = [
         '#plain_text' => "The office is currently open.",
@@ -180,6 +205,7 @@ class TrothOfficerController extends ControllerBase {
         ->getForm($message);
       $output[] = $form;
     }
+
     $output = $this->addEditLink($output);
     return $output;
   }
@@ -200,7 +226,7 @@ class TrothOfficerController extends ControllerBase {
       $name = $group['name'];
       $dir = $group['shortname'];
       $output[] = [
-        '#markup' => t('<li><a href="/leadership/archives/@dir">@name</a></li>', [
+        '#markup' => t('<li><a href="/about/leadership/archives/@dir.html">@name</a></li>', [
           '@dir' => $dir,
           '@name' => $name,
         ]),
@@ -217,11 +243,14 @@ class TrothOfficerController extends ControllerBase {
    *   A simple renderable array.
    */
   public function archivePage($group = NULL) {
+    $group = $this->stripHtml($group);
     if ($group == NULL || $group == '') {
       throw new NotFoundHttpException();
     }
 
     $group = troth_officer_office_groups($group);
+    $groupid = key($group);
+
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
@@ -236,16 +265,24 @@ class TrothOfficerController extends ControllerBase {
     ];
 
     $items = [];
-    $types = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_officer');
+    $query = \Drupal::entityQuery('troth_office');
+    $query->condition('office_type', $groupid, '=');
+    $types = $query->execute();
+
     $current_path = \Drupal::service('path.current')->getPath();
     $current_path = \Drupal::request()->getRequestUri();
-    foreach ($types as $bundle => $data) {
+    $current_path = $this->stripHtml($current_path);
+    foreach ($types as $office_id => $data) {
+
+      $type = TrothOffice::load($office_id);
+      $office_name = $type->getName();
+      $path = $this->getMachineName($office_name);
       $now = new DateTimePlus();
       $query = \Drupal::entityQuery('troth_officer')
         ->condition('enddate', $now->format('U'), '>=')
-        ->condition('bundle', $bundle, '=');
+        ->condition('office_id', $office_id, '=');
       $entids = $query->execute();
-      $items[$bundle] = ['#markup' => "<a href=\"$current_path/$bundle\">" . $data['label'] . "</a>"];
+      $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>"];
     }
     $output[] = [
       '#theme' => 'item_list',
@@ -266,17 +303,27 @@ class TrothOfficerController extends ControllerBase {
     if ($group == NULL || $group == '' || $office == NULL || $office == '') {
       throw new NotFoundHttpException();
     }
+    $group = $this->stripHtml($group);
+    $office = $this->stripHtml($office);
 
     $group = troth_officer_office_groups($group);
+    $groupid = key($group);
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
-    $types = \Drupal::service('entity_type.bundle.info')->getBundleInfo('troth_officer');
-    if (!in_array($office, array_keys($types))) {
+    $query = \Drupal::entityQuery('troth_office');
+    $query->condition('office_type', $groupid, '=');
+    $query->condition('office_name', $office, 'like');
+    $types = $query->execute();
+    $query = \Drupal::entityQuery('troth_officer');
+    $query->condition('office_id', $types, 'in');
+    $count = $query->count()->execute();
+
+    if ($count == 0) {
       throw new NotFoundHttpException();
     }
 
-    $type = TrothOfficerType::load($office);
+    $type = TrothOffice::load(key($types));
     // We have a valid path, lets get the group information:
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
@@ -288,8 +335,9 @@ class TrothOfficerController extends ControllerBase {
     ];
     $now = new DateTimePlus();
     $query = \Drupal::entityQuery('troth_officer')
-      ->condition('bundle', $office, '=');
+      ->condition('office_id', $types, 'in');
     $entids = $query->execute();
+
     $header = [
       '#picture' => '',
       '#name' => 'Name',
@@ -325,14 +373,14 @@ class TrothOfficerController extends ControllerBase {
       }
       $start = \Drupal::service('date.formatter')->format($entity->getStartDate(), 'troth_date');
       $end = \Drupal::service('date.formatter')->format($entity->getEndDate(), 'troth_date');
-      $rows[$entity->getStartDate()] = [
+      $rows[$entity->getEndDate()] = [
         '#picture' => $picture,
         '#name' => $name,
         '#start' => $start,
         '#end' => $end,
       ];
 
-      ksort($rows);
+      krsort($rows);
       $render['#rows'] = $rows;
       $render['#attributes'] = ['class' => 'troth_officer_table'];
     }
@@ -373,6 +421,27 @@ class TrothOfficerController extends ControllerBase {
       ];
     }
     return $output;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getMachineName($string) {
+    $transliterated = \Drupal::transliteration()->transliterate($string, LanguageInterface::LANGCODE_DEFAULT, '_');
+    $transliterated = mb_strtolower($transliterated);
+
+    $transliterated = preg_replace('@[^a-z0-9_.]+@', '_', $transliterated);
+
+    return $transliterated;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function stripHtml($string) {
+    $string = str_replace('.htm', '', str_replace('.html', '', $string));
+
+    return $string;
   }
 
 }
