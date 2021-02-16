@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\user\Entity\Role;
 use Drupal\contact\Entity\ContactForm;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\troth_officer\Entity\TrothOffice;
 
 /**
  * Form for the TrothOfficerType entity.
@@ -103,6 +104,7 @@ class TrothOfficeEntityForm extends ContentEntityForm {
         $form['office_roles']['#options'][$role->id()] = $role->label();
       }
     }
+    asort($form['office_roles']['#options']);
 
     if (\Drupal::moduleHandler()->moduleExists('troth_elections')) {
       $form['office_open'] = [
@@ -144,6 +146,37 @@ class TrothOfficeEntityForm extends ContentEntityForm {
     }
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    // Enter custom validation here.
+    // We need to confirm name/group is unique.
+    $name = $this->getMachineName($form_state->getValue('office_name'));
+    $type = $form_state->getValue('office_type');
+    $query = \Drupal::entityQuery('troth_office')
+      ->condition('office_type', $type);
+    $officeids = $query->execute();
+    if (count($officeids) > 0) {
+      foreach ($officeids as $id) {
+        $office = TrothOffice::load($id);
+        $officename = $this->getMachineName($office->getName());
+        if ($officename == $name) {
+          $form_state->setErrorByName('office_name', t('The office name ":name" is already in use.', [':name' => $form_state->getValue('office_name')]));
+        }
+      }
+    }
+
+    // We need to confirm email addrss is unique.
+    $email = $form_state->getValue('office_email');
+    $query = \Drupal::entityQuery('troth_office')
+      ->condition('office_email', $email);
+    $count = $query->count()->execute();
+    if ($count > 0) {
+      $form_state->setErrorByName('office_email', t('The office email ":email" is already in use.', [':email' => $email]));
+    }
   }
 
   /**
