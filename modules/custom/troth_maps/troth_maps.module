@@ -48,7 +48,7 @@ function troth_maps_download_url($url = NULL) {
     $file = system_retrieve_file($url, $path);
     return $file;
   }
-  return NULL;
+  return -1;
 }
 
 /**
@@ -168,18 +168,22 @@ function troth_maps_download_zips() {
   foreach ($urls as $tid => $url) {
     $table = $tables[$tid];
     $file = troth_maps_download_url($url);
-    if ($file != NULL) {
+    if ($file != NULL && $file != -1) {
       $files[$table][$tid] = $file;
     }
-    else {
-      $country = explode(":", $tid);
-      $country = $country[1];
-      $dlid = \Drupal::entityQuery('troth_maps_downloads')
-        ->condition('country', $country, 'like')
-        ->execute();
-      $download = TrothMapsDownloads::load($dlid);
-      $download->setLastUpdate($timestamp);
-      $download->save();
+    elseif($file == NULL) {
+      if(!is_numeric($tid)){
+        $country = explode(":", $tid);
+        $country = $country[1];
+        $dlid = \Drupal::entityQuery('troth_maps_downloads')
+          ->condition('country', $country, 'like')
+          ->execute();
+        foreach($dlid as $id){
+          $download = TrothMapsDownloads::load($id);
+          $download->setLastUpdate(time());
+          $download->save();
+        }
+      }
     }
   }
   return $files;
