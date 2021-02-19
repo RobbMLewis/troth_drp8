@@ -115,6 +115,7 @@ class TrothOfficeEntityForm extends ContentEntityForm {
         '#required' => FALSE,
       ];
 
+
       $form['office_number_open'] = [
         '#type' => 'number',
         '#title' => $this->t('Number Open'),
@@ -152,15 +153,21 @@ class TrothOfficeEntityForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+  parent::validateForm($form, $form_state);
     // Enter custom validation here.
+    $entid = $this->entity->id();
+
     // We need to confirm name/group is unique.
     $name = $this->getMachineName($form_state->getValue('office_name'));
     $type = $form_state->getValue('office_type');
     $query = \Drupal::entityQuery('troth_office')
-      ->condition('office_type', $type);
+      ->condition('office_type', $type,'=')
+      ->condition('id',$entid,'!=');
     $officeids = $query->execute();
+
     if (count($officeids) > 0) {
       foreach ($officeids as $id) {
+        dpm($id,$entid);
         $office = TrothOffice::load($id);
         $officename = $this->getMachineName($office->getName());
         if ($officename == $name) {
@@ -172,9 +179,10 @@ class TrothOfficeEntityForm extends ContentEntityForm {
     // We need to confirm email addrss is unique.
     $email = $form_state->getValue('office_email');
     $query = \Drupal::entityQuery('troth_office')
-      ->condition('office_email', $email);
+      ->condition('office_email', $email,'like')
+      ->condition('id',$entid, '!=');
     $count = $query->count()->execute();
-    if ($count > 0) {
+    if ($count > 0 && $email != '') {
       $form_state->setErrorByName('office_email', t('The office email ":email" is already in use.', [':email' => $email]));
     }
   }
@@ -200,12 +208,12 @@ class TrothOfficeEntityForm extends ContentEntityForm {
     $entity->setNumOpen(0);
     if (\Drupal::moduleHandler()->moduleExists('troth_elections')) {
       $office_open = $form_state->getValue('office_open');
-      $entity->setOpen($office_open);
       $office_number_open = $form_state->getValue('office_number_open');
-      $entity->setNumOpen($office_number_open);
+        $entity->setOpen($office_open);
+        $entity->setNumOpen($office_number_open);
     }
-
     $status = $entity->save();
+
     $email = $entity->getEmail();
     $officeName = $entity->getName();
     $officeType = $entity->getOfficeType();
