@@ -5,7 +5,7 @@ namespace Drupal\troth_elections\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
-use Drupal\troth_officer\Entity\TrothOfficerType;
+use Drupal\troth_officer\Entity\TrothOffice;
 use Drupal\troth_elections\Entity\TrothElectionsNominationType;
 use Drupal\Core\Url;
 
@@ -103,7 +103,7 @@ class TrothElectionsAcceptNomForm extends FormBase {
             ->execute();
           if (count($results) >= $num_required) {
 
-            $office = TrothOfficerType::load($office_id);
+            $office = TrothOffice::load($office_id);
             $offices[$office_id] = $office->getName();
             $accepted = $nomination->getAccepted();
             $declined = $nomination->getDeclined();

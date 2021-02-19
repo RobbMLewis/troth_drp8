@@ -118,12 +118,12 @@ function troth_elections_tokens($type, $tokens, array $data = [], array $options
   if ($type == 'troth-elections') {
     global $base_url;
     $storage = \Drupal::entityTypeManager()
-      ->getStorage('troth_officer_type');
+      ->getStorage('troth_office');
 
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'offices':
-          $results = \Drupal::entityQuery('troth_officer_type')
+          $results = \Drupal::entityQuery('troth_office')
             ->condition('office_number_open', 0, '>')
             ->condition('office_open', 1, '=')
             ->execute();
@@ -140,7 +140,7 @@ function troth_elections_tokens($type, $tokens, array $data = [], array $options
           break;
 
         case 'offices-or':
-          $results = \Drupal::entityQuery('troth_officer_type')
+          $results = \Drupal::entityQuery('troth_office')
             ->condition('office_number_open', 0, '>')
             ->condition('office_open', 1, '=')
             ->execute();
@@ -378,8 +378,8 @@ function troth_elections_valid_voter($uid = NULL) {
  */
 function troth_elections_nomination_display() {
   $officestorage = \Drupal::entityTypeManager()
-    ->getStorage('troth_officer_type');
-  $results = \Drupal::entityQuery('troth_officer_type')
+    ->getStorage('troth_office');
+  $results = \Drupal::entityQuery('troth_office')
     ->condition('office_number_open', 0, '>')
     ->condition('office_open', 1, '=')
     ->execute();
@@ -547,8 +547,8 @@ function troth_elections_voters() {
 function troth_candidate_statements() {
   // Get all open offices.
   $officestorage = \Drupal::entityTypeManager()
-    ->getStorage('troth_officer_type');
-  $results = \Drupal::entityQuery('troth_officer_type')
+    ->getStorage('troth_office');
+  $results = \Drupal::entityQuery('troth_office')
     ->condition('office_number_open', 0, '>')
     ->condition('office_open', 1, '=')
     ->execute();
@@ -742,8 +742,8 @@ function troth_election_db_results($public = NULL) {
 
   // Get all open offices.
   $officestorage = \Drupal::entityTypeManager()
-    ->getStorage('troth_officer_type');
-  $results = \Drupal::entityQuery('troth_officer_type')
+    ->getStorage('troth_office');
+  $results = \Drupal::entityQuery('troth_office')
     ->condition('office_number_open', 0, '>')
     ->condition('office_open', 1, '=')
     ->execute();

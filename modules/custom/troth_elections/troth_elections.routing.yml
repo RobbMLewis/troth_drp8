@@ -11,7 +11,7 @@ troth_elections.admin_settings_form:
 troth_elections_offices_type.listbuilder:  
   path: '/admin/config/troth/elections/office'  
   defaults:  
-    _entity_list: 'troth_officer_type'
+    _entity_list: 'troth_office'
     _title: 'TrothElectionsOfficerTypeListBuilder'  
   requirements:  
     _permission: 'access administration pages,troth elections officer'  

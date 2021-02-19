@@ -7,7 +7,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\User;
 use Drupal\troth_elections\Entity\TrothElectionsNominationType;
 use Drupal\troth_elections\Entity\TrothElectionsNomination;
-use Drupal\troth_officer\Entity\TrothOfficerType;
+use Drupal\troth_officer\Entity\TrothOffice;
 
 /**
  * Edit Troth User Admin form.
@@ -112,8 +112,8 @@ class TrothElectionsMakeNomForm extends FormBase {
         $uids = $storage['uids'];
         unset($storage['uids']);
         $officestorage = \Drupal::entityTypeManager()
-          ->getStorage('troth_officer_type');
-        $results = \Drupal::entityQuery('troth_officer_type')
+          ->getStorage('troth_office');
+        $results = \Drupal::entityQuery('troth_office')
           ->condition('office_number_open', 0, '>')
           ->condition('office_open', 1, '=')
           ->execute();
@@ -377,7 +377,7 @@ class TrothElectionsMakeNomForm extends FormBase {
       if ($altmail != '') {
         $email = "$email / $altmail";
       }
-      $office = TrothOfficerType::load($office_id);
+      $office = TrothOffice::load($office_id);
       $storage['name'] = "$lastName, $firstName; $email";
       $storage['office'] = $office->getName();
     }

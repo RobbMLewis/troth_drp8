@@ -47,8 +47,8 @@ class TrothElectionsExportVote extends FormBase {
 
     // Get office data.
     $officestorage = \Drupal::entityTypeManager()
-      ->getStorage('troth_officer_type');
-    $results = \Drupal::entityQuery('troth_officer_type')
+      ->getStorage('troth_office');
+    $results = \Drupal::entityQuery('troth_office')
       ->condition('office_number_open', 0, '>')
       ->condition('office_open', 1, '=')
       ->execute();

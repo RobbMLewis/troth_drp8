@@ -38,11 +38,14 @@ class TrothElectionsPropositionTypeEntityForm extends BundleEntityFormBase {
     $form['text'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Text of Proposition'),
-      '#default_value' => $entity_type->getText()['value'] ?: '',
-      '#format' => $entity_type->getText()['format'],
       '#description' => $this->t('Please enter the text of the Proposition to be voted on.'),
       '#required' => TRUE,
     ];
+    $text = $entity_type->getText();
+    if($text != ''){
+      $form['text']['#default_value'] = $text['value'];
+      $form['text']['#format'] = $text['format']; 
+    }     
 
     $form['options'] = [
       '#type' => 'textarea',
