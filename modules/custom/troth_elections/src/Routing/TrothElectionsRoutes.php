@@ -21,10 +21,10 @@ class TrothElectionsRoutes {
     $year = $votingStartDate->format('Y');
 
     // Year Page.
-    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year, $language) == FALSE) {
+    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year."/index.html", $language) == FALSE) {
       $route = new Route(
       // Path to attach this route to:
-      '/members/elections/' . $year,
+      '/members/elections/' . $year ."/index.html",
       // Route defaults:
       [
         '_controller' => '\Drupal\troth_elections\Controller\TrothElectionsController::summaryPage',
@@ -41,10 +41,10 @@ class TrothElectionsRoutes {
     }
 
     // Nomination Page.
-    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/nominations', $language) == FALSE) {
+    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/nominations.html', $language) == FALSE) {
       $route = new Route(
       // Path to attach this route to:
-      '/members/elections/' . $year . '/nominations',
+      '/members/elections/' . $year . '/nominations.html',
       // Route defaults:
       [
         '_controller' => '\Drupal\troth_elections\Controller\TrothElectionsController::nominationDisplay',
@@ -61,10 +61,10 @@ class TrothElectionsRoutes {
     }
 
     // Candidate Statemsnts Page.
-    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/candidates', $language) == FALSE) {
+    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/candidates.html', $language) == FALSE) {
       $route = new Route(
       // Path to attach this route to:
-      '/members/elections/' . $year . '/candidates',
+      '/members/elections/' . $year . '/candidates.html',
       // Route defaults:
       [
         '_controller' => '\Drupal\troth_elections\Controller\TrothElectionsController::candidateStatements',
@@ -81,10 +81,10 @@ class TrothElectionsRoutes {
     }
 
     // Voters Page.
-    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/voters', $language) == FALSE) {
+    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . '/voters.html', $language) == FALSE) {
       $route = new Route(
       // Path to attach this route to:
-      '/members/elections/' . $year . '/voters',
+      '/members/elections/' . $year . '/voters.html',
       // Route defaults:
       [
         '_controller' => '\Drupal\troth_elections\Controller\TrothElectionsController::voters',

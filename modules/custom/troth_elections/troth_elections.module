@@ -282,11 +282,12 @@ function troth_elections_eligible_voters($uid = NULL, $message = FALSE) {
     ->condition('field_profile_member_expire_date', $electionStartDate->format('Y-m-d'), '>=')
     ->condition('field_profile_member_start_date', $oneyear->format('Y-m-d'), '<=')
     ->condition('field_profile_membership_control', $control, 'in')
-    ->condition('field_profile_birth_date', $eighteen->format('Y-m-d'), '>=');
+    ->condition('field_profile_birth_date', $eighteen->format('Y-m-d'), '<=');
   if (is_numeric($uid)) {
     $query->condition('uid', $uid, '=');
   }
   $uids = $query->execute();
+
 
   // Lifetime member query.
   $query = \Drupal::entityQuery('user')
@@ -308,14 +309,14 @@ function troth_elections_eligible_voters($uid = NULL, $message = FALSE) {
   if (!in_array($uid, $voters) && $message) {
     // We want to throw errors for why they are not voters.
     $account = user_load($uid);
-    if (!in_array($account->field_profile_membership_status->value, $control)) {
+    if (!in_array($account->field_profile_membership_status->value, $status)) {
       // They failed with status.
       drupal_set_message(t("You are not an elgible voter because your membership status is @status.  Allowed statuses are @allowed.  Please contatct the clerk at clerk@thetroth.org for more information.", [
         '@status' => $account->field_profile_membership_status->value,
         '@allowed' => implode(', ', $status),
       ]), 'warning');
     }
-    if (!in_array($account->field_profile_membership_control->value, $status)) {
+    if (!in_array($account->field_profile_membership_control->value, $control)) {
       // They failed with control.
       drupal_set_message(t("You are not an elgible voter because your membership control is @control.  Allowed controls are @allowed.  Please contatct the clerk at clerk@thetroth.org for more information.", [
         '@control' => $account->field_profile_membership_control->value,
@@ -408,13 +409,13 @@ function troth_elections_nomination_display() {
     if ($nomination->getNominated() == 1) {
       $status = 'Queried';
     }
-    elseif ($nomination->getAccepted() == 1) {
+    if ($nomination->getAccepted() == 1) {
       $status = 'Accepted';
     }
-    elseif ($nomination->getDeclined() == 1) {
+    if ($nomination->getDeclined() == 1) {
       $status = 'Declined';
     }
-    elseif ($nomination->getIneligible() == 1) {
+    if ($nomination->getIneligible() == 1) {
       $status = 'Ineligible';
     }
     $offices[$office_id]['noms'][$name . $uid] = [
@@ -473,7 +474,10 @@ function troth_elections_nomination_display() {
     $header = ["Name", "Nomination Status"];
     $rows = [];
     foreach ($office['noms'] as $name => $data) {
-      $rows[] = [$data['name'], $data['status']];
+      $rows[] = [
+        ['data'=>$data['name'], 'align' => 'center'],
+        ['data'=>$data['status'], 'align' => 'center'],
+      ];
     }
     $output[] = [
       '#theme' => 'table',

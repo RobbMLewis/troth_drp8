@@ -87,7 +87,7 @@ class TrothElectionsController extends ControllerBase {
     ];
 
     if ($today >= $nominationStart) {
-      $url = Url::fromUserInput($parent . "/" . $year . "/nominations");
+      $url = Url::fromUserInput($parent . "/" . $year . "/nominations.html");
       $output[] = [
         '#markup' => $this->t('<p><a href=":url">Nominations</a></p>', [
           ':url' => $url->toString(),
@@ -95,7 +95,7 @@ class TrothElectionsController extends ControllerBase {
       ];
     }
     if ($today >= $bioEnd) {
-      $url = Url::fromUserInput($parent . "/" . $year . "/candidates");
+      $url = Url::fromUserInput($parent . "/" . $year . "/candidates.html");
       $output[] = [
         '#markup' => $this->t('<p><a href=":url">Candidate Statements</a></p>', [
           ':url' => $url->toString(),
@@ -103,7 +103,7 @@ class TrothElectionsController extends ControllerBase {
       ];
     }
     if ($today >= $voteStart) {
-      $url = Url::fromUserInput($parent . "/" . $year . "/voters");
+      $url = Url::fromUserInput($parent . "/" . $year . "/voters.html");
       $output[] = [
         '#markup' => $this->t('<p><a href=":url">Members Voting</a></p>', [
           ':url' => $url->toString(),
