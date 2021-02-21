@@ -23,6 +23,7 @@ function troth_officer_office_groups($name = NULL) {
       $short[$id] = $data['shortname'];
     }
   }
+  asort($short);
   return($short);
 }
 
