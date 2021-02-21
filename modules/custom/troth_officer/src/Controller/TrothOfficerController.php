@@ -178,7 +178,7 @@ class TrothOfficerController extends ControllerBase {
         $name = $officer->field_profile_first_name->value . " " . $officer->field_profile_last_name->value;
         $start = \Drupal::service('date.formatter')->format($entity->getStartDate(), 'troth_date');
         $end = \Drupal::service('date.formatter')->format($entity->getEndDate(), 'troth_date');
-        $rows[$entity->getStartDate()] = [
+        $rows[$entity->getStartDate() . $name] = [
           '#picture' => $picture,
           '#name' => $name,
           '#start' => $start,
@@ -373,7 +373,7 @@ class TrothOfficerController extends ControllerBase {
       }
       $start = \Drupal::service('date.formatter')->format($entity->getStartDate(), 'troth_date');
       $end = \Drupal::service('date.formatter')->format($entity->getEndDate(), 'troth_date');
-      $rows[$entity->getEndDate()] = [
+      $rows[$entity->getEndDate() . $name] = [
         '#picture' => $picture,
         '#name' => $name,
         '#start' => $start,
