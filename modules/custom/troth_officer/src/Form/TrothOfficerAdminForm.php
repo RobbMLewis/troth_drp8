@@ -228,6 +228,20 @@ class TrothOfficerAdminForm extends ConfigFormBase {
 
         $result = $query->execute();
         $menu_link_id = (!empty($result)) ? reset($result) : FALSE;
+        if (!$menu_link_id) {
+          // We need to check by alias.
+          $parentpath = '/about/leadership.html';
+          $leaderpath = \Drupal::service('path.alias_manager')->getPathByAlias($parentpath);
+          $leaderpath = Url::fromUri("internal:" . $leaderpath)->getRouteParameters();
+          $parentpath = 'entity:node/' . $leaderpath['node'];
+          $query = \Drupal::entityQuery('menu_link_content')
+            ->condition('link.uri', $parentpath)
+            ->condition('menu_name', 'main');
+
+          $result = $query->execute();
+          $menu_link_id = (!empty($result)) ? reset($result) : FALSE;
+        }
+
         $parent = MenuLinkContent::load($menu_link_id);
         $menu_link = MenuLinkContent::create([
           'title' => $data['name'],
