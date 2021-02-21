@@ -342,7 +342,13 @@ class TrothElectionsMakeNomForm extends FormBase {
           ]);
           $params['sub'] = "You have been nominated for the Troth elections.";
           $params['from'] = $eoEmail;
-          $to = "$nomEmail,$eoEmail";
+          $debug = \Drupal::config('troth_elections.adminsettings')->get('troth_elections_debug');
+          if ($debug == 1) {
+            $to = $eoEmail;
+          }
+          else {
+            $to = "$nomEmail,$eoEmail";
+          }
           $result = $mailManager->mail('troth_user', 'troth_mail', $to, $langcode, $params, NULL, TRUE);
           if ($result['result'] != TRUE) {
             \Drupal::logger('troth_elections')->error('Nominations Email did not send to: %to, %message', [
