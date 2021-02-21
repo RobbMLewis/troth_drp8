@@ -30,7 +30,6 @@ class TrothOfficerController extends ControllerBase {
 
     $group = troth_officer_office_groups($group);
     $groupid = key($group);
-
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
@@ -39,7 +38,7 @@ class TrothOfficerController extends ControllerBase {
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
 
-    if (isset($group['archive'])) {
+    if (isset($group['archive']) && $group['archive'] != 0) {
       throw new NotFoundHttpException();
     }
     $output = [];
@@ -123,7 +122,7 @@ class TrothOfficerController extends ControllerBase {
     // We have a valid path, lets get the group information:
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
-    if ($group['archive']) {
+    if (isset($group['archive']) && $group['archive'] != 0) {
       throw new NotFoundHttpException();
     }
 
