@@ -55,37 +55,44 @@ class TrothOfficerController extends ControllerBase {
     $current_path = \Drupal::service('path.current')->getPath();
     $current_path = \Drupal::request()->getRequestUri();
     $current_path = $this->stripHtml($current_path);
-    foreach ($types as $office_id => $data) {
-      $type = TrothOffice::load($office_id);
-      $office_name = $type->getName();
-      $path = $this->getMachineName($office_name);
-      $now = new DateTimePlus();
-      $query = \Drupal::entityQuery('troth_officer')
-        ->condition('enddate', $now->format('U'), '>=')
-        ->condition('office_id', $office_id, '=');
-      $entids = $query->execute();
-      if (count($entids) == 0) {
-        $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path\">" . $office_name . "</a>: Open"];
-      }
-      else {
-        $names = [];
-        foreach ($entids as $entid) {
-          $entity = TrothOfficer::load($entid);
-          $officer = $entity->getOfficer();
-          $names[] = $officer->field_profile_first_name->value . " " . $officer->field_profile_last_name->value;
-        }
-        $name = implode(', ', $names);
-        $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>: $name"];
-      }
+    if (count($types) == 1) {
+      $type = TrothOffice::load(reset($types));
+      $office = $type->getName();
+      return $this->officePage($group['shortname'], $office);
     }
-    $output[] = [
-      '#theme' => 'item_list',
-      '#list_type' => 'ul',
-      '#items' => $items,
-    ];
+    else {
+      foreach ($types as $office_id => $data) {
+        $type = TrothOffice::load($office_id);
+        $office_name = $type->getName();
+        $path = $this->getMachineName($office_name);
+        $now = new DateTimePlus();
+        $query = \Drupal::entityQuery('troth_officer')
+          ->condition('enddate', $now->format('U'), '>=')
+          ->condition('office_id', $office_id, '=');
+        $entids = $query->execute();
+        if (count($entids) == 0) {
+          $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path\">" . $office_name . "</a>: Open"];
+        }
+        else {
+          $names = [];
+          foreach ($entids as $entid) {
+            $entity = TrothOfficer::load($entid);
+            $officer = $entity->getOfficer();
+            $names[] = $officer->field_profile_first_name->value . " " . $officer->field_profile_last_name->value;
+          }
+          $name = implode(', ', $names);
+          $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>: $name"];
+        }
+      }
+      $output[] = [
+        '#theme' => 'item_list',
+        '#list_type' => 'ul',
+        '#items' => $items,
+      ];
 
-    $output = $this->addEditLink($output);
-    return $output;
+      $output = $this->addEditLink($output);
+      return $output;
+    }
   }
 
   /**
@@ -98,14 +105,15 @@ class TrothOfficerController extends ControllerBase {
     if ($group == NULL || $group == '' || $office == NULL || $office == '') {
       throw new NotFoundHttpException();
     }
-    $group = $this->stripHtml($group);
-    $office = $this->stripHtml($office);
+    $group = strtolower($this->stripHtml($group));
+    $office = strtolower($this->stripHtml($office));
 
     $group = troth_officer_office_groups($group);
     $groupid = key($group);
     if (count($group) == 0) {
       throw new NotFoundHttpException();
     }
+
     $query = \Drupal::entityQuery('troth_office');
     $query->condition('office_type', $groupid, '=');
     $query->condition('office_name', $office, 'like');
@@ -271,25 +279,32 @@ class TrothOfficerController extends ControllerBase {
     $current_path = \Drupal::service('path.current')->getPath();
     $current_path = \Drupal::request()->getRequestUri();
     $current_path = $this->stripHtml($current_path);
-    foreach ($types as $office_id => $data) {
-
-      $type = TrothOffice::load($office_id);
-      $office_name = $type->getName();
-      $path = $this->getMachineName($office_name);
-      $now = new DateTimePlus();
-      $query = \Drupal::entityQuery('troth_officer')
-        ->condition('enddate', $now->format('U'), '>=')
-        ->condition('office_id', $office_id, '=');
-      $entids = $query->execute();
-      $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>"];
+    if (count($types) == 1) {
+      $type = TrothOffice::load(reset($types));
+      $office = $type->getName();
+      return $this->officePage($group['shortname'], $office);
     }
-    $output[] = [
-      '#theme' => 'item_list',
-      '#list_type' => 'ul',
-      '#items' => $items,
-    ];
-    $output = $this->addEditLink($output);
-    return $output;
+    else {
+
+      foreach ($types as $office_id => $data) {
+        $type = TrothOffice::load($office_id);
+        $office_name = $type->getName();
+        $path = $this->getMachineName($office_name);
+        $now = new DateTimePlus();
+        $query = \Drupal::entityQuery('troth_officer')
+          ->condition('enddate', $now->format('U'), '>=')
+          ->condition('office_id', $office_id, '=');
+        $entids = $query->execute();
+        $items[$office_id] = ['#markup' => "<a href=\"$current_path/$path.html\">" . $office_name . "</a>"];
+      }
+      $output[] = [
+        '#theme' => 'item_list',
+        '#list_type' => 'ul',
+        '#items' => $items,
+      ];
+      $output = $this->addEditLink($output);
+      return $output;
+    }
   }
 
   /**
