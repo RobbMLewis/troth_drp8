@@ -171,14 +171,14 @@ function troth_maps_download_zips() {
     if ($file != NULL && $file != -1) {
       $files[$table][$tid] = $file;
     }
-    elseif($file == NULL) {
-      if(!is_numeric($tid)){
+    elseif ($file == NULL) {
+      if (!is_numeric($tid)) {
         $country = explode(":", $tid);
         $country = $country[1];
         $dlid = \Drupal::entityQuery('troth_maps_downloads')
           ->condition('country', $country, 'like')
           ->execute();
-        foreach($dlid as $id){
+        foreach ($dlid as $id) {
           $download = TrothMapsDownloads::load($id);
           $download->setLastUpdate(time());
           $download->save();

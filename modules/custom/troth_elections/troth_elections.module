@@ -278,7 +278,7 @@ function troth_elections_eligible_voters($uid = NULL, $message = FALSE) {
 
   // Regular member query.
   $query = \Drupal::entityQuery('user')
-    ->condition('field_profile_membership_status', $status , 'in')
+    ->condition('field_profile_membership_status', $status, 'in')
     ->condition('field_profile_member_expire_date', $electionStartDate->format('Y-m-d'), '>=')
     ->condition('field_profile_member_start_date', $oneyear->format('Y-m-d'), '<=')
     ->condition('field_profile_membership_control', $control, 'in')
@@ -288,10 +288,9 @@ function troth_elections_eligible_voters($uid = NULL, $message = FALSE) {
   }
   $uids = $query->execute();
 
-
   // Lifetime member query.
   $query = \Drupal::entityQuery('user')
-    ->condition('field_profile_membership_status', $status , 'in')
+    ->condition('field_profile_membership_status', $status, 'in')
     ->condition('field_profile_membership_control', $control, 'in')
     ->condition('field_profile_expire_issue', '999', '>=');
   if (is_numeric($uid)) {
@@ -467,7 +466,6 @@ function troth_elections_nomination_display() {
     ];
     $output[] = ['#markup' => t('<H2>Nominations are closed</H2>')];
   }
-  $output[] = ['#markup' => t('<p>Once a person has accepted the nomination, their name will become a link to e-mail them.  If you have questions for someone that has accepted a nomination, please use that link to e-mail them.</p>')];
 
   // Build render table for offices and nominees.
   foreach ($offices as $office) {
@@ -475,8 +473,8 @@ function troth_elections_nomination_display() {
     $rows = [];
     foreach ($office['noms'] as $name => $data) {
       $rows[] = [
-        ['data'=>$data['name'], 'align' => 'center'],
-        ['data'=>$data['status'], 'align' => 'center'],
+        ['data' => $data['name'], 'align' => 'center'],
+        ['data' => $data['status'], 'align' => 'center'],
       ];
     }
     $output[] = [

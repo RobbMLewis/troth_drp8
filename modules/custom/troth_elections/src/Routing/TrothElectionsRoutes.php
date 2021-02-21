@@ -21,10 +21,10 @@ class TrothElectionsRoutes {
     $year = $votingStartDate->format('Y');
 
     // Year Page.
-    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year."/index.html", $language) == FALSE) {
+    if (\Drupal::service('path.alias_storage')->aliasExists('/members/elections/' . $year . "/index.html", $language) == FALSE) {
       $route = new Route(
       // Path to attach this route to:
-      '/members/elections/' . $year ."/index.html",
+      '/members/elections/' . $year . "/index.html",
       // Route defaults:
       [
         '_controller' => '\Drupal\troth_elections\Controller\TrothElectionsController::summaryPage',

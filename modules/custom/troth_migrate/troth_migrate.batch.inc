@@ -303,13 +303,13 @@ function migrate_nodes(&$context) {
     $nids = $query->execute()->fetchAllAssoc(0, 0);
 
     $context['sandbox']['nids'] = $nids;
-    $context['sandbox']['max'] = count($nids)-1;
+    $context['sandbox']['max'] = count($nids) - 1;
     $context['sandbox']['current'] = 0;
   }
 
   $nids = $context['sandbox']['nids'];
   $current = $context['sandbox']['current'];
-  $context['message'] = t('Migrating Nodes: @nid',['@nid'=>$current]);
+  $context['message'] = t('Migrating Nodes: @nid', ['@nid' => $current]);
   $nids = array_slice($nids, $current, $limit, TRUE);
   $searchnids = [];
   $curnid = 0;
@@ -627,7 +627,7 @@ function migrate_order(&$context) {
   }
   $variations = $context['sandbox']['variations'];
   $current = $context['sandbox']['current'] + 1;
-  $context['message'] = t('Migrating Orders: @id',['@id'=>$current]);
+  $context['message'] = t('Migrating Orders: @id', ['@id' => $current]);
   $query = $con->select('commerce_order', 'o')
     ->fields('o')
     ->orderBy('order_id')

@@ -24,7 +24,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
     else {
       $regiontype = $this->entity->getRegionType();
     }
-    
+
     $form['prefix'] = [
       '#type' => 'item',
       '#markup' => t('<p>Modify or update various map and region related parts of the website</p>'),
@@ -369,7 +369,7 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
       $entity->setRegionName($region_name);
       $entity->setRegionEmail($region_email);
       $entity->setRegionType($type);
-      $entity->setBuildValues(['placeholder'=>'']);
+      $entity->setBuildValues(['placeholder' => '']);
       $entity->setKmlColor($kml_color);
       $entity->setBorderColor($border_color);
       $entity->setTransparency($transparency);
@@ -388,7 +388,6 @@ class TrothMapsRegionEntityForm extends ContentEntityForm {
       ];
       $entity->setBuildValues($data);
       $entity->save();
-
 
       // Update zipcode entity.
       if ($type == 'local') {

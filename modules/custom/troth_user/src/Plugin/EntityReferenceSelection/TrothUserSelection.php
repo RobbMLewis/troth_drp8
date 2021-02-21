@@ -29,12 +29,12 @@ class TrothUserSelection extends UserSelection {
     if (count($matches) > 1) {
       $or->condition('field_profile_first_name', $matches[0], $match_operator);
       $or->condition('field_profile_last_name', $matches[1], $match_operator);
-      $or->condition('uid',$matches[0],$match_operator);
+      $or->condition('uid', $matches[0], $match_operator);
     }
     else {
       $or->condition('field_profile_first_name', $match, $match_operator);
       $or->condition('field_profile_last_name', $match, $match_operator);
-      $or->condition('uid',$matches[0],$match_operator);
+      $or->condition('uid', $matches[0], $match_operator);
     }
     $or->condition('field_profile_troth_name', $match, $match_operator);
     if ($this->getConfiguration()['include_anonymous']) {

@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\user\UserInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Defines the troth_maps entity.
@@ -47,7 +46,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *     "delete-form" = "/admin/config/troth/maps/steward/{troth_steward}/delete",
  *     "collection" = "/admin/config/troth/maps/steward",
  *   },
-
+ *
  *   admin_permission = "administer site configuration",
  * )
  */
@@ -133,7 +132,7 @@ class TrothSteward extends ContentEntityBase implements TrothStewardEntityInterf
    * {@inheritdoc}
    */
   public function getEndTimestamp() {
-    return$this->get('enddate')->value;
+    return $this->get('enddate')->value;
   }
 
   /**

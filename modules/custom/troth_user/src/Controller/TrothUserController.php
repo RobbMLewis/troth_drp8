@@ -96,7 +96,7 @@ class TrothUserController extends ControllerBase {
     $output[] = [
       '#markup' => $out,
     ];
-            return $output;
+    return $output;
   }
 
 }
