@@ -190,10 +190,10 @@ class TrothOfficerController extends ControllerBase {
       $render['#attributes'] = ['class' => 'troth_officer_table'];
       $output[] = $render;
     }
-    $output[] = [
-      '#markup' => t("<H2>Contact the @office</H2>", ['@office' => $type->getName()]),
-    ];
     if ($type->getEmail() != '') {
+      $output[] = [
+        '#markup' => t("<H2>Contact the @office</H2>", ['@office' => $type->getName()]),
+      ];
       $config = \Drupal::config('contact.settings');
       $contact_form = \Drupal::entityTypeManager()
         ->getStorage('contact_form')
@@ -385,10 +385,10 @@ class TrothOfficerController extends ControllerBase {
       $render['#attributes'] = ['class' => 'troth_officer_table'];
     }
     $output[] = $render;
-    $output[] = [
-      '#markup' => t("<H2>Contact the @office</H2>", ['@office' => $type->getName()]),
-    ];
     if ($type->getEmail() != '') {
+      $output[] = [
+        '#markup' => t("<H2>Contact the @office</H2>", ['@office' => $type->getName()]),
+      ];
       $config = \Drupal::config('contact.settings');
       $contact_form = \Drupal::entityTypeManager()
         ->getStorage('contact_form')
