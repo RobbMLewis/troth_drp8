@@ -39,7 +39,7 @@ class TrothOfficerController extends ControllerBase {
     $groups = unserialize(\Drupal::config('troth_officer.adminsettings')->get('groups'));
     $group = $groups[array_key_first($group)];
 
-    if ($group['archive']) {
+    if (isset($group['archive'])) {
       throw new NotFoundHttpException();
     }
     $output = [];
