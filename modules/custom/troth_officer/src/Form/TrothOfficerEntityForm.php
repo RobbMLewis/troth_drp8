@@ -54,7 +54,7 @@ class TrothOfficerEntityForm extends ContentEntityForm {
         drupal_set_message($this->t('Saved the %bundle_label entity:  %entity_label.', $message_params));
     }
     $officer_entity_id = $entity->getEntityType()->id();
-    $form_state->setRedirect("entity.{$officer_entity_id}.canonical", [$officer_entity_id => $entity->id()]);
+    $form_state->setRedirectUrl($entity->toUrl('collection'));
   }
 
 }
