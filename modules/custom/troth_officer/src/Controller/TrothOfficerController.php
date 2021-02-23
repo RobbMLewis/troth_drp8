@@ -184,7 +184,12 @@ class TrothOfficerController extends ControllerBase {
         }
         $name = $officer->field_profile_first_name->value . " " . $officer->field_profile_last_name->value;
         $start = \Drupal::service('date.formatter')->format($entity->getStartDate(), 'troth_date');
-        $end = \Drupal::service('date.formatter')->format($entity->getEndDate(), 'troth_date');
+        if ($type->getTerm() > 0) {
+          $end = \Drupal::service('date.formatter')->format($entity->getEndDate(), 'troth_date');
+        }
+        else {
+          $end = "No End Date";
+        }
         $rows[$entity->getStartDate() . $name] = [
           '#picture' => $picture,
           '#name' => $name,

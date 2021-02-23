@@ -79,7 +79,7 @@ class TrothOfficeEntityForm extends ContentEntityForm {
       '#type' => 'number',
       '#title' => $this->t('Term Length'),
       '#step' => 1,
-      '#min' => 0,
+      '#min' => -1,
       '#max' => 3,
       '#default_value' => $this->entity->getTerm() ?: 2,
       '#description' => $this->t('How many years is the term for this office?'),
