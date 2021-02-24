@@ -68,10 +68,39 @@ class TrothOfficeListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
+  public function load() {
+
+    $entity_query = \Drupal::service('entity.query')->get('troth_office');
+    $header = $this->buildHeader();
+
+    $entity_query->pager(50);
+    $entity_query->tableSort($header);
+
+    $entids = $entity_query->execute();
+
+    return $this->storage->loadMultiple($entids);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
-    $header['office_name'] = $this->t('Office Name');
-    $header['office_type'] = $this->t('Office Group');
-    $header['office_email'] = $this->t('Email');
+    $header['office_name'] = [
+      'data' => $this->t('Office Name'),
+      'field' => 'office_name',
+      'specifier' => 'office_name',
+    ];
+    $header['office_type'] = [
+      'data' => $this->t('Office Group'),
+      'field' => 'office_type',
+      'specifier' => 'office_type',
+    ];
+
+    $header['office_email'] = [
+      'data' => $this->t('Email'),
+      'field' => 'office_email',
+      'specifier' => 'office_email',
+    ];
 
     return $header + parent::buildHeader();
   }
