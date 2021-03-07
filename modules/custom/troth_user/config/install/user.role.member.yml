@@ -4,5 +4,32 @@ dependencies: {  }
 id: member
 label: Member
 weight: -8
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'access checkout'
+  - 'access comments'
+  - 'access content'
+  - 'access site-wide contact form'
+  - 'display eu cookie compliance popup'
+  - 'view Terms and Conditions'
+  - 'view any blog content'
+  - 'view any children_and_youth content'
+  - 'view any clergy content'
+  - 'view any date content'
+  - 'view any in_reach content'
+  - 'view any international_relations content'
+  - 'view any lore content'
+  - 'view any memorial_hall content'
+  - 'view any public_page content'
+  - 'view any publications content'
+  - 'view any red_hammer_page content'
+  - 'view any shop content'
+  - 'view any slideshow content'
+  - 'view any steward content'
+  - 'view any troth_kindred_program content'
+  - 'view any webform content'
+  - 'view default commerce_product'
+  - 'view donation commerce_product'
+  - 'view files'
+  - 'view media'
+  - 'view membership_renew commerce_product'
