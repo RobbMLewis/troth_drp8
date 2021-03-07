@@ -35,6 +35,7 @@ class CustomAccessCheck implements AccessInterface {
       // Not covered by these access checks, return neutral.
       return AccessResult::neutral();
     }
+    return AccessResult::neutral();
   }
 
   /**
