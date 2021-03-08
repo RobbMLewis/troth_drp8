@@ -4,5 +4,6 @@ dependencies: {  }
 id: lore
 label: Lore
 weight: 1
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'view any lore content'

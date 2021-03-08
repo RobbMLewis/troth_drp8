@@ -4,5 +4,15 @@ dependencies: {  }
 id: children_and_youth
 label: 'Children and Youth'
 weight: -7
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create children_and_youth content'
+  - 'delete any children_and_youth content'
+  - 'delete children_and_youth revisions'
+  - 'delete own children_and_youth content'
+  - 'edit any children_and_youth content'
+  - 'edit own children_and_youth content'
+  - 'revert children_and_youth revisions'
+  - 'view any children_and_youth content'
+  - 'view children_and_youth revisions'
+  - 'view own children_and_youth content'

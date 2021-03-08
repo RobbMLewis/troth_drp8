@@ -4,5 +4,15 @@ dependencies: {  }
 id: steward_edit_files
 label: 'Steward edit files'
 weight: 11
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create steward content'
+  - 'delete any steward content'
+  - 'delete steward revisions'
+  - 'delete own steward content'
+  - 'edit any steward content'
+  - 'edit own steward content'
+  - 'revert steward revisions'
+  - 'view any steward content'
+  - 'view steward revisions'
+  - 'view own steward content'

@@ -4,5 +4,15 @@ dependencies: {  }
 id: clergy_edit_files
 label: 'Clergy edit files'
 weight: -5
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create clergy content'
+  - 'delete any clergy content'
+  - 'delete clergy revisions'
+  - 'delete own clergy content'
+  - 'edit any clergy content'
+  - 'edit own clergy content'
+  - 'revert clergy revisions'
+  - 'view any clergy content'
+  - 'view clergy revisions'
+  - 'view own clergy content'

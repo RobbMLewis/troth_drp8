@@ -4,5 +4,15 @@ dependencies: {  }
 id: red_hammer
 label: 'Red Hammer'
 weight: 17
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create red_hammer_page content'
+  - 'delete any red_hammer_page content'
+  - 'delete red_hammer_page revisions'
+  - 'delete own red_hammer_page content'
+  - 'edit any red_hammer_page content'
+  - 'edit own red_hammer_page content'
+  - 'revert red_hammer_page revisions'
+  - 'view any red_hammer_page content'
+  - 'view red_hammer_page revisions'
+  - 'view own red_hammer_page content'

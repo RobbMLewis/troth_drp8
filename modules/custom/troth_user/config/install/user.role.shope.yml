@@ -4,5 +4,15 @@ dependencies: {  }
 id: shope
 label: Shope
 weight: 8
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create shop content'
+  - 'delete any shop content'
+  - 'delete shop revisions'
+  - 'delete own shop content'
+  - 'edit any shop content'
+  - 'edit own shop content'
+  - 'revert shop revisions'
+  - 'view any shop content'
+  - 'view shop revisions'
+  - 'view own shop content'

@@ -4,5 +4,15 @@ dependencies: {  }
 id: public_relations
 label: 'Public Relations'
 weight: 6
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create blog content'
+  - 'delete any blog content'
+  - 'delete blog revisions'
+  - 'delete own blog content'
+  - 'edit any blog content'
+  - 'edit own blog content'
+  - 'revert blog revisions'
+  - 'view any blog content'
+  - 'view blog revisions'
+  - 'view own blog content'

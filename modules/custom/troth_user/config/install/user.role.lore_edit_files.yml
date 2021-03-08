@@ -4,5 +4,15 @@ dependencies: {  }
 id: lore_edit_files
 label: 'Lore edit files'
 weight: 2
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create lore content'
+  - 'delete any lore content'
+  - 'delete lore revisions'
+  - 'delete own lore content'
+  - 'edit any lore content'
+  - 'edit own lore content'
+  - 'revert lore revisions'
+  - 'view any lore content'
+  - 'view lore revisions'
+  - 'view own lore content'

@@ -4,5 +4,15 @@ dependencies: {  }
 id: international_relations
 label: 'International Relations'
 weight: 0
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create international_relations content'
+  - 'delete any international_relations content'
+  - 'delete international_relations revisions'
+  - 'delete own international_relations content'
+  - 'edit any international_relations content'
+  - 'edit own international_relations content'
+  - 'revert international_relations revisions'
+  - 'view any international_relations content'
+  - 'view international_relations revisions'
+  - 'view own international_relations content'

@@ -4,5 +4,15 @@ dependencies: {  }
 id: troth_kindred_program
 label: 'Troth Kindred Program'
 weight: 13
-is_admin: null
-permissions: {  }
+is_admin: false
+permissions:
+  - 'create troth_kindred_program content'
+  - 'delete any troth_kindred_program content'
+  - 'delete troth_kindred_program revisions'
+  - 'delete own troth_kindred_program content'
+  - 'edit any troth_kindred_program content'
+  - 'edit own troth_kindred_program content'
+  - 'revert troth_kindred_program revisions'
+  - 'view any troth_kindred_program content'
+  - 'view troth_kindred_program revisions'
+  - 'view own troth_kindred_program content'
